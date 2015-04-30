@@ -433,7 +433,7 @@ var Map=new Class({
 		var tips=this.tips;
 		this.map.options.minZoom=0;
 		var z=this.map.getBoundsZoom(bounds);
-		//this.map.setMaxBounds(bounds);
+		this.map.setMaxBounds(bounds);
 
 		this.map.options.minZoom=z;
 		this.bounds=bounds;
