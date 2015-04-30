@@ -1,0 +1,266 @@
+*
+{
+	box-sizing  : border-box;
+	font-family : roboto;
+}
+
+html, button, input, select, textarea, .pure-g [class *= "pure-u"]
+{
+	font-family : roboto;
+}
+
+.pure-button
+{
+	border-radius : 0px;
+}
+
+body, html
+{
+	position : relative;
+	width    : 100%;
+	height   : 100%;
+	/*font-size: 12px;*/
+}
+
+header
+{
+	line-height : 2em;
+	padding     : 1em;
+	position    : relative;
+	z-index     : 3;
+}
+
+.filters
+{
+	position   : absolute;
+	z-index    : 2;
+	width      : 100%;
+	height     : 15em;
+	top        : -15em;
+	left       : 0px;
+	display    : block;
+	border     : 0px;
+	padding    : 0px;
+	transition : all 250ms;
+}
+
+.filters.visible
+{
+	top : 0%;
+}
+
+.map
+{
+	position : relative;
+	width    : 100%;
+	height   : 56em;
+	z-index  : 1;
+}
+
+.filters nav.filter-btn
+{
+	display  : block;
+	position : absolute;
+	height   : 1em;
+	bottom   : -1em;
+	right    : 1em;
+}
+
+.filters nav.filter-tab-switch
+{
+	display  : block;
+	position : absolute;
+	height   : 1em;
+	bottom   : -1em;
+	width    : 25em;
+}
+
+.filter-tab section.select
+{
+	padding-left  : 1em;
+	padding-right : 1em;
+}
+
+.filter-tab section.select header
+{
+	font-weight : bold;
+	padding     : 0;
+}
+
+.filter-tab section.select select
+{
+	width : 100%;
+}
+
+.filters nav.filter-tab-switch a.pure-button
+{
+	display      : block;
+	margin-right : 4px;
+}
+
+#map-main
+{
+	height : 100%;
+}
+
+.year-container
+{
+	height   : 150px;
+	position : relative;
+}
+
+.year-container div
+{
+	position         : absolute;
+	width            : 100%;
+	height           : 10%;
+	background-color : #3c6494;;
+	bottom           : 0px;
+	color            : #fff;
+	padding          : 0px;
+	margin           : 0px;
+}
+
+.year-container div.sel
+{
+	background-color : #ca7e7d;
+}
+
+.map-control
+{
+	position : absolute;
+	width    : 5.4em;
+	left     : 2em;
+	z-index  : 2;
+	bottom   : 2em;
+}
+
+.map-control span a
+{
+	margin     : 0.2em;
+	display    : block;
+	text-align : center;
+}
+
+.map-control span a.pure-button
+{
+	padding-left  : 0px;
+	padding-right : 0px;
+
+}
+
+.map-control span a.pure-button, .filters nav.filter-tab-switch a.pure-button, .filters nav.filter-btn a.pure-button
+{
+	box-shadow : 2px 4px 6px 0px rgba(0, 0, 0, 0.5);
+}
+
+ul.years
+{
+	padding          : 0px;
+	margin           : 0px;
+	list-style-image : none;
+	margin-top       : 2em;
+	display          : inline-block;
+	width            : 100%;
+	padding-left     : 1em;
+	padding-right    : 1em;
+}
+
+ul.years li
+{
+	display       : inline-block;
+	text-align    : center;
+	margin        : 0px;
+	padding-left  : 2px;
+	padding-right : 2px;
+	width         : 6.25%;
+}
+
+ul.years li div.year-val
+{
+	padding-top : 1em;
+	border-top  : 1px solid #000;
+	margin-top  : 0.2em;
+	font-size   : 0.6em;
+}
+
+ul.years li div.year-container div
+{
+	font-size : 0.6em;
+}
+
+.marker-circle
+{
+	cursor : pointer;
+}
+
+.graph-inner
+{
+	position      : absolute;
+	width         : 80px;
+	height        : 80px;
+	left          : -40px;
+	top           : -40px;
+	background    : #fff;
+	border-radius : 50%;
+	text-align    : center;
+}
+
+.graph-inner header
+{
+	font-weight : bold;
+	padding     : 0px;
+	margin      : 0px;
+	padding-top : 1em;
+}
+
+.tip-wrap
+{
+	background-color : #fff;
+	border           : 1px solid #000;
+	z-index          : 999;
+	border-radius    : 0.5em;
+	padding          : 1em;
+	max-width        : 30em;
+}
+
+.tip-wrap .tip-title
+{
+	font-weight : bold;
+}
+
+@media screen and (max-width : 35.5em)
+{
+	/*
+	.filters
+	{
+		width: 100%;
+		height: 100%;
+	}
+	*/
+}
+
+@media screen and (max-width : 48em)
+{
+	/*
+	.filters
+	{
+		width: 100%;
+		height: 100%;
+	}
+	*/
+}
+
+@media screen and (max-width : 64em)
+{
+	.filters
+	{
+		height : 28em;
+		top    : -28em;
+	}
+}
+
+@media screen and (min-width : 80em)
+{
+
+}
