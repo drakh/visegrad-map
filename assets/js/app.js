@@ -20,12 +20,60 @@ var mapconf = {
 var mapid = 'map-main';
 
 var FilterWin = new Class({
-	initialize: function (el)
+	Implements: [Events, Options],
+	options: {current_switch: 0},
+	initialize: function (el, options)
 	{
 		this.visible = false;
 		this.el = el;
 		var b = el.getElement('a.switch');
 		b.addEvent('click', this.sw.bind(this));
+		this.switches = el.getElements('a.g-switch');
+		this.bind_switches();
+	},
+	bind_switches: function ()
+	{
+		var s = this.switches;
+		for (var i = 0; i < s.length; i++)
+		{
+			s[i].addEvent('click', this.switch_grants.bind(this, i));
+		}
+		this.switch_tabs(this.options.current_switch);
+	},
+	switch_grants: function (i, e)
+	{
+		if (e)
+		{
+			e.stop();
+		}
+		if (i != this.options.current_switch)
+		{
+			this.options.current_switch = i;//store current switch
+			this.switch_tabs(i);
+			this.fireEvent('switch', this.options.current_switch);
+			this.show();//open the filter window
+		}
+		else
+		{
+			this.sw();//use as win show/hide switch
+		}
+	},
+	switch_tabs: function (i)
+	{
+		var s = this.switches;
+		for (var j = 0; j < s.length; j++)
+		{
+			if (j == i)
+			{
+				s[j].removeClass('dark-bg');
+				s[j].addClass('light-bg');
+			}
+			else
+			{
+				s[j].removeClass('light-bg');
+				s[j].addClass('dark-bg');
+			}
+		}
 	},
 	sw: function (e)
 	{
@@ -460,7 +508,7 @@ var Map = new Class({
 		this.destroy_graph(map);
 		this.graph = new GraphMarker(points[i], map, pane, tips, {onDestroy: this.graph_destroyed.bind(this, map)});
 	},
-	destroy_graph:function(map)
+	destroy_graph: function (map)
 	{
 		if (this.graph)
 		{
@@ -722,8 +770,10 @@ var PlaceFilter = new Class({
 	initialize: function (data, options)
 	{
 		this.setOptions(options);
-		this.data = data;
-		this.filtered_data = data;
+		this.data = data;//all data
+		this.filter_sel = 0;//current filter - GRANTS, SCHOLARSHIPS, RESIDENCES
+
+		this.filtered_data = data[this.filter_sel];
 
 		new FilterWin($('filter_pane'));
 		var y = $$('ul.years');
@@ -821,7 +871,6 @@ var App = {
 	init: function ()
 	{
 		var tips = new Tips();
-		//tips.removeEvents('show');
 		this.map = new Map($(mapid), $('map-controls'), tips);
 		//this.table=new DTable();
 		this.filter = new PlaceFilter(mapdata, {
@@ -830,7 +879,7 @@ var App = {
 	},
 	draw: function (data)
 	{
-		this.map.draw_points(data);
+		//this.map.draw_points(data);
 		//this.table.fill(data);
 	}
 };
