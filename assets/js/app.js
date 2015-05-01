@@ -767,7 +767,75 @@ var FilterWin = new Class({
 		this.el.removeClass('visible');
 	}
 });
-
+var SelectFilter = new Class({
+	Implements: [Events, Options],
+	initialize: function (el, options)
+	{
+		this.setOptions(options);
+		this.el = el;
+		this.filter = [];
+	},
+	set_data: function (data)
+	{
+		this.rebuild(data);
+		this.select_all();
+	},
+	rebuild: function (data)
+	{
+		var el = this.el;
+		el.empty();
+		var els = {}
+		for (var pid in data)
+		{
+			var e = new Element('option', {
+				value: pid,
+				text: data[pid],
+				events: {click: this.change_filters.bind(this)}
+			}).inject(el);
+			els[pid] = e;
+		}
+		this.els = els;
+	},
+	change_filters: function ()
+	{
+		var els = this.els;
+		var tmps = [];
+		for (var pid in els)
+		{
+			if (els[pid].selected == true)
+			{
+				tmps.push(pid);
+			}
+		}
+		this.filter = tmps;
+	},
+	select_all: function ()
+	{
+		var els = this.els;
+		var tmps = [];
+		for (var pid in els)
+		{
+			els[pid].selected = true;
+			tmps.push(pid);
+		}
+		this.filter = tmps;
+		this.select_change();
+	},
+	select_none: function ()
+	{
+		for (var pid in els)
+		{
+			els[pid].selected = false;
+			tmps.push(pid);
+		}
+		this.filter = [];
+		this.select_change();
+	},
+	select_change: function ()
+	{
+		this.fireEvent('filterchange', {filter: this.filter});
+	}
+})
 var PlaceFilter = new Class({
 	Implements: [
 		Events,
@@ -775,23 +843,46 @@ var PlaceFilter = new Class({
 	],
 	initialize: function (data, filterdata, country_filters, options)
 	{
-		console.log(data);
-		console.log(filterdata);
-		console.log(country_filters);
-
 		this.setOptions(options);
+
+		this.select_filters = ['countries', 'types', 'tags'];
+
 		this.data = data;//all points data
-		this.filterdata = [];//all filtersdata
+		this.filterdata = filterdata;
+		this.country_filters = country_filters;
 
-		this.year_sel = new YearSel($$('ul.years')[0], {
-			onRangechanged: this.filter_years.bind(this)
-		});
+		this.filtered_data = [];//all filtersdata
+		/*
+		 this.year_sel = new YearSel($$('ul.years')[0], {
+		 onRangechanged: this.filter_years.bind(this)
+		 });
+		 */
+		var p = $('filter_pane');
+		this.build_selects(p);
 
-		new FilterWin($('filter_pane'), {
-			onTypeswitch: this.switch_data.bind(this)
-		});
+		/*
+		 new FilterWin(p, {
+		 onTypeswitch: this.switch_data.bind(this)
+		 });
+		 */
 
-		this.filter();
+		//this.filter();
+	},
+	build_selects: function (el)
+	{
+		var s = el.getElements('select');
+		var d = this.select_filters;
+		var selects = {}
+		for (var i = 0; i < s.length; i++)
+		{
+			selects[d[i]] = new SelectFilter(s[i]);
+			if (d[i] == 'countries')
+			{
+				selects[d[i]].set_data(this.country_filters);
+			}
+		}
+		this.selects = selects;
+
 	},
 	switch_data: function (i)
 	{
