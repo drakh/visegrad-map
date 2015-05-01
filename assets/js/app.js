@@ -19,91 +19,6 @@ var mapconf = {
 };
 var mapid = 'map-main';
 
-var FilterWin = new Class({
-	Implements: [Events, Options],
-	options: {current_switch: 0},
-	initialize: function (el, options)
-	{
-		this.visible = false;
-		this.el = el;
-		var b = el.getElement('a.switch');
-		b.addEvent('click', this.sw.bind(this));
-		this.switches = el.getElements('a.g-switch');
-		this.bind_switches();
-	},
-	bind_switches: function ()
-	{
-		var s = this.switches;
-		for (var i = 0; i < s.length; i++)
-		{
-			s[i].addEvent('click', this.switch_grants.bind(this, i));
-		}
-		this.switch_tabs(this.options.current_switch);
-	},
-	switch_grants: function (i, e)
-	{
-		if (e)
-		{
-			e.stop();
-		}
-		if (i != this.options.current_switch)
-		{
-			this.options.current_switch = i;//store current switch
-			this.switch_tabs(i);
-			this.fireEvent('switch', this.options.current_switch);
-			this.show();//open the filter window
-		}
-		else
-		{
-			this.sw();//use as win show/hide switch
-		}
-	},
-	switch_tabs: function (i)
-	{
-		var s = this.switches;
-		for (var j = 0; j < s.length; j++)
-		{
-			if (j == i)
-			{
-				s[j].removeClass('dark-bg');
-				s[j].addClass('light-bg');
-			}
-			else
-			{
-				s[j].removeClass('light-bg');
-				s[j].addClass('dark-bg');
-			}
-		}
-	},
-	sw: function (e)
-	{
-		if (e)
-		{
-			e.stop();
-		}
-		switch (this.visible)
-		{
-			case true:
-				this.hide();
-				break;
-			default :
-				this.show();
-				break;
-
-		}
-	},
-	show: function ()
-	{
-		this.visible = true;
-		this.el.addClass('visible');
-	},
-	hide: function ()
-	{
-		this.visible = false;
-		this.el.removeClass('visible');
-	}
-});
-
 var CityMarker = new Class({
 	Implements: [
 		Events,
@@ -676,16 +591,20 @@ var YearSel = new Class({
 		Options
 	],
 
-	initialize: function (el, data, options)
+	initialize: function (el, options)
 	{
 		this.setOptions(options);
 		this.bars = el.getElements('.year-container div');
 		this.vals = el.getElements('div.year-val');
-
-		this.data = data;
+		this.data = [];
 		this.drag = new YearDrag(el, this.vals.length, {
 			onChanged: this.change_vals.bind(this)
 		});
+	},
+	set_data: function (data)
+	{
+		this.data = data;
+		this.redraw_divs(data);
 	},
 	redraw_divs: function (data)
 	{
@@ -762,28 +681,124 @@ var YearSel = new Class({
 	}
 });
 
+var FilterWin = new Class({
+	Implements: [Events, Options],
+	options: {current_switch: 0},
+	initialize: function (el, options)
+	{
+		this.setOptions(options);
+		this.visible = false;
+		this.el = el;
+		var b = el.getElement('a.switch');
+		b.addEvent('click', this.sw.bind(this));
+		this.switches = el.getElements('a.g-switch');
+		this.bind_switches();
+	},
+	bind_switches: function ()
+	{
+		var s = this.switches;
+		for (var i = 0; i < s.length; i++)
+		{
+			s[i].addEvent('click', this.switch_grants.bind(this, i));
+		}
+		this.switch_tabs(this.options.current_switch);
+	},
+	switch_grants: function (i, e)
+	{
+		if (e)
+		{
+			e.stop();
+		}
+		if (i != this.options.current_switch)
+		{
+			this.options.current_switch = i;//store current switch
+			this.switch_tabs(i);
+			this.show();//open the filter window
+		}
+		else
+		{
+			this.sw();//use as win show/hide switch
+		}
+	},
+	switch_tabs: function (i)
+	{
+		var s = this.switches;
+		for (var j = 0; j < s.length; j++)
+		{
+			if (j == i)
+			{
+				s[j].removeClass('dark-bg');
+				s[j].addClass('light-bg');
+			}
+			else
+			{
+				s[j].removeClass('light-bg');
+				s[j].addClass('dark-bg');
+			}
+		}
+		console.log('switch: ' + i);
+		this.fireEvent('typeswitch', this.options.current_switch);
+	},
+	sw: function (e)
+	{
+		if (e)
+		{
+			e.stop();
+		}
+		switch (this.visible)
+		{
+			case true:
+				this.hide();
+				break;
+			default :
+				this.show();
+				break;
+
+		}
+	},
+	show: function ()
+	{
+		this.visible = true;
+		this.el.addClass('visible');
+	},
+	hide: function ()
+	{
+		this.visible = false;
+		this.el.removeClass('visible');
+	}
+});
+
 var PlaceFilter = new Class({
 	Implements: [
 		Events,
 		Options
 	],
-	initialize: function (data, options)
+	initialize: function (data, filterdata, country_filters, options)
 	{
+		console.log(data);
+		console.log(filterdata);
+		console.log(country_filters);
+
 		this.setOptions(options);
-		this.data = data;//all data
-		this.filter_sel = 0;//current filter - GRANTS, SCHOLARSHIPS, RESIDENCES
+		this.data = data;//all points data
+		this.filterdata = [];//all filtersdata
 
-		this.filtered_data = data[this.filter_sel];
+		this.year_sel = new YearSel($$('ul.years')[0], {
+			onRangechanged: this.filter_years.bind(this)
+		});
 
-		new FilterWin($('filter_pane'));
-		var y = $$('ul.years');
-		for (var i = 0; i < y.length; i++)
-		{
-			new YearSel(y[i], this.filtered_data, {
-				onRangechanged: this.filter_years.bind(this)
-			});
-		}
+		new FilterWin($('filter_pane'), {
+			onTypeswitch: this.switch_data.bind(this)
+		});
+
 		this.filter();
+	},
+	switch_data: function (i)
+	{
+		this.filter_sel = i;//current filter - GRANTS, SCHOLARSHIPS, RESIDENCES
+		this.filtered_data = this.data[i];
+		this.filtered_filters = this.filterdata[i];
+		//this.year_sel.set_data(this.filtered_data);
 	},
 	filter_years: function (yrs)
 	{
@@ -873,7 +888,7 @@ var App = {
 		var tips = new Tips();
 		this.map = new Map($(mapid), $('map-controls'), tips);
 		//this.table=new DTable();
-		this.filter = new PlaceFilter(mapdata, {
+		this.filter = new PlaceFilter(mapdata, filters, filter_countries, {
 			onFilterchanged: this.draw.bind(this)
 		});
 	},
