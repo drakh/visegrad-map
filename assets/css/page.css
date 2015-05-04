@@ -119,6 +119,7 @@ header
 	color            : #fff;
 	padding          : 0px;
 	margin           : 0px;
+	transition       : height 750ms;
 }
 
 .year-container div.sel
@@ -227,6 +228,11 @@ ul.years li div.year-container div
 .tip-wrap .tip-title
 {
 	font-weight : bold;
+}
+
+.graph-section .ct-chart
+{
+	height : 300px;
 }
 
 @media screen and (max-width : 35.5em)
