@@ -664,11 +664,32 @@ var YearSel = new Class({
 			data: {},
 			max: 0
 		};
+		this.bounds = bounds;
 		this.build_elements(bounds, el);
 		this.data = [];
 		this.drag = new YearDrag(el, this.vals.length, {
 			onChanged: this.change_vals.bind(this)
 		});
+	},
+	get_message: function ()
+	{
+		var f = this.range;
+		var min = f[0];
+		var max;
+		var m;
+		for (pid in f)
+		{
+			max = f[pid];
+		}
+		if (min != max)
+		{
+			m = min + '-' + max
+		}
+		else
+		{
+			m = min;
+		}
+		return m;
 	},
 	build_elements: function (b, el)
 	{
@@ -733,7 +754,12 @@ var YearSel = new Class({
 				bars[i].removeClass('sel');
 			}
 		}
-		this.fireEvent('rangechanged', f);
+		this.range = f;
+		var ret = {
+			years: f,
+			msg: this.get_message()
+		}
+		this.fireEvent('rangechanged', ret);
 	},
 	change_vals: function (d)
 	{
@@ -876,6 +902,34 @@ var SelectFilter = new Class({
 		a.addEvent('click', this.select_all.bind(this));
 		n.addEvent('click', this.select_none.bind(this));
 	},
+	get_message: function ()
+	{
+		var els = this.els;
+		var a = this.filter;
+		var r_a = [];
+		var all = true;
+		var m = 'none';
+		for (var pid in els)
+		{
+			if (a.contains(pid))
+			{
+				r_a.include(els[pid].get('text'));
+			}
+			else
+			{
+				all = false;
+			}
+		}
+		if (all == true)
+		{
+			m = 'all'
+		}
+		else if (r_a.length > 0)
+		{
+			m = r_a.join(', ');
+		}
+		return m;
+	},
 	set_data: function (data)
 	{
 		this.rebuild(data);
@@ -963,15 +1017,13 @@ var SelectFilter = new Class({
 	},
 	select_change: function ()
 	{
-		this.fireEvent('filterchange', {filter: this.filter});
+		var msg = this.get_message();
+		this.fireEvent('filterchange', {filter: this.filter, msg: msg});
 	}
 });
 
 var PlaceFilter = new Class({
-	Implements: [
-		Events,
-		Options
-	],
+	Implements: [Events, Options],
 	initialize: function (data, filterdata, country_filters, options)
 	{
 		this.setOptions(options);
@@ -981,7 +1033,7 @@ var PlaceFilter = new Class({
 			'types',
 			'tags'
 		];
-
+		this.msg = {};
 		this.data = data;//all points data
 		this.filterdata = filterdata;
 		this.country_filters = country_filters;
@@ -1001,9 +1053,51 @@ var PlaceFilter = new Class({
 		});
 
 	},
-	get_message: function ()
+	get_msg: function ()
 	{
-		var m = 'message';
+		var m = 'All grants hosted ';
+		var msgs = this.msg;
+		var m_a = [];
+		for (var pid in msgs)
+		{
+			switch (pid)
+			{
+				case 'years':
+					m_a[1] = 'for period ' + msgs[pid];
+					break;
+				case 'countries':
+					if (msgs[pid] == 'all')
+					{
+						m_a[0] = 'in ' + msgs[pid] + ' ' + pid;
+					}
+					else
+					{
+						m_a[0] = 'in ' + msgs[pid];
+					}
+					break;
+				case 'types':
+					if (msgs[pid] == 'all')
+					{
+						m_a[2] = 'in ' + msgs[pid] + ' ' + pid;
+					}
+					else
+					{
+						m_a[2] = 'in ' + msgs[pid];
+					}
+					break;
+				case 'tags':
+					if (msgs[pid] == 'all')
+					{
+						m_a[3] = 'in ' + msgs[pid] + ' ' + pid;
+					}
+					else
+					{
+						m_a[3] = 'in ' + msgs[pid];
+					}
+					break;
+			}
+		}
+		m=m+m_a.join(' ');
 		return m;
 	},
 	build_selects: function (el)
@@ -1032,6 +1126,7 @@ var PlaceFilter = new Class({
 	},
 	set_filt_arr: function (i, d)
 	{
+		this.msg[i] = d.msg;
 		this.filt_arr[i] = d.filter;
 		var prefiltered = this.prefilter();
 		this.pref = prefiltered;
@@ -1046,8 +1141,10 @@ var PlaceFilter = new Class({
 		s['types'].set_data(this.filtered_filters.g);
 		s['tags'].set_data(this.filtered_filters.c);
 	},
-	filter_years: function (yrs)
+	filter_years: function (y)
 	{
+		var yrs = y.years;
+		this.msg['years'] = y.msg;
 		var f_yrs = {};
 		for (var pid in yrs)
 		{
@@ -1182,9 +1279,11 @@ var PlaceFilter = new Class({
 	},
 	filter: function (data)
 	{
+		var msg = this.get_msg();
+		console.log('my msg:' + msg);
 		var r = {
 			data: data,
-			message: this.get_message()
+			message: msg
 		}
 		this.fireEvent('filterchanged', r);
 	}
@@ -1622,11 +1721,11 @@ var MessageWin = new Class({
 	},
 	set_message: function (m)
 	{
-		console.log(m);
 		this.el.empty();
 		this.el.set('html', m);
 	}
 });
+
 var VisegradApp = {
 	initiated: false,
 	init: function ()
