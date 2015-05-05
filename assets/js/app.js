@@ -141,9 +141,10 @@ var GraphMarker = new Class({
 		Events,
 		Options
 	],
-	initialize: function (pt, map, pane, tips, options)
+	initialize: function (pt, map, pane, tips, graph_f, options)
 	{
 		this.setOptions(options);
+		this.graph_f = graph_f;
 		this.tips = tips;
 		this.tooltip_visible = false;
 		var el = new Element('div', {
@@ -218,7 +219,9 @@ var GraphMarker = new Class({
 
 		var g = this.g_data[i].v;
 		var p = this.pt_data;
-		var str = '';
+		var d=this.desc;
+		var str = d[i].nm+': <strong>'+d[i].count+'</strong>';
+		/*
 		for (var pid in p.data)
 		{
 			var a = p.data[pid];
@@ -234,6 +237,7 @@ var GraphMarker = new Class({
 				}
 			}
 		}
+		*/
 		return str;
 	},
 	show_tooltip: function (i)
@@ -258,6 +262,7 @@ var GraphMarker = new Class({
 	},
 	mk_graph: function (p)
 	{
+		var graph_f = this.graph_f;
 		var d = {};
 		for (var pid in p.data)
 		{
@@ -278,10 +283,15 @@ var GraphMarker = new Class({
 		}
 
 		var g_data = [];
+		var desc = [];
 		var r = [];
 		var i = 0;
 		for (var pid in d)
 		{
+			desc[i] ={
+				nm:graph_f.c[pid],
+				count:d[pid]
+			};
 			g_data[i] = {
 				v: d[pid],
 				t: pid
@@ -295,6 +305,7 @@ var GraphMarker = new Class({
 		}
 		this.pt_data = p;
 		this.g_data = g_data;
+		this.desc = desc;
 		return (r);
 	},
 	before_zoom: function ()
@@ -415,9 +426,9 @@ var AppMap = new Class({
 			this.map.fitBounds(this.bounds);
 		}
 	},
-	draw_points: function (data)
+	draw_points: function (data, f)
 	{
-
+		this.graph_f = f;
 		this.remove_markers();
 
 		var pane = this.pane;
@@ -458,8 +469,9 @@ var AppMap = new Class({
 		var pane = this.pane;
 		var map = this.map;
 		var tips = this.tips;
+		var graph_f = this.graph_f;
 		this.destroy_graph(map);
-		this.graph = new GraphMarker(points[i], map, pane, tips, {onDestroy: this.graph_destroyed.bind(this, map)});
+		this.graph = new GraphMarker(points[i], map, pane, tips, graph_f, {onDestroy: this.graph_destroyed.bind(this, map)});
 	},
 	destroy_graph: function (map)
 	{
@@ -1147,6 +1159,7 @@ var PlaceFilter = new Class({
 	},
 	switch_data: function (i)
 	{
+		this.sel_filter = i;
 		this.filtered_data = this.data[i];
 		this.filtered_filters = this.filterdata[i];
 		var s = this.selects;
@@ -1297,8 +1310,9 @@ var PlaceFilter = new Class({
 		console.log('my msg:' + msg);
 		var r = {
 			data: data,
-			message: msg
-		}
+			message: msg,
+			sel: this.sel_filter
+		};
 		this.fireEvent('filterchanged', r);
 	}
 });
@@ -1764,8 +1778,9 @@ var VisegradApp = {
 	{
 		var data = d.data;
 		var message = d.message;
+		var sel = d.sel;
 		this.msg_win.set_message(message);
-		this.map.draw_points(data);
+		this.map.draw_points(data, filters[sel]);
 		this.graph.set_data(data);
 		this.table.set_data(data);
 	}
