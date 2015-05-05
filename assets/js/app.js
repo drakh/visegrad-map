@@ -1,6 +1,7 @@
 var mapconf = {
 	url: 'http://{s}.tile.stamen.com/{id}/{z}/{x}/{y}.png',
 	attr: 'one',
+	visegrad: ["CZ", "HU", "PL", "SK"],
 	subdomains: 'a.b.c.d'.split('.'),
 	map_id: 'toner',
 	min_z: 5,
@@ -50,16 +51,11 @@ var CityMarker = new Class({
 				'z-index': z
 			},
 			events: {
-				/*disabled for now*/
-				/*
-				 mouseenter: this.to_front.bind(this),
-				 mouseleave: this.to_back.bind(this),
-				 */
 				click: this.fire_click.bind(this, map, pane)
 			}
 		}).inject(pane);
 
-		var g_el = new Element('div', {
+		new Element('div', {
 			styles: {
 				position: 'absolute',
 				width: w * 2,
@@ -1053,6 +1049,29 @@ var PlaceFilter = new Class({
 		});
 
 	},
+	prepare_countries: function ()
+	{
+		var d = this.filtered_data;
+		var cts = this.country_filters;
+
+		var a = mapconf.visegrad;
+
+		for (var i = 0; i < d.length; i++)
+		{
+			var c = d[i].c;
+			if (!a.contains(c))
+			{
+				a.include(c);
+			}
+		}
+		var r = {};
+		for (var i = 0; i < a.length; i++)
+		{
+			var pid = a[i];
+			r[pid] = cts[pid];
+		}
+		this.countries_prefiltered = r;
+	},
 	get_msg: function ()
 	{
 		var m = 'All grants hosted ';
@@ -1097,7 +1116,7 @@ var PlaceFilter = new Class({
 					break;
 			}
 		}
-		m=m+m_a.join(' ');
+		m = m + m_a.join(' ');
 		return m;
 	},
 	build_selects: function (el)
@@ -1114,12 +1133,6 @@ var PlaceFilter = new Class({
 			selects[d[i]] = new SelectFilter(s[i], a[i], n[i], {
 				onFilterchange: this.set_filt_arr.bind(this, d[i])
 			});
-			switch (d[i])
-			{
-				case 'countries':
-					selects[d[i]].set_data(this.country_filters);
-					break;
-			}
 		}
 		this.selects = selects;
 
@@ -1134,10 +1147,11 @@ var PlaceFilter = new Class({
 	},
 	switch_data: function (i)
 	{
-		this.filter_sel = i;//current filter - GRANTS, SCHOLARSHIPS, RESIDENCES
 		this.filtered_data = this.data[i];
 		this.filtered_filters = this.filterdata[i];
 		var s = this.selects;
+		this.prepare_countries();
+		s['countries'].set_data(this.countries_prefiltered);
 		s['types'].set_data(this.filtered_filters.g);
 		s['tags'].set_data(this.filtered_filters.c);
 	},
