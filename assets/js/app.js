@@ -653,7 +653,6 @@ var YearSel = new Class({
 		Events,
 		Options
 	],
-
 	initialize: function (el, options)
 	{
 		this.setOptions(options);
@@ -1048,7 +1047,8 @@ var PlaceFilter = new Class({
 				{
 					if (f_yrs[pid])
 					{
-						s += d[j].amount;
+						//s += d[j].amount;
+						s++;
 						dta[pid] = p.data[pid];
 					}
 				}
