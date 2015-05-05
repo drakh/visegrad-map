@@ -1169,8 +1169,11 @@ var DTable = new Class({
 		this.setOptions(options);
 		var t = new Element('table', {class: 'pure-table pure-table-bordered pure-table-striped'}).inject(el);
 		this.build_head(t);
-
 		this.el = new Element('tbody').inject(t);
+		this.pagination = {
+			limit: 50,
+			page: 0
+		}
 	},
 	build_head: function (t)
 	{
@@ -1184,9 +1187,7 @@ var DTable = new Class({
 	set_data: function (data)
 	{
 		var d = data.points;
-		var w = this.el;
-		w.empty();
-		console.log(d);
+		var a = [];
 		for (var i = 0; i < d.length; i++)
 		{
 			var dt = d[i].data;
@@ -1195,14 +1196,41 @@ var DTable = new Class({
 				var y_d = dt[yr];
 				for (var k = 0; k < y_d.length; k++)
 				{
-					var r = new Element('tr');
-					new Element('td', {text: d[i].s}).inject(r);
-					new Element('td', {text: yr}).inject(r);
-					new Element('td', {text: y_d[k].a}).inject(r);
-					new Element('td', {text: y_d[k].name}).inject(r);
-					r.inject(w);
+					var ae = {
+						city: d[i].s,
+						yr: yr,
+						org: y_d[k].a,
+						nm: y_d[k].name
+					};
+					a.include(ae);
 				}
 			}
+		}
+		this.table_data = a;
+		this.fill_table();
+	},
+	fill_table: function ()
+	{
+
+		var w = this.el;
+		w.empty();
+		var pg = this.pagination;
+		var d = this.table_data;
+		var min = pg.page * pg.limit;
+		var max = min + pg.limit;
+		if (max > d.length)
+		{
+			max = d.length;
+		}
+
+		for (var i = min; i < max; i++)
+		{
+			var r = new Element('tr');
+			new Element('td', {text: d[i].city}).inject(r);
+			new Element('td', {text: d[i].yr}).inject(r);
+			new Element('td', {text: d[i].org}).inject(r);
+			new Element('td', {text: d[i].nm}).inject(r);
+			r.inject(w);
 		}
 	}
 });
