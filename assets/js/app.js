@@ -1001,6 +1001,11 @@ var PlaceFilter = new Class({
 		});
 
 	},
+	get_message: function ()
+	{
+		var m = 'message';
+		return m;
+	},
 	build_selects: function (el)
 	{
 		var s = el.getElements('select');
@@ -1177,7 +1182,11 @@ var PlaceFilter = new Class({
 	},
 	filter: function (data)
 	{
-		this.fireEvent('filterchanged', data);
+		var r = {
+			data: data,
+			message: this.get_message()
+		}
+		this.fireEvent('filterchanged', r);
 	}
 });
 
@@ -1606,7 +1615,18 @@ var PageScroller = new Class({
 		this.s = s;
 	}
 });
-
+var MessageWin = new Class({
+	initialize: function (el)
+	{
+		this.el = el;
+	},
+	set_message: function (m)
+	{
+		console.log(m);
+		this.el.empty();
+		this.el.set('html', m);
+	}
+});
 var VisegradApp = {
 	initiated: false,
 	init: function ()
@@ -1614,6 +1634,9 @@ var VisegradApp = {
 		if (this.initiated == false)
 		{
 			this.initiated = true;
+
+			this.msg_win = new MessageWin($('filter-message'));
+
 			new PageScroller($$('section.page-section'));
 			var tips = new Tips();
 			this.map = new AppMap($(mapid), $('map-controls'), tips);
@@ -1624,8 +1647,11 @@ var VisegradApp = {
 			});
 		}
 	},
-	draw: function (data)
+	draw: function (d)
 	{
+		var data = d.data;
+		var message = d.message;
+		this.msg_win.set_message(message);
 		this.map.draw_points(data);
 		this.graph.set_data(data);
 		this.table.set_data(data);
