@@ -845,15 +845,35 @@ var SelectFilter = new Class({
 			var e = new Element('option', {
 				value: pid,
 				text: data[pid],
-				events: {click: this.change_filters.bind(this)}
+				events: {
+					mousedown: this.prevent.bind(this),
+					mouseup: this.prevent.bind(this),
+					click: this.change_filters.bind(this, pid)
+				}
 			}).inject(el);
 			els[pid] = e;
 		}
 		this.els = els;
 	},
-	change_filters: function ()
+	prevent: function (e)
 	{
+		e.stop();
+	},
+	change_filters: function (pid, e)
+	{
+		if (e)
+		{
+			e.stop();
+		}
 		var els = this.els;
+		if (els[pid].selected == true)
+		{
+			els[pid].selected = false;
+		}
+		else
+		{
+			els[pid].selected = true;
+		}
 		var tmps = [];
 		for (var pid in els)
 		{
