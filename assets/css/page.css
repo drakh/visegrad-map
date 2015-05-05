@@ -127,7 +127,7 @@ header
 	background-color : #ca7e7d;
 }
 
-.map-control
+.map-control, .map-control-city
 {
 	position : absolute;
 	width    : 5.4em;
@@ -135,22 +135,25 @@ header
 	z-index  : 2;
 	bottom   : 2em;
 }
-
-.map-control span a
+.map-control-city
+{
+	left: 7.4em;
+}
+.map-control span a, .map-control-city  span a
 {
 	margin     : 0.2em;
 	display    : block;
 	text-align : center;
 }
 
-.map-control span a.pure-button
+.map-control span a.pure-button, .map-control-city  span a.pure-button
 {
 	padding-left  : 0px;
 	padding-right : 0px;
 
 }
 
-.map-control span a.pure-button, .filters nav.filter-tab-switch a.pure-button, .filters nav.filter-btn a.pure-button
+.map-control-city  span a.pure-button, .map-control span a.pure-button, .filters nav.filter-tab-switch a.pure-button, .filters nav.filter-btn a.pure-button
 {
 	box-shadow : 2px 4px 6px 0px rgba(0, 0, 0, 0.5);
 }
