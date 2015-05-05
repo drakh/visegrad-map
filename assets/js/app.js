@@ -1538,7 +1538,7 @@ var PageScroller = new Class({
 		{
 			s[i] = new Element('i', {class: c[i], events: {click: this.sc_clicked.bind(this, i)}}).inject(w);
 		}
-		this.c=s;
+		this.c = s;
 	},
 	sc_clicked: function (i, e)
 	{
@@ -1587,17 +1587,23 @@ var PageScroller = new Class({
 				s = i;
 			}
 		}
-		this.c[0].removeClass('hidden');
-		this.c[1].removeClass('hidden');
-		if(s<=0)
+		if (s <= 0)
 		{
-			this.c[0].addClass('hidden');
+			this.c[0].addClass('c-hidden');
 		}
-		if(s>=this.els.length-1)
+		else
 		{
-			this.c[1].addClass('hidden');
+			this.c[0].removeClass('c-hidden');
 		}
-		this.s=s;
+		if (s >= this.els.length - 1)
+		{
+			this.c[1].addClass('c-hidden');
+		}
+		else
+		{
+			this.c[1].removeClass('c-hidden');
+		}
+		this.s = s;
 	}
 });
 
