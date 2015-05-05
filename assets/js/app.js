@@ -219,25 +219,25 @@ var GraphMarker = new Class({
 
 		var g = this.g_data[i].v;
 		var p = this.pt_data;
-		var d=this.desc;
-		var str = d[i].nm+': <strong>'+d[i].count+'</strong>';
+		var d = this.desc;
+		var str = d[i].nm + ': <strong>' + d[i].count + '</strong>';
 		/*
-		for (var pid in p.data)
-		{
-			var a = p.data[pid];
-			for (var i = 0; i < a.length; i++)
-			{
-				var dt = a[i].c;
-				for (var j = 0; j < dt.length; j++)
-				{
-					if (dt[j] == g)
-					{
-						str += '<div><strong>' + a[i].a + '</strong>: ' + a[i].name + '</div>';
-					}
-				}
-			}
-		}
-		*/
+		 for (var pid in p.data)
+		 {
+		 var a = p.data[pid];
+		 for (var i = 0; i < a.length; i++)
+		 {
+		 var dt = a[i].c;
+		 for (var j = 0; j < dt.length; j++)
+		 {
+		 if (dt[j] == g)
+		 {
+		 str += '<div><strong>' + a[i].a + '</strong>: ' + a[i].name + '</div>';
+		 }
+		 }
+		 }
+		 }
+		 */
 		return str;
 	},
 	show_tooltip: function (i)
@@ -288,9 +288,9 @@ var GraphMarker = new Class({
 		var i = 0;
 		for (var pid in d)
 		{
-			desc[i] ={
-				nm:graph_f.c[pid],
-				count:d[pid]
+			desc[i] = {
+				nm: graph_f.c[pid],
+				count: d[pid]
 			};
 			g_data[i] = {
 				v: d[pid],
@@ -1041,6 +1041,7 @@ var PlaceFilter = new Class({
 			'types',
 			'tags'
 		];
+		this.cc_s = 0;
 		this.msg = {};
 		this.data = data;//all points data
 		this.filterdata = filterdata;
@@ -1059,7 +1060,80 @@ var PlaceFilter = new Class({
 		new FilterWin(p, {
 			onTypeswitch: this.switch_data.bind(this)
 		});
+		this.cc_switches = $$('#city-country a');
+		this.cc_switches_bind();
 
+	},
+	cc_switches_bind: function ()
+	{
+		var cc = this.cc_switches;
+		for (var i = 0; i < cc.length; i++)
+		{
+			cc[i].addEvent('click', this.cc_sw.bind(this, i));
+		}
+		this.cc_sw(this.cc_s);
+	},
+	cc_sw: function (i, e)
+	{
+		if (e)
+		{
+			e.stop();
+		}
+		var cc = this.cc_switches;
+		for (var j = 0; j < cc.length; j++)
+		{
+			if (j == i)
+			{
+				cc[j].removeClass('dark-bg');
+				cc[j].addClass('light-bg');
+			}
+			else
+			{
+				cc[j].removeClass('light-bg');
+				cc[j].addClass('dark-bg');
+			}
+		}
+		if (i != this.cc_s)
+		{
+			this.cc_s = i;
+			this.switch_data(this.sel_filter);
+		}
+	},
+	get_cc_data: function (data)
+	{
+		var r = [];
+		var cc = this.cc_s;
+		console.log(this.cc_s);
+		if (cc == 0)
+		{
+			r = data;
+		}
+		else
+		{
+			var c = {};
+			for (var i = 0; i < data.length; i++)
+			{
+				var d = data[i];
+				if (!c[d.c])
+				{
+					c[d.c] = countries_geo[d.c]
+					c[d.c]['data'] = {};
+				}
+				for (var pid in d.data)
+				{
+					if (!c[d.c]['data'][pid])
+					{
+						c[d.c]['data'][pid] = [];
+					}
+					c[d.c]['data'][pid].append(d.data[pid]);
+				}
+			}
+			for(var pid in c)
+			{
+				r.include(c[pid]);
+			}
+		}
+		return r;
 	},
 	prepare_countries: function ()
 	{
@@ -1160,7 +1234,9 @@ var PlaceFilter = new Class({
 	switch_data: function (i)
 	{
 		this.sel_filter = i;
-		this.filtered_data = this.data[i];
+		var d = this.get_cc_data(this.data[i]);
+		console.log(d);
+		this.filtered_data = d;
 		this.filtered_filters = this.filterdata[i];
 		var s = this.selects;
 		this.prepare_countries();
@@ -1307,7 +1383,6 @@ var PlaceFilter = new Class({
 	filter: function (data)
 	{
 		var msg = this.get_msg();
-		console.log('my msg:' + msg);
 		var r = {
 			data: data,
 			message: msg,
