@@ -15,7 +15,11 @@ var mapconf = {
 			45.7268402,
 			24.1729511
 		]
-	]
+	],
+	year_bounds: {
+		min: 2000,
+		max: 2015
+	}
 };
 var mapid = 'map-main';
 
@@ -653,7 +657,7 @@ var YearSel = new Class({
 		Events,
 		Options
 	],
-	initialize: function (el, options)
+	initialize: function (el, bounds, options)
 	{
 		this.setOptions(options);
 
@@ -661,12 +665,33 @@ var YearSel = new Class({
 			data: {},
 			max: 0
 		};
-		this.bars = el.getElements('.year-container div');
-		this.vals = el.getElements('div.year-val');
+		this.build_elements(bounds, el);
 		this.data = [];
 		this.drag = new YearDrag(el, this.vals.length, {
 			onChanged: this.change_vals.bind(this)
 		});
+	},
+	build_elements: function (b, el)
+	{
+		var bars = [];
+		var vals = [];
+		console.log(b);
+		for (var i = b.min; i <= b.max; i++)
+		{
+			console.log(i);
+			var li = new Element('li');
+			var y_c = new Element('div', {
+				class: 'year-container'
+			}).inject(li);
+
+			var ba = new Element('div').inject(y_c);
+			var va = new Element('div', {class: 'year-val', text: i}).inject(li);
+			li.inject(el);
+			vals.include(va);
+			bars.include(ba);
+		}
+		this.bars = bars;
+		this.vals = vals;
 	},
 	set_data: function (data)
 	{
@@ -967,7 +992,7 @@ var PlaceFilter = new Class({
 		this.filtered_data = [];//all filtersdata
 
 
-		this.year_sel = new YearSel($$('ul.years')[0], {
+		this.year_sel = new YearSel($$('ul.years')[0], mapconf.year_bounds, {
 			onRangechanged: this.filter_years.bind(this)
 		});
 
@@ -1249,13 +1274,6 @@ var DGraph = new Class({
 	set_data: function (data)
 	{
 		this.data = data;
-		/*
-		 for (var i=0; i<this.g.length; i++)
-		 {
-		 this.g[i].detach();
-		 }
-		 this.g=[];
-		 */
 		this.el.empty();
 		this.build_graphs();
 	},
