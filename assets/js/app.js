@@ -1582,7 +1582,6 @@ var PageScroller = new Class({
 		for (var i = 0; i < els.length; i++)
 		{
 			var c = els[i].getCoordinates();
-			console.log(c);
 			if (ws.y >= c.top)
 			{
 				s = i;
@@ -1606,7 +1605,6 @@ var VisegradApp = {
 	initiated: false,
 	init: function ()
 	{
-		console.log('initiated: ' + this.initiated);
 		if (this.initiated == false)
 		{
 			this.initiated = true;
