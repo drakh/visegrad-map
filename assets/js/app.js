@@ -1,6 +1,8 @@
 var mapconf = {
 	url: 'http://{s}.tile.stamen.com/{id}/{z}/{x}/{y}.png',
 	attr: 'one',
+	table_headers: ["City", "Year", "Applicant", "Project title"],
+	graph_names: ["Grant programs", "Activity fields", "Countries"],
 	visegrad: ["CZ", "HU", "PL", "SK"],
 	subdomains: 'a.b.c.d'.split('.'),
 	map_id: 'toner',
@@ -1128,7 +1130,7 @@ var PlaceFilter = new Class({
 					c[d.c]['data'][pid].append(d.data[pid]);
 				}
 			}
-			for(var pid in c)
+			for (var pid in c)
 			{
 				r.include(c[pid]);
 			}
@@ -1412,10 +1414,10 @@ var DTable = new Class({
 	{
 		var h = new Element('thead').inject(t);
 		var r = new Element('tr').inject(h);
-		new Element('th', {text: 'City'}).inject(r);
-		new Element('th', {text: 'Year'}).inject(r);
-		new Element('th', {text: 'Applicant'}).inject(r);
-		new Element('th', {text: 'Project title'}).inject(r);
+		new Element('th', {text: mapconf.table_headers[0]}).inject(r);
+		new Element('th', {text: mapconf.table_headers[1]}).inject(r);
+		new Element('th', {text: mapconf.table_headers[3]}).inject(r);
+		new Element('th', {text: mapconf.table_headers[3]}).inject(r);
 	},
 	set_data: function (data)
 	{
@@ -1495,7 +1497,7 @@ var DGraph = new Class({
 	{
 		var w = this.el;
 		var s = new Element('section', {class: 'graph-section'}).inject(w);
-		new Element('header', {html: 'Topics:'}).inject(s);
+		new Element('header', {html: mapconf.graph_names[0] + ':'}).inject(s);
 		var grid = new Element('div', {class: 'pure-g'}).inject(s);
 		var pie = new Element('div', {class: 'pure-u-1 pure-u-md-1-3 ct-chart'}).inject(grid);
 		var bar = new Element('div', {class: 'pure-u-1 pure-u-md-2-3 ct-chart'}).inject(grid);
@@ -1571,7 +1573,7 @@ var DGraph = new Class({
 
 		var w = this.el;
 		var s = new Element('section', {class: 'graph-section'}).inject(w);
-		new Element('header', {html: 'Tags:'}).inject(s);
+		new Element('header', {html: mapconf.graph_names[1] + ':'}).inject(s);
 		var grid = new Element('div', {class: 'pure-g'}).inject(s);
 		var pie = new Element('div', {class: 'pure-u-1 pure-u-md-1-3 ct-chart'}).inject(grid);
 		var bar = new Element('div', {class: 'pure-u-1 pure-u-md-2-3 ct-chart'}).inject(grid);
@@ -1651,7 +1653,7 @@ var DGraph = new Class({
 	{
 		var w = this.el;
 		var s = new Element('section', {class: 'graph-section'}).inject(w);
-		new Element('header', {html: 'Countries:'}).inject(s);
+		new Element('header', {html: mapconf.graph_names[2] + ':'}).inject(s);
 		var grid = new Element('div', {class: 'pure-g'}).inject(s);
 		var pie = new Element('div', {class: 'pure-u-1 pure-u-md-1-3 ct-chart'}).inject(grid);
 		var bar = new Element('div', {class: 'pure-u-1 pure-u-md-2-3 ct-chart'}).inject(grid);
