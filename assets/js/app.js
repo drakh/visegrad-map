@@ -1414,8 +1414,8 @@ var DTable = new Class({
 		var r = new Element('tr').inject(h);
 		new Element('th', {text: 'City'}).inject(r);
 		new Element('th', {text: 'Year'}).inject(r);
-		new Element('th', {text: 'Organisation'}).inject(r);
-		new Element('th', {text: 'Name'}).inject(r);
+		new Element('th', {text: 'Applicant'}).inject(r);
+		new Element('th', {text: 'Project title'}).inject(r);
 	},
 	set_data: function (data)
 	{
