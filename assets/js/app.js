@@ -249,7 +249,6 @@ var GraphMarker = new Class({
 	mk_graph: function (p)
 	{
 		var graph_f = this.graph_f;
-		console.log(graph_f);
 		var d = {};
 		var pdt = [];
 		for (var pid in p.data)
@@ -277,7 +276,6 @@ var GraphMarker = new Class({
 			});
 		}
 		pdt.sortOn("value", Array.NUMERIC);
-		console.log(pdt);
 		var g_data = [];
 		var desc = [];
 		var r = [];
@@ -681,8 +679,8 @@ var YearSel = new Class({
 	],
 	initialize: function (el, bounds, options)
 	{
-		this.setOptions(options);
 		this.created = false;
+		this.setOptions(options);
 		this.p_d = {
 			data: {},
 			max: 0
@@ -739,6 +737,11 @@ var YearSel = new Class({
 		this.data = data;
 		this.p_d = this.prepare_data(data);
 		this.redraw_divs();
+		if (this.created == false)
+		{
+			this.created = true;
+			this.fireEvent('filtercreated');
+		}
 	},
 	redraw_divs: function ()
 	{
@@ -1050,6 +1053,7 @@ var PlaceFilter = new Class({
 	Implements: [Events, Options],
 	initialize: function (data, filterdata, country_filters, options)
 	{
+		this.created_filter = {years: false, countries: false, types: false, tags: false};
 		this.setOptions(options);
 
 		this.select_filters = [
@@ -1079,6 +1083,22 @@ var PlaceFilter = new Class({
 		this.cc_switches = $$('#city-country a');
 		this.cc_switches_bind();
 
+	},
+	check_created: function ()
+	{
+		var c = this.created_filter;
+		var created = true;
+		for (var pid in c)
+		{
+			if (c[pid] == false)
+			{
+				created = false;
+			}
+		}
+		if (created == true)
+		{
+			this.fireEvent('created');
+		}
 	},
 	cc_switches_bind: function ()
 	{
