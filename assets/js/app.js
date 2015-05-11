@@ -138,6 +138,7 @@ var CityMarker = new Class({
 	}
 });
 
+
 var GraphMarker = new Class({
 	Implements: [
 		Events,
@@ -223,23 +224,6 @@ var GraphMarker = new Class({
 		var p = this.pt_data;
 		var d = this.desc;
 		var str = d[i].nm + ': <strong>' + d[i].count + '</strong>';
-		/*
-		 for (var pid in p.data)
-		 {
-		 var a = p.data[pid];
-		 for (var i = 0; i < a.length; i++)
-		 {
-		 var dt = a[i].c;
-		 for (var j = 0; j < dt.length; j++)
-		 {
-		 if (dt[j] == g)
-		 {
-		 str += '<div><strong>' + a[i].a + '</strong>: ' + a[i].name + '</div>';
-		 }
-		 }
-		 }
-		 }
-		 */
 		return str;
 	},
 	show_tooltip: function (i)
@@ -265,7 +249,9 @@ var GraphMarker = new Class({
 	mk_graph: function (p)
 	{
 		var graph_f = this.graph_f;
+		console.log(graph_f);
 		var d = {};
+		var pdt = [];
 		for (var pid in p.data)
 		{
 			var a = p.data[pid];
@@ -283,28 +269,55 @@ var GraphMarker = new Class({
 				}
 			}
 		}
-
+		for (var pid in d)
+		{
+			pdt.include({
+				name: pid,
+				value: d[pid]
+			});
+		}
+		pdt.sortOn("value", Array.NUMERIC);
+		console.log(pdt);
 		var g_data = [];
 		var desc = [];
 		var r = [];
-		var i = 0;
-		for (var pid in d)
+		var k = 0;
+		var l = pdt.length - 1;
+		for (var k = l; k >= 0; k--)
 		{
+			var i = l - k;
 			desc[i] = {
-				nm: graph_f.c[pid],
-				count: d[pid]
-			};
+				nm: graph_f.c[pdt[k].name],
+				count: pdt[k].value
+			}
 			g_data[i] = {
-				v: d[pid],
-				t: pid
-			};
-
+				v: pdt[k].value,
+				t: pdt[k].name
+			}
 			r[i] = {
-				data: d[pid],
+				data: pdt[k].value,
 				className: 'graph-' + (i % 17)
-			};
-			i++
+			}
 		}
+		/*
+		 for (var pid in d)
+		 {
+		 desc[i] = {
+		 nm: graph_f.c[pid],
+		 count: d[pid]
+		 };
+		 g_data[i] = {
+		 v: d[pid],
+		 t: pid
+		 };
+
+		 r[i] = {
+		 data: d[pid],
+		 className: 'graph-' + (i % 17)
+		 };
+		 i++
+		 }
+		 */
 		this.pt_data = p;
 		this.g_data = g_data;
 		this.desc = desc;
