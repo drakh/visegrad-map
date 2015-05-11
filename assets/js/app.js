@@ -1726,6 +1726,12 @@ var PageScroller = new Class({
 	Implements: [Events, Options],
 	initialize: function (els, options)
 	{
+		var titles=[];
+		for(var i=0;i<els.length;i++)
+		{
+			titles[i]=els[i].get('title');
+		}
+		this.titles=titles;
 		this.els = els;
 		this.s = 0;
 		this.classes = [
@@ -1806,14 +1812,17 @@ var PageScroller = new Class({
 		}
 		else
 		{
+			this.c[0].set('title',this.titles[s-1]);
 			this.c[0].removeClass('c-hidden');
 		}
+
 		if (s >= this.els.length - 1)
 		{
 			this.c[1].addClass('c-hidden');
 		}
 		else
 		{
+			this.c[1].set('title',this.titles[s+1]);
 			this.c[1].removeClass('c-hidden');
 		}
 		this.s = s;
