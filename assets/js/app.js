@@ -1416,7 +1416,7 @@ var DPager = new Class({
 		var page = p.page;
 		var w = this.w;
 		w.empty();
-		var pages = Math.ceil(p.count / p.limit)-1;
+		var pages = Math.ceil(p.count / p.limit) - 1;
 		if (page > 0)
 		{
 			var li = new Element('li', {class: 'pure-menu-item'}).inject(w);
@@ -1579,7 +1579,7 @@ var DTable = new Class({
 	},
 	change_page: function (p)
 	{
-		this.pagination=p;
+		this.pagination = p;
 		this.fill_table();
 	},
 	fill_table: function ()
