@@ -669,7 +669,7 @@ var YearSel = new Class({
 	initialize: function (el, bounds, options)
 	{
 		this.setOptions(options);
-
+		this.created = false;
 		this.p_d = {
 			data: {},
 			max: 0
@@ -905,6 +905,7 @@ var SelectFilter = new Class({
 	],
 	initialize: function (el, a, n, options)
 	{
+		this.created = false;
 		this.setOptions(options);
 		this.el = el;
 		this.filter = [];
@@ -1105,7 +1106,6 @@ var PlaceFilter = new Class({
 	{
 		var r = [];
 		var cc = this.cc_s;
-		console.log(this.cc_s);
 		if (cc == 0)
 		{
 			r = data;
@@ -1237,7 +1237,6 @@ var PlaceFilter = new Class({
 	{
 		this.sel_filter = i;
 		var d = this.get_cc_data(this.data[i]);
-		console.log(d);
 		this.filtered_data = d;
 		this.filtered_filters = this.filterdata[i];
 		var s = this.selects;
@@ -1394,6 +1393,134 @@ var PlaceFilter = new Class({
 	}
 });
 
+
+var DPager = new Class({
+	Implements: [Events, Options],
+	initialize: function (el, options)
+	{
+		this.setOptions(options);
+		this.pagination = {};
+		var e = new Element('div', {
+			class: 'pure-menu pure-menu-horizontal'
+		}).inject(el);
+		this.w = new Element('ul', {class: 'pure-menu-list'}).inject(e);
+	},
+	set_data: function (p)
+	{
+		this.pagination = p;
+		this.rebuild();
+	},
+	rebuild: function ()
+	{
+		var p = this.pagination;
+		var page = p.page;
+		var w = this.w;
+		w.empty();
+		var pages = Math.ceil(p.count / p.limit)-1;
+		if (page > 0)
+		{
+			var li = new Element('li', {class: 'pure-menu-item'}).inject(w);
+			new Element('a', {
+				html: '<i class="el el-fast-backward"></i>',
+				class: 'pure-button pure-menu-link',
+				events: {
+					click: this.change_page.bind(this, (0))
+				}
+			}).inject(li);
+
+			var li = new Element('li', {class: 'pure-menu-item'}).inject(w);
+			new Element('a', {
+				html: '<i class="el el-backward"></i>',
+				class: 'pure-button pure-menu-link',
+				events: {
+					click: this.change_page.bind(this, (page - 1))
+				}
+			}).inject(li);
+		}
+
+		var start = page - 3;
+		if (start < 0)
+		{
+			start = 0;
+		}
+		var end = page + 3;
+		if (start == 0)
+		{
+			end = start + 6;
+		}
+		if (end > pages)
+		{
+			end = pages;
+		}
+		if (end >= pages)
+		{
+			start = end - (6 - (pages - end));
+		}
+		if (start < 0)
+		{
+			start = 0;
+		}
+
+		for (var i = start; i <= end; i++)
+		{
+			if (i == page)
+			{
+				var li = new Element('li', {
+					html: '<span class="pure-button pure-button-active">' + (i + 1) + '</span>',
+					class: 'pure-menu-selected pure-menu-item'
+				}).inject(w);
+			}
+			else
+			{
+				var li = new Element('li', {class: 'pure-menu-item'}).inject(w);
+				new Element('a', {
+					html: (i + 1),
+					class: 'pure-button pure-menu-link',
+					events: {
+						click: this.change_page.bind(this, (i))
+					}
+				}).inject(li);
+			}
+
+		}
+		if (page < pages)
+		{
+			var li = new Element('li', {class: 'pure-menu-item'}).inject(w);
+			new Element('a', {
+				html: '<i class="el el-forward"></i>',
+				class: 'pure-button pure-menu-link',
+				events: {
+					click: this.change_page.bind(this, (page + 1))
+				}
+			}).inject(li);
+
+			var li = new Element('li', {class: 'pure-menu-item'}).inject(w);
+			new Element('a', {
+				html: '<i class="el el-fast-forward"></i>',
+				class: 'pure-button pure-menu-link',
+				events: {
+					click: this.change_page.bind(this, (pages))
+				}
+			}).inject(li);
+		}
+		this.set_page();
+	},
+	change_page: function (i, e)
+	{
+		if (e)
+		{
+			e.stop();
+		}
+		this.pagination.page = i;
+		this.rebuild();
+	},
+	set_page: function ()
+	{
+		this.fireEvent('pagechanged', this.pagination);
+	}
+
+});
+
 var DTable = new Class({
 	Implements: [
 		Events,
@@ -1402,13 +1529,17 @@ var DTable = new Class({
 	initialize: function (el, options)
 	{
 		this.setOptions(options);
-		var t = new Element('table', {class: 'pure-table pure-table-bordered pure-table-striped'}).inject(el);
-		this.build_head(t);
-		this.el = new Element('tbody').inject(t);
 		this.pagination = {
 			limit: 50,
-			page: 0
-		}
+			page: 0,
+			count: 0
+		};
+
+
+		var t = new Element('table', {class: 'pure-table pure-table-bordered pure-table-striped'}).inject(el);
+		this.build_head(t);
+		this.pager = new DPager(el, {onPagechanged: this.change_page.bind(this)});
+		this.el = new Element('tbody').inject(t);
 	},
 	build_head: function (t)
 	{
@@ -1421,6 +1552,7 @@ var DTable = new Class({
 	},
 	set_data: function (data)
 	{
+		this.pagination.page = 0;
 		var d = data.points;
 		var a = [];
 		for (var i = 0; i < d.length; i++)
@@ -1441,7 +1573,13 @@ var DTable = new Class({
 				}
 			}
 		}
+		this.pagination.count = a.length;
 		this.table_data = a;
+		this.pager.set_data(this.pagination);
+	},
+	change_page: function (p)
+	{
+		this.pagination=p;
 		this.fill_table();
 	},
 	fill_table: function ()
@@ -1726,12 +1864,12 @@ var PageScroller = new Class({
 	Implements: [Events, Options],
 	initialize: function (els, options)
 	{
-		var titles=[];
-		for(var i=0;i<els.length;i++)
+		var titles = [];
+		for (var i = 0; i < els.length; i++)
 		{
-			titles[i]=els[i].get('title');
+			titles[i] = els[i].get('title');
 		}
-		this.titles=titles;
+		this.titles = titles;
 		this.els = els;
 		this.s = 0;
 		this.classes = [
@@ -1812,7 +1950,7 @@ var PageScroller = new Class({
 		}
 		else
 		{
-			this.c[0].set('title',this.titles[s-1]);
+			this.c[0].set('title', this.titles[s - 1]);
 			this.c[0].removeClass('c-hidden');
 		}
 
@@ -1822,7 +1960,7 @@ var PageScroller = new Class({
 		}
 		else
 		{
-			this.c[1].set('title',this.titles[s+1]);
+			this.c[1].set('title', this.titles[s + 1]);
 			this.c[1].removeClass('c-hidden');
 		}
 		this.s = s;
