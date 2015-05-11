@@ -21152,7 +21152,6 @@ var mapconf = {
 	}
 };
 var mapid = 'map-main';
-
 var CityMarker = new Class({
 	Implements: [
 		Events,
@@ -21264,8 +21263,6 @@ var CityMarker = new Class({
 		this.el.destroy();
 	}
 });
-
-
 var GraphMarker = new Class({
 	Implements: [
 		Events,
@@ -21491,8 +21488,6 @@ var GraphMarker = new Class({
 		});
 	}
 });
-
-
 var AppMap = new Class({
 	initialize: function (el, c, tips)
 	{
@@ -21637,7 +21632,6 @@ var AppMap = new Class({
 
 	}
 });
-
 var YearDrag = new Class({
 	Implements: [
 		Events,
@@ -21697,7 +21691,6 @@ var YearDrag = new Class({
 		this.fireEvent('changed', range);
 	}
 });
-
 var YearSlider = new Class({
 	Implements: [
 		Events,
@@ -21798,7 +21791,6 @@ var YearSlider = new Class({
 		this.fireEvent('changed', r);
 	}
 });
-
 var YearSel = new Class({
 	Implements: [
 		Events,
@@ -21950,7 +21942,6 @@ var YearSel = new Class({
 		return r;
 	}
 });
-
 var FilterWin = new Class({
 	Implements: [
 		Events,
@@ -22039,8 +22030,6 @@ var FilterWin = new Class({
 		this.el.removeClass('visible');
 	}
 });
-
-
 var SelectFilter = new Class({
 	Implements: [
 		Events,
@@ -22175,7 +22164,6 @@ var SelectFilter = new Class({
 		this.fireEvent('filterchange', {filter: this.filter, msg: msg});
 	}
 });
-
 var PlaceFilter = new Class({
 	Implements: [Events, Options],
 	initialize: function (data, filterdata, country_filters, options)
@@ -22552,8 +22540,6 @@ var PlaceFilter = new Class({
 		this.fireEvent('filterchanged', r);
 	}
 });
-
-
 var DPager = new Class({
 	Implements: [Events, Options],
 	initialize: function (el, options)
@@ -22680,7 +22666,6 @@ var DPager = new Class({
 	}
 
 });
-
 var DTable = new Class({
 	Implements: [
 		Events,
@@ -22767,7 +22752,6 @@ var DTable = new Class({
 		}
 	}
 });
-
 var DGraph = new Class({
 	Implements: [
 		Events,
@@ -23019,7 +23003,6 @@ var DGraph = new Class({
 		}, {stackBars: true});
 	}
 });
-
 var PageScroller = new Class({
 	Implements: [Events, Options],
 	initialize: function (els, options)
@@ -23137,7 +23120,6 @@ var MessageWin = new Class({
 		this.el.set('html', m);
 	}
 });
-
 var VisegradApp = {
 	initiated: false,
 	init: function ()

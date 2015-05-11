@@ -3,6 +3,27 @@ module.exports = function (grunt)
 	grunt.initConfig(
 		{
 			concat: {
+				app_js: {
+					src: [
+						'assets/src/mapconf.js',
+						'assets/src/CityMarker.js',
+						'assets/src/GraphMarker.js',
+						'assets/src/AppMap.js',
+						'assets/src/YearDrag.js',
+					    'assets/src/YearSlider.js',
+					    'assets/src/YearSel.js',
+					    'assets/src/FilterWin.js',
+					    'assets/src/SelectFilter.js',
+					    'assets/src/PlaceFilter.js',
+					    'assets/src/DPager.js',
+					    'assets/src/DTable.js',
+					    'assets/src/DGraph.js',
+					    'assets/src/PageScroller.js',
+					    'assets/src/MessageWin.js',
+					    'assets/src/VisegradApp.js'
+					],
+					dest: 'assets/js/app.src.js'
+				},
 				dist_js: {
 					src: [
 						'bower_components/chartist/dist/chartist.min.js',
@@ -11,7 +32,7 @@ module.exports = function (grunt)
 						'bower_components/mootools-more/mootools-more-nocompat.js',
 						'bower_components/mootools-more/Array.sortOn.js',
 						'nino-data/countries.js',
-						'assets/js/app.js'
+						'assets/js/app.src.js'
 					],
 					dest: 'dist/app.js'
 				},
