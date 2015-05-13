@@ -26,6 +26,7 @@ Array.DESCENDING = 2;
 Array.UNIQUESORT = 4;
 Array.RETURNINDEXEDARRAY = 8;
 Array.NUMERIC = 16;
+Array.DESCNUMERIC = 17;
 
 (function ()
 {
@@ -70,7 +71,7 @@ Array.NUMERIC = 16;
 				}
 			})(sub_fields, item_a, item_b);
 
-			if (opts & Array.NUMERIC)
+			if ((opts & Array.NUMERIC) || (opts & Array.DESCNUMERIC))
 			{
 				ret = (a.toFloat() - b.toFloat());
 			}
@@ -89,7 +90,7 @@ Array.NUMERIC = 16;
 			{
 				ret = sort_by(fields.slice(1), options.slice(1));
 			}
-			else if (opts & Array.DESCENDING)
+			else if ((opts & Array.DESCENDING) || (opts & Array.DESCNUMERIC))
 			{
 				ret *= -1;
 			}
