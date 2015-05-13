@@ -1,28 +1,33 @@
 var AppMap = new Class({
-	initialize: function (el, c, tips)
+	Implements: [Events, Options],
+	options: {
+		tips: null
+	},
+	initialize: function (el, c, conf, options)
 	{
+		this.setOptions(options);
+		this.conf = conf;
 		this.markers = {};
-		this.tips = tips;
-		var map = L.map($(mapid), {
+		var a_map = L.map($(mapid), {
 			attributionControl: false,
 			zoomControl: false
 		});
 
-		L.tileLayer(mapconf.url, {
-			attribution: mapconf.attr,
-			id: mapconf.map_id,
-			subdomains: mapconf.subdomains,
-			minZoom: mapconf.min_z,
-			maxZoom: mapconf.max_z
-		}).addTo(map);
+		L.tileLayer(conf.url, {
+			attribution: conf.attr,
+			id: conf.map_id,
+			subdomains: conf.subdomains,
+			minZoom: conf.min_z,
+			maxZoom: conf.max_z
+		}).addTo(a_map);
 
-		this.pane = map.getPanes().popupPane;
+		this.pane = a_map.getPanes().popupPane;
 
 		if (c)
 		{
 			this.initialize_controls(c);
 		}
-		this.map = map;
+		this.map = a_map;
 		this.zoom_to_v4();
 
 	},
@@ -58,7 +63,7 @@ var AppMap = new Class({
 		{
 			e.stop();
 		}
-		this.map.fitBounds(mapconf.v4_bounds);
+		this.map.fitBounds(this.conf.v4_bounds);
 	},
 	zoom_to_bounds: function (e)
 	{
@@ -78,31 +83,37 @@ var AppMap = new Class({
 
 		var pane = this.pane;
 		var map = this.map;
-		var tips = this.tips;
 
 		var points = data.points;
 		var bounds = data.bounds;
 		this.map.options.minZoom = 0;
+		var conf = this.conf;
+
 		if (points.length > 0)
 		{
 			var z = this.map.getBoundsZoom(bounds);
-			if (z > mapconf.max_z)
+			if (z > conf.max_z)
 			{
-				z = mapconf.max_z;
+				z = conf.max_z;
 			}
-			if (z < mapconf.min_z)
+			if (z < conf.min_z)
 			{
-				z = mapconf.min_z;
+				z = conf.min_z;
 			}
 
 			this.map.setMaxBounds(bounds);
 			this.map.options.minZoom = z;
 			this.bounds = bounds;
 			this.points = points;
+			var rel = points.rel;
 			for (var i = 0; i < points.length; i++)
 			{
 				var p = points[i];
-				this.markers[i] = new CityMarker(map, p, pane, points.rel, tips, {onClick: this.show_graph.bind(this, i)});
+				this.markers[i] = new CityMarker(map, p, rel, {
+					tips: this.options.tips,
+					pane: pane,
+					onClick: this.show_graph.bind(this, i)
+				});
 			}
 			this.zoom_to_bounds();
 		}
@@ -112,11 +123,13 @@ var AppMap = new Class({
 		var points = this.points;
 		var map = this.map;
 		var pane = this.pane;
-		var map = this.map;
-		var tips = this.tips;
 		var graph_f = this.graph_f;
 		this.destroy_graph(map);
-		this.graph = new GraphMarker(points[i], map, pane, tips, graph_f, {onDestroy: this.graph_destroyed.bind(this, map)});
+		this.graph = new GraphMarker(points[i], map, graph_f, {
+			pane: pane,
+			tips: this.options.tips,
+			onDestroy: this.graph_destroyed.bind(this, map)
+		});
 	},
 	destroy_graph: function (map)
 	{

@@ -10,7 +10,7 @@ var VisegradApp = {
 
 			new PageScroller($$('section.page-section'));
 			var tips = new Tips();
-			this.map = new AppMap($(mapid), $('map-controls'), tips);
+			this.map = new AppMap($(mapid), $('map-controls'), mapconf, {tips: tips});
 			this.graph = new DGraph($('e-graphs'));
 			this.table = new DTable($('e-table'));
 			this.filter = new PlaceFilter(mapdata, filters, filter_countries, {

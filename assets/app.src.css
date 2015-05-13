@@ -1,0 +1,569 @@
+@font-face
+{
+	font-family : 'roboto';
+	src         : url('../fonts/Roboto-Regular-webfont.eot');
+	src         : url('../fonts/Roboto-Regular-webfont.eot?#iefix') format('embedded-opentype'),
+	url('../fonts/Roboto-Regular-webfont.woff') format('woff'),
+	url('../fonts/Roboto-Regular-webfont.ttf') format('truetype'),
+	url('../fonts/Roboto-Regular-webfont.svg#robotoregular') format('svg');
+	font-weight : normal;
+	font-style  : normal;
+
+}
+@font-face
+{
+	font-family : 'roboto';
+	src         : url('../fonts/Roboto-Bold-webfont.eot');
+	src         : url('../fonts/Roboto-Bold-webfont.eot?#iefix') format('embedded-opentype'),
+	url('../fonts/Roboto-Bold-webfont.woff') format('woff'),
+	url('../fonts/Roboto-Bold-webfont.ttf') format('truetype'),
+	url('../fonts/Roboto-Bold-webfont.svg#robotobold') format('svg');
+	font-weight : bold;
+	font-style  : normal;
+}
+
+
+.white-bg
+{
+	background-color : #fff;
+	color            : #000;
+}
+
+.black-bg
+{
+	background-color : #000;
+	color            : #fff;
+}
+
+.dark-bg
+{
+	background-color : #464646;
+	color            : #d1d1d1;
+}
+
+.light-bg
+{
+	background-color : #d1d1d1;
+	color            : #464646;
+}
+
+.grey-1
+{
+	color : #666;
+}
+
+.grey-1-bg
+{
+	background-color : #666;
+}
+
+.grey-2
+{
+	color : #949494;
+}
+
+.grey-2-bg
+{
+	background-color : #949494;
+}
+
+.grey-3
+{
+	color : #b4b4b4;
+}
+
+.grey-3-bg
+{
+	background-color : #b4b4b4;
+}
+
+.green
+{
+	color : #02d349;
+}
+
+.green-bg
+{
+	background-color : #02d349;
+}
+
+.yellow
+{
+	color : #fcac00;
+}
+
+.yellow-bg
+{
+	background-color : #fcac00;
+}
+
+.blue
+{
+	color : #00d6e0;
+}
+
+.blue-bg
+{
+	background-color : #00d6e0;
+}
+
+.red
+{
+	color : #fa4c03;
+}
+
+.red-bg
+{
+	background-color : #fa4c03;
+}
+
+/*graph*/
+.graph-0
+{
+	color  : #3c6494;
+	fill   : #3c6494;
+	stroke : #3c6494;
+}
+
+.graph-1
+{
+	color  : #963d3b;
+	fill   : #963d3b;
+	stroke : #963d3b;
+}
+
+.graph-2
+{
+	color  : #799244;
+	fill   : #799244;
+	stroke : #799244;
+}
+
+.graph-3
+{
+	color  : #634d7e;
+	fill   : #634d7e;
+	stroke : #634d7e;
+}
+
+.graph-4
+{
+	color  : #39869b;
+	fill   : #39869b;
+	stroke : #39869b;
+}
+
+.graph-5
+{
+	color  : #c27535;
+	fill   : #c27535;
+	stroke : #c27535;
+}
+
+.graph-6
+{
+	color  : #4978b1;
+	fill   : #4978b1;
+	stroke : #4978b1;
+}
+
+.graph-7
+{
+	color  : #b34a47;
+	fill   : #b34a47;
+	stroke : #b34a47;
+}
+
+.graph-8
+{
+	color  : #91af53;
+	fill   : #91af53;
+	stroke : #91af53;
+}
+
+.graph-9
+{
+	color  : #775d97;
+	fill   : #775d97;
+	stroke : #775d97;
+}
+
+.graph-10
+{
+	color  : #46a1b9;
+	fill   : #46a1b9;
+	stroke : #46a1b9;
+}
+
+.graph-11
+{
+	color  : #e78c41;
+	fill   : #e78c41;
+	stroke : #e78c41;
+}
+
+.graph-12
+{
+	color  : #7e9bc8;
+	fill   : #7e9bc8;
+	stroke : #7e9bc8;
+}
+
+.graph-13
+{
+	color  : #ca7e7d;
+	fill   : #ca7e7d;
+	stroke : #ca7e7d;
+}
+
+.graph-14
+{
+	color  : #aec683;
+	fill   : #aec683;
+	stroke : #aec683;
+}
+
+.graph-15
+{
+	color  : #9b89b3;
+	fill   : #9b89b3;
+	stroke : #9b89b3;
+}
+
+.graph-16
+{
+	color  : #7cbbcf;
+	fill   : #7cbbcf;
+	stroke : #7cbbcf;
+}
+
+.graph-17
+{
+	color  : #f8aa79;
+	fill   : #f8aa79;
+	stroke : #f8aa79;
+}
+
+/*marker*/
+.marker-circle
+{
+	stroke           : #000;
+	stroke-width     : 1px;
+	stroke-opacity   : 0.3;
+	fill             : #ca7e7d;
+	fill-opacity     : 0.3;
+	background-color : #ca7e7d;
+	opacity          : 0.3;
+	border           : 1px solid #000;
+	border-radius    : 50%;
+}
+*
+{
+	box-sizing  : border-box;
+	font-family : roboto;
+}
+
+html, button, input, select, textarea, .pure-g [class *= "pure-u"]
+{
+	font-family : roboto;
+}
+
+.pure-button
+{
+	border-radius : 0px;
+}
+
+body, html
+{
+	position : relative;
+	width    : 100%;
+	height   : 100%;
+	/*font-size: 12px;*/
+}
+
+header
+{
+	line-height : 2em;
+	padding     : 1em;
+	position    : relative;
+	z-index     : 3;
+}
+
+.filters
+{
+	position   : absolute;
+	z-index    : 2;
+	width      : 100%;
+	height     : 15em;
+	bottom        : 0em;
+	left       : 0px;
+	display    : block;
+	border     : 0px;
+	padding    : 0px;
+	transition : all 250ms;
+}
+
+.filters.visible
+{
+	bottom : -15em;
+}
+
+.map
+{
+	position : relative;
+	width    : 100%;
+	height   : 56em;
+	z-index  : 1;
+}
+
+.filters nav.filter-btn
+{
+	display  : block;
+	position : absolute;
+	height   : 1em;
+	bottom   : -1em;
+	right    : 1em;
+}
+
+.filters nav.filter-tab-switch
+{
+	display  : block;
+	position : absolute;
+	height   : 1em;
+	bottom   : -1em;
+	width    : 25em;
+}
+
+.filter-tab section.select
+{
+	padding-left  : 1em;
+	padding-right : 1em;
+}
+
+.filter-tab section.select header
+{
+	font-weight : bold;
+	padding     : 0;
+}
+
+.filter-tab section.select select
+{
+	width : 100%;
+}
+
+.filters nav.filter-tab-switch a.pure-button
+{
+	display      : block;
+	margin-right : 4px;
+}
+
+#map-main
+{
+	height : 100%;
+}
+
+.year-container
+{
+	height   : 150px;
+	position : relative;
+}
+
+.year-container div
+{
+	position         : absolute;
+	width            : 100%;
+	height           : 10%;
+	background-color : #3c6494;;
+	bottom           : 0px;
+	color            : #fff;
+	padding          : 0px;
+	margin           : 0px;
+	transition       : height 750ms;
+}
+.main-header
+{
+	position: fixed;
+	width: 100%;
+	z-index: 5;
+	padding: 0px;
+}
+.main-header section.logo
+{
+	position: relative;
+	z-index: 3;
+	padding: 1em;
+}
+.year-container div.sel
+{
+	background-color : #ca7e7d;
+}
+
+.map-control, .map-control-city
+{
+	position : absolute;
+	width    : 5.4em;
+	left     : 2em;
+	z-index  : 2;
+	bottom   : 2em;
+}
+.map-control-city
+{
+	left: 7.4em;
+}
+.map-control span a, .map-control-city  span a
+{
+	margin     : 0.2em;
+	display    : block;
+	text-align : center;
+}
+
+.map-control span a.pure-button, .map-control-city  span a.pure-button
+{
+	padding-left  : 0px;
+	padding-right : 0px;
+
+}
+
+.map-control-city  span a.pure-button, .map-control span a.pure-button, .filters nav.filter-tab-switch a.pure-button, .filters nav.filter-btn a.pure-button
+{
+	box-shadow : 2px 4px 6px 0px rgba(0, 0, 0, 0.5);
+}
+
+ul.years
+{
+	padding          : 0px;
+	margin           : 0px;
+	list-style-image : none;
+	margin-top       : 2em;
+	display          : inline-block;
+	width            : 100%;
+	padding-left     : 1em;
+	padding-right    : 1em;
+}
+
+ul.years li
+{
+	display       : inline-block;
+	text-align    : center;
+	margin        : 0px;
+	padding-left  : 2px;
+	padding-right : 2px;
+	width         : 6.25%;
+}
+
+ul.years li div.year-val
+{
+	padding-top : 1em;
+	border-top  : 1px solid #000;
+	margin-top  : 0.2em;
+	font-size   : 0.6em;
+}
+
+ul.years li div.year-container div
+{
+	font-size : 0.6em;
+}
+
+.marker-circle
+{
+	cursor : pointer;
+}
+
+.graph-inner
+{
+	position      : absolute;
+	width         : 80px;
+	height        : 80px;
+	left          : -40px;
+	top           : -40px;
+	background    : #fff;
+	border-radius : 50%;
+	text-align    : center;
+}
+
+.graph-inner header
+{
+	font-weight : bold;
+	padding     : 0px;
+	margin      : 0px;
+	padding-top : 1em;
+}
+
+.tip-wrap
+{
+	background-color : #fff;
+	border           : 1px solid #000;
+	z-index          : 999;
+	border-radius    : 0.5em;
+	padding          : 1em;
+	max-width        : 30em;
+}
+
+.tip-wrap .tip-title
+{
+	font-weight : bold;
+}
+
+.graph-section .ct-chart
+{
+	height : 300px;
+}
+
+.page-scroller
+{
+	position: fixed;
+	top: 50%;
+	z-index: 999;
+	width: 1em;
+	right: 2em;
+}
+.page-scroller i
+{
+	font-size: 1.5em;
+	padding: 0.5em 0.25em 0.5em 0.25em;
+	opacity: 1;
+	transition: opacity 250ms;
+}
+.page-scroller i.c-hidden
+{
+	opacity: 0;
+}
+
+@media screen and (max-width : 35.5em)
+{
+	/*
+	.filters
+	{
+		width: 100%;
+		height: 100%;
+	}
+	*/
+}
+
+@media screen and (max-width : 48em)
+{
+	/*
+	.filters
+	{
+		width: 100%;
+		height: 100%;
+	}
+	*/
+}
+
+@media screen and (max-width : 64em)
+{
+	.filters
+	{
+		height : 28em;
+	}
+	.filters.visible
+	{
+		bottom : -28em;
+	}
+}
+
+@media screen and (min-width : 80em)
+{
+
+}

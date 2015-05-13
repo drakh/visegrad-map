@@ -1,391 +1,33 @@
-var mapconf = {
-	url: 'http://{s}.tile.stamen.com/{id}/{z}/{x}/{y}.png',
-	attr: 'one',
-	table_headers: ["City", "Year", "Applicant", "Project title"],
-	graph_names: ["Grant programs", "Activity fields", "Countries"],
-	visegrad: ["CZ", "HU", "PL", "SK"],
-	subdomains: 'a.b.c.d'.split('.'),
-	map_id: 'toner',
-	min_z: 5,
-	max_z: 10,
-	min_radius: 5,
-	v4_bounds: [
-		[
-			55.0721744,
-			12.1004461
-		],
-		[
-			45.7268402,
-			24.1729511
-		]
-	],
-	year_bounds: {
-		min: 2000,
-		max: 2015
-	}
-};
-var mapid = 'map-main';
-var CityMarker = new Class({
-	Implements: [
-		Events,
-		Options
-	],
-	initialize: function (map, pt, pane, b, tips, options)
-	{
-		this.setOptions(options);
-		this.tips = tips;
-		var max_z = 996;
-		var min_z = 1;
-		var r = pt.total / b.min;
-		var l = Math.log(r);
-		var z = max_z - Math.round(l * 10);
-		if (z < min_z)
-		{
-			z = min_z;
-		}
-		var w = Math.round((mapconf.min_radius + (l * 5)));
-
-		var el = new Element('div', {
-			title: pt.s,
-			styles: {
-				position: 'absolute',
-				'z-index': z
-			},
-			events: {
-				click: this.fire_click.bind(this, map, pane)
-			}
-		}).inject(pane);
-
-		new Element('div', {
-			styles: {
-				position: 'absolute',
-				width: w * 2,
-				height: w * 2,
-				left: -w,
-				top: -w
-			},
-			class: 'marker-circle'
-		}).inject(el);
-		this.z = z;
-		this.pt = pt;
-		this.el = el;
-		this.g = null;
-		this.reposition(map);
-		map.on('zoomstart', this.before_zoom.bind(this));
-		map.on('zoomend', this.reposition.bind(this, map));
-
-	},
-	fire_click: function ()
-	{
-		this.fireEvent('click');
-	},
-	to_front: function ()
-	{
-		this.el.setStyles({
-			'z-index': 997
-		});
-	},
-	to_back: function ()
-	{
-		this.el.setStyles({
-			'z-index': this.z
-		});
-	},
-	before_zoom: function ()
-	{
-		this.el.setStyles({
-			display: 'none'
-		});
-	},
-	reposition: function (map)
-	{
-		var ps = map.latLngToLayerPoint([
-			this.pt.lat,
-			this.pt.lon
-		]);
-
-		this.el.setStyles({
-			display: 'block',
-			transform: 'translate3d(' + ps.x + 'px, ' + ps.y + 'px, 0px)'
-		});
-	},
-	show_graph: function (map, pane)
-	{
-
-		var p = this.pt;
-		map.panTo([
-			p.lat,
-			p.lon
-		]);
-		this.g = new GraphMarker(p, map, pane, this.tips, {onDestroy: this.graph_destroyed.bind(this, map)});
-	},
-	graph_destroyed: function ()
-	{
-		this.g = null;
-	},
-	destroy_graph: function (map)
-	{
-		if (this.g != null)
-		{
-			this.g.destroy(map);
-		}
-	},
-	destroy: function (map)
-	{
-		this.destroy_graph(map);
-		this.el.destroy();
-	}
-});
-var GraphMarker = new Class({
-	Implements: [
-		Events,
-		Options
-	],
-	initialize: function (pt, map, pane, tips, graph_f, options)
-	{
-		this.setOptions(options);
-		this.graph_f = graph_f;
-		this.tips = tips;
-		this.tooltip_visible = false;
-		var el = new Element('div', {
-			styles: {
-				title: pt.s,
-				position: 'absolute',
-				'z-index': 998
-			},
-			events: {
-				mouseenter: this.to_front.bind(this),
-				mouseleave: this.to_back.bind(this)
-			}
-		}).inject(pane);
-
-		var g_el = new Element('div', {
-			styles: {
-				position: 'absolute',
-				width: 200,
-				height: 200,
-				left: -100,
-				top: -100,
-				background: '#fff',
-				'border-radius': '50%'
-			},
-			class: 'ct-chart'
-		}).inject(el);
-		var g = new Chartist.Pie(g_el, {
-			series: this.mk_graph(pt)
-		}, {
-			donut: true,
-			donutWidth: 50,
-			showLabel: false
-		});
-		g.on('created', this.graph_bind_events.bind(this, g_el));
-
-		new Element('div',
-			{
-				html: '<div><header>' + pt.s + '</header></div><div>' + pt.total + '</div>',
-				class: 'graph-inner',
-				events: {
-					click: this.destroy.bind(this, map)
-				}
-			}).inject(el);
-		this.pt = pt;
-		this.g = g;
-
-
-		this.el = el;
-		this.reposition(map);
-
-		map.on('zoomstart', this.before_zoom.bind(this));
-		map.on('zoomend', this.reposition.bind(this, map));
-	},
-	graph_bind_events: function (el, d)
-	{
-		var s = el.getElements('.ct-series');
-		var l = s.length;
-		for (var i = 0; i < s.length; i++)
-		{
-			var j = (l - 1 - i);
-			s[i].addEvents({
-				click: this.show_hide_tooltip.bind(this, j)
-			});
-			s[i].store('tip:title', this.pt.s);
-			s[i].store('tip:text', this.mk_text(j));
-		}
-		this.slices = s;
-		this.tips.attach(s);
-	},
-	mk_text: function (i)
-	{
-
-		var g = this.g_data[i].v;
-		var p = this.pt_data;
-		var d = this.desc;
-		var str = d[i].nm + ': <strong>' + d[i].count + '</strong>';
-		return str;
-	},
-	show_tooltip: function (i)
-	{
-		this.tips.show();
-		this.tooltip_visible = true;
-	},
-	hide_tooltip: function (i)
-	{
-		this.tooltip_visible = false;
-	},
-	show_hide_tooltip: function (i)
-	{
-		if (this.tooltip_visible == true)
-		{
-			this.hide_tooltip(i);
-		}
-		else
-		{
-			this.show_tooltip(i);
-		}
-	},
-	mk_graph: function (p)
-	{
-		var graph_f = this.graph_f;
-		var d = {};
-		var pdt = [];
-		for (var pid in p.data)
-		{
-			var a = p.data[pid];
-			for (var i = 0; i < a.length; i++)
-			{
-				var dt = a[i].c;
-				for (var j = 0; j < dt.length; j++)
-				{
-					var t = dt[j];
-					if (!d[t])
-					{
-						d[t] = 0;
-					}
-					d[t]++;
-				}
-			}
-		}
-		for (var pid in d)
-		{
-			pdt.include({
-				name: pid,
-				value: d[pid]
-			});
-		}
-		pdt.sortOn("value", Array.NUMERIC);
-		var g_data = [];
-		var desc = [];
-		var r = [];
-		var k = 0;
-		var l = pdt.length - 1;
-		for (var k = l; k >= 0; k--)
-		{
-			var i = l - k;
-			desc[i] = {
-				nm: graph_f.c[pdt[k].name],
-				count: pdt[k].value
-			}
-			g_data[i] = {
-				v: pdt[k].value,
-				t: pdt[k].name
-			}
-			r[i] = {
-				data: pdt[k].value,
-				className: 'graph-' + (i % 17)
-			}
-		}
-		/*
-		 for (var pid in d)
-		 {
-		 desc[i] = {
-		 nm: graph_f.c[pid],
-		 count: d[pid]
-		 };
-		 g_data[i] = {
-		 v: d[pid],
-		 t: pid
-		 };
-
-		 r[i] = {
-		 data: d[pid],
-		 className: 'graph-' + (i % 17)
-		 };
-		 i++
-		 }
-		 */
-		this.pt_data = p;
-		this.g_data = g_data;
-		this.desc = desc;
-		return (r);
-	},
-	before_zoom: function ()
-	{
-		this.el.setStyles({
-			display: 'none'
-		});
-	},
-	reposition: function (map)
-	{
-		var ps = map.latLngToLayerPoint([
-			this.pt.lat,
-			this.pt.lon
-		]);
-
-		this.el.setStyles({
-			display: 'block',
-			transform: 'translate3d(' + ps.x + 'px, ' + ps.y + 'px, 0px)'
-		});
-
-	},
-	destroy: function (map)
-	{
-		this.tips.detach(this.slices);
-		this.g.detach();
-		this.el.destroy();
-		map.off('zoomstart', this.before_zoom.bind(this));
-		map.off('zoomend', this.reposition.bind.bind(this, map));
-
-		this.fireEvent('destroy');
-		this.removeEvents();
-	},
-	to_front: function ()
-	{
-		this.el.setStyles({
-			'z-index': 999
-		});
-	},
-	to_back: function ()
-	{
-		this.el.setStyles({
-			'z-index': 998
-		});
-	}
-});
 var AppMap = new Class({
-	initialize: function (el, c, tips)
+	Implements: [Events, Options],
+	options: {
+		tips: null
+	},
+	initialize: function (el, c, conf, options)
 	{
+		this.setOptions(options);
+		this.conf = conf;
 		this.markers = {};
-		this.tips = tips;
-		var map = L.map($(mapid), {
+		var a_map = L.map($(mapid), {
 			attributionControl: false,
 			zoomControl: false
 		});
 
-		L.tileLayer(mapconf.url, {
-			attribution: mapconf.attr,
-			id: mapconf.map_id,
-			subdomains: mapconf.subdomains,
-			minZoom: mapconf.min_z,
-			maxZoom: mapconf.max_z
-		}).addTo(map);
+		L.tileLayer(conf.url, {
+			attribution: conf.attr,
+			id: conf.map_id,
+			subdomains: conf.subdomains,
+			minZoom: conf.min_z,
+			maxZoom: conf.max_z
+		}).addTo(a_map);
 
-		this.pane = map.getPanes().popupPane;
+		this.pane = a_map.getPanes().popupPane;
 
 		if (c)
 		{
 			this.initialize_controls(c);
 		}
-		this.map = map;
+		this.map = a_map;
 		this.zoom_to_v4();
 
 	},
@@ -421,7 +63,7 @@ var AppMap = new Class({
 		{
 			e.stop();
 		}
-		this.map.fitBounds(mapconf.v4_bounds);
+		this.map.fitBounds(this.conf.v4_bounds);
 	},
 	zoom_to_bounds: function (e)
 	{
@@ -441,31 +83,37 @@ var AppMap = new Class({
 
 		var pane = this.pane;
 		var map = this.map;
-		var tips = this.tips;
 
 		var points = data.points;
 		var bounds = data.bounds;
 		this.map.options.minZoom = 0;
+		var conf = this.conf;
+
 		if (points.length > 0)
 		{
 			var z = this.map.getBoundsZoom(bounds);
-			if (z > mapconf.max_z)
+			if (z > conf.max_z)
 			{
-				z = mapconf.max_z;
+				z = conf.max_z;
 			}
-			if (z < mapconf.min_z)
+			if (z < conf.min_z)
 			{
-				z = mapconf.min_z;
+				z = conf.min_z;
 			}
 
 			this.map.setMaxBounds(bounds);
 			this.map.options.minZoom = z;
 			this.bounds = bounds;
 			this.points = points;
+			var rel = points.rel;
 			for (var i = 0; i < points.length; i++)
 			{
 				var p = points[i];
-				this.markers[i] = new CityMarker(map, p, pane, points.rel, tips, {onClick: this.show_graph.bind(this, i)});
+				this.markers[i] = new CityMarker(map, p, rel, {
+					tips: this.options.tips,
+					pane: pane,
+					onClick: this.show_graph.bind(this, i)
+				});
 			}
 			this.zoom_to_bounds();
 		}
@@ -475,11 +123,13 @@ var AppMap = new Class({
 		var points = this.points;
 		var map = this.map;
 		var pane = this.pane;
-		var map = this.map;
-		var tips = this.tips;
 		var graph_f = this.graph_f;
 		this.destroy_graph(map);
-		this.graph = new GraphMarker(points[i], map, pane, tips, graph_f, {onDestroy: this.graph_destroyed.bind(this, map)});
+		this.graph = new GraphMarker(points[i], map, graph_f, {
+			pane: pane,
+			tips: this.options.tips,
+			onDestroy: this.graph_destroyed.bind(this, map)
+		});
 	},
 	destroy_graph: function (map)
 	{
@@ -505,316 +155,652 @@ var AppMap = new Class({
 
 	}
 });
-var YearDrag = new Class({
+var CityMarker = new Class({
 	Implements: [
 		Events,
 		Options
 	],
-	drags: [
-		'min',
-		'max'
-	],
-	initialize: function (el, divs, options)
+	options: {
+		pane: null,
+		front_z: 997,
+		max_z: 996,
+		min_z: 1
+	},
+	initialize: function (map, pt, b, options)
 	{
 		this.setOptions(options);
-		var w = el.getParent();
-		w.setStyles({
-			position: 'relative'
-		});
+		var o = this.options;
+		var max_z = o.max_z;
+		var min_z = o.min_z;
+		var r = pt.total / b.min;
+		var l = Math.log(r);
+		var z = max_z - Math.round(l * 10);
+		if (z < min_z)
+		{
+			z = min_z;
+		}
+		var w = Math.round((mapconf.min_radius + (l * 5)));
 
 		var el = new Element('div', {
+			title: pt.s,
 			styles: {
 				position: 'absolute',
-				width: '100%',
-				height: '20px',
-				bottom: 10,
-				left: 0,
-				padding: '1em'
+				'z-index': z
+			},
+			events: {
+				click: this.fire_click.bind(this)
 			}
-		}).inject(w);
-		var d_w = new Element('div', {
+		}).inject(o.pane);
+
+		new Element('div', {
 			styles: {
-				position: 'relative',
-				'border-top': '2px solid #000'
-			}
+				position: 'absolute',
+				width: w * 2,
+				height: w * 2,
+				left: -w,
+				top: -w
+			},
+			class: 'marker-circle'
 		}).inject(el);
-		var sliders = [];
-		for (var i = 0; i < 2; i++)
-		{
-			sliders[i] = new Element('a', {
-				styles: {
-					display: 'block',
-					width: 20,
-					height: 30,
-					top: -15,
-					cursor: 'pointer',
-					'text-align': 'center',
-					'padding-top': '0.2em',
-					position: 'absolute'
-				},
-				html: '<i class="el el-caret-up"></i>'
-			}).inject(d_w);
-		}
-		new YearSlider(d_w, sliders, divs, {
-			onChanged: this.sliders_changed.bind(this)
+		this.z = z;
+		this.pt = pt;
+		this.el = el;
+		this.g = null;
+		this.reposition(map);
+		map.on('zoomstart', this.before_zoom.bind(this));
+		map.on('zoomend', this.reposition.bind(this, map));
+
+	},
+	fire_click: function ()
+	{
+		this.fireEvent('click');
+	},
+	to_front: function ()
+	{
+		this.el.setStyles({
+			'z-index': this.options.front_z
 		});
 	},
-	sliders_changed: function (range)
+	to_back: function ()
 	{
-		this.fireEvent('changed', range);
+		this.el.setStyles({
+			'z-index': this.z
+		});
+	},
+	before_zoom: function ()
+	{
+		this.el.setStyles({
+			display: 'none'
+		});
+	},
+	reposition: function (map)
+	{
+		var ps = map.latLngToLayerPoint([
+			this.pt.lat,
+			this.pt.lon
+		]);
+
+		this.el.setStyles({
+			display: 'block',
+			transform: 'translate3d(' + ps.x + 'px, ' + ps.y + 'px, 0px)'
+		});
+	},
+	destroy: function ()
+	{
+		this.el.destroy();
 	}
 });
-var YearSlider = new Class({
+var DGraph = new Class({
 	Implements: [
 		Events,
 		Options
 	],
-	initialize: function (wrapper, sliders, divs, options)
+	initialize: function (el, options)
 	{
 		this.setOptions(options);
-		this.w = wrapper;
-		this.sliders = sliders;
-
-		var d = [];
-		var l = sliders.length - 1;
-
-		this.bounds = {};
-		this.bounds['divs'] = divs;
-
-		for (var i = 0; i < l + 1; i++)
-		{
-			d[i] = new Drag(sliders[i], {
-				onComplete: this.snap.bind(this, i)
-			});
-		}
-		this.drags = d;
-
-		this.slidersel = [0, divs];
-		this.set_size();
-		this.chng();
-		window.addEvent('resize', this.set_size.bind(this));
-	},
-	set_size: function ()
-	{
-		var wrapper = this.w;
-		var w_s = wrapper.getSize();
-		var divs = this.bounds.divs;
-
-		var grid = Math.round(w_s.x / divs);
-		var d = this.drags;
-		var sliders = this.sliders;
-		var slidersel = this.slidersel;
-		var l = sliders.length - 1;
-
-		for (var i = 0; i < d.length; i++)
-		{
-			var s_s = sliders[i].getSize();
-			var x = Math.round(s_s.x / 2);
-			var y = Math.round(s_s.y / 2);
-
-			var s_p = (slidersel[i] * grid - x);
-			sliders[i].setStyles({
-				left: s_p
-			});
-			var min_x = 0 - x;
-			var max_x = w_s.x - x;
-
-			d[i].options.limit = {
-				x: [
-					min_x + (Math.round(w_s.x / divs) * i),
-					max_x - Math.round(w_s.x / divs) * (l - i)
-				],
-				y: [
-					0 - y,
-					0 - y
-				]
-			};
-			d[i].options.grid = grid;
-		}
-		this.bounds['x'] = {
-			min: min_x,
-			max: max_x
-		};
-		this.bounds['grid'] = grid;
-	},
-	snap: function (i, el)
-	{
-		var b = this.bounds;
-		var p = el.getPosition(this.w);
-		switch (i)
-		{
-			case 0:
-				this.drags[1].options.limit.x[0] = p.x + b.grid;
-				this.slidersel[0] = Math.round((p.x - b.x.min) / b.grid);
-				break;
-			case 1:
-				this.drags[0].options.limit.x[1] = p.x - b.grid;
-				this.slidersel[1] = Math.round((p.x - b.x.min) / b.grid);
-				break;
-		}
-		this.chng();
-	},
-	chng: function ()
-	{
-		var s = this.slidersel;
-		var r = {
-			min: s[0],
-			max: s[1]
-		}
-		this.fireEvent('changed', r);
-	}
-});
-var YearSel = new Class({
-	Implements: [
-		Events,
-		Options
-	],
-	initialize: function (el, bounds, options)
-	{
-		this.created = false;
-		this.setOptions(options);
-		this.p_d = {
-			data: {},
-			max: 0
-		};
-		this.bounds = bounds;
-		this.build_elements(bounds, el);
-		this.data = [];
-		this.drag = new YearDrag(el, this.vals.length, {
-			onChanged: this.change_vals.bind(this)
-		});
-	},
-	get_message: function ()
-	{
-		var f = this.range;
-		var min = f[0];
-		var max;
-		var m;
-		for (pid in f)
-		{
-			max = f[pid];
-		}
-		if (min != max)
-		{
-			m = min + '-' + max
-		}
-		else
-		{
-			m = min;
-		}
-		return m;
-	},
-	build_elements: function (b, el)
-	{
-		var bars = [];
-		var vals = [];
-		for (var i = b.min; i <= b.max; i++)
-		{
-			var li = new Element('li');
-			var y_c = new Element('div', {
-				class: 'year-container'
-			}).inject(li);
-
-			var ba = new Element('div').inject(y_c);
-			var va = new Element('div', {class: 'year-val', text: i}).inject(li);
-			li.inject(el);
-			vals.include(va);
-			bars.include(ba);
-		}
-		this.bars = bars;
-		this.vals = vals;
+		this.g = [];
+		this.el = el;
 	},
 	set_data: function (data)
 	{
 		this.data = data;
-		this.p_d = this.prepare_data(data);
-		this.redraw_divs();
-		if (this.created == false)
-		{
-			this.created = true;
-			this.fireEvent('filtercreated');
-		}
+		this.el.empty();
+		this.build_graphs();
 	},
-	redraw_divs: function ()
+	build_graphs: function ()
 	{
-		var bars = this.bars;
-		var vals = this.vals;
-		var lim = this.limit;
-		var f = {};
-		var dt = this.p_d;
+		this.build_topic_graph();
+		this.build_tag_graph();
+		this.build_country_graph();
+	},
+	build_topic_graph: function ()
+	{
+		var w = this.el;
+		var s = new Element('section', {class: 'graph-section'}).inject(w);
+		new Element('header', {html: mapconf.graph_names[0] + ':'}).inject(s);
+		var grid = new Element('div', {class: 'pure-g'}).inject(s);
+		var pie = new Element('div', {class: 'pure-u-1 pure-u-md-1-3 ct-chart'}).inject(grid);
+		var bar = new Element('div', {class: 'pure-u-1 pure-u-md-2-3 ct-chart'}).inject(grid);
+		var data = this.data.points;
 
-		var m = dt.max / 100;
-		var yr = 0;
+		var c_d = {};
+		var y_d = {};
 
-		for (var i = 0; i < vals.length; i++)
-		{
-			var y = vals[i].get('text');
-			if (dt.data[y])
-			{
-				var hg = (dt.data[y] / m);
-				bars[i].set('text', dt.data[y]).setStyles(
-					{height: hg + '%'}
-				);
-			}
-			else
-			{
-				bars[i].set('text', '');
-				bars[i].setStyles({'height': 0});
-			}
-			if (i >= lim.min && i < lim.max)
-			{
-				bars[i].addClass('sel');
-				f[yr] = y;
-				yr++;
-			}
-			else
-			{
-				bars[i].removeClass('sel');
-			}
-		}
-		this.range = f;
-		var ret = {
-			years: f,
-			msg: this.get_message()
-		}
-		this.fireEvent('rangechanged', ret);
-	},
-	change_vals: function (d)
-	{
-		this.limit = d;
-		this.redraw_divs();
-	},
-	prepare_data: function (data)
-	{
-		var dt = {};
-		var max = 0;
 		for (var i = 0; i < data.length; i++)
 		{
-			var d = data[i];
-			for (var pid in d.data)
+			var d = data[i].data;
+			for (var yr in d)
 			{
-				var dx = d.data[pid];
-				if (!dt[pid])
+				var dd = d[yr];
+				if (!y_d[yr])
 				{
-					dt[pid] = 0;
+					y_d[yr] = {};
 				}
-				for (var j = 0; j < dx.length; j++)
+				for (var k = 0; k < dd.length; k++)
 				{
-					dt[pid]++;
-					if (dt[pid] > max)
+					var g_g = dd[k].g
+					if (!c_d[g_g])
 					{
-						max = dt[pid];
+						c_d[g_g] = 0;
 					}
+					if (!y_d[yr][g_g])
+					{
+						y_d[yr][g_g] = 0;
+					}
+					y_d[yr][g_g]++;
+					c_d[g_g]++;
 				}
 			}
 		}
-		var r = {
-			data: dt,
-			max: max
-		};
-		return r;
+		var i = 0;
+		var r = [];
+		var l = [];
+		for (var pid in c_d)
+		{
+			l[i] = pid;
+			r[i] = {
+				data: c_d[pid],
+				className: 'graph-' + (i % 17)
+			};
+			i++;
+		}
+		new Chartist.Pie(pie, {
+			series: r,
+			labels: l
+		}, {showLabel: false});
+
+
+		r = [];
+		l = [];
+		i = 0;
+		for (var yr in y_d)
+		{
+			l[i] = yr;
+			r[i] = [];
+			for (var ct in y_d[yr])
+			{
+				r[i].include(y_d[yr][ct]);
+			}
+			i++;
+		}
+		new Chartist.Bar(bar, {
+			labels: l,
+			series: r
+		}, {stackBars: true});
+	},
+	build_tag_graph: function ()
+	{
+
+		var w = this.el;
+		var s = new Element('section', {class: 'graph-section'}).inject(w);
+		new Element('header', {html: mapconf.graph_names[1] + ':'}).inject(s);
+		var grid = new Element('div', {class: 'pure-g'}).inject(s);
+		var pie = new Element('div', {class: 'pure-u-1 pure-u-md-1-3 ct-chart'}).inject(grid);
+		var bar = new Element('div', {class: 'pure-u-1 pure-u-md-2-3 ct-chart'}).inject(grid);
+		var data = this.data.points;
+
+		var c_d = {};
+		var y_d = {};
+
+		for (var i = 0; i < data.length; i++)
+		{
+			var d = data[i].data;
+			for (var yr in d)
+			{
+				var dd = d[yr];
+				if (!y_d[yr])
+				{
+					y_d[yr] = {};
+				}
+				for (var k = 0; k < dd.length; k++)
+				{
+					var qg_g = dd[k].c;
+					for (var j = 0; j < qg_g.length; j++)
+					{
+						var g_g = qg_g[j];
+						if (!c_d[g_g])
+						{
+							c_d[g_g] = 0;
+						}
+						if (!y_d[yr][g_g])
+						{
+							y_d[yr][g_g] = 0;
+						}
+						y_d[yr][g_g]++;
+						c_d[g_g]++;
+					}
+
+				}
+			}
+		}
+		var i = 0;
+		var r = [];
+		var l = [];
+		for (var pid in c_d)
+		{
+			l[i] = pid;
+			r[i] = {
+				data: c_d[pid],
+				className: 'graph-' + (i % 17)
+			};
+			i++;
+		}
+		new Chartist.Pie(pie, {
+			series: r,
+			labels: l
+		}, {showLabel: false});
+
+
+		r = [];
+		l = [];
+		i = 0;
+		for (var yr in y_d)
+		{
+			l[i] = yr;
+			r[i] = [];
+			for (var ct in y_d[yr])
+			{
+				r[i].include(y_d[yr][ct]);
+			}
+			i++;
+		}
+		new Chartist.Bar(bar, {
+			labels: l,
+			series: r
+		}, {stackBars: true});
+	},
+	build_country_graph: function ()
+	{
+		var w = this.el;
+		var s = new Element('section', {class: 'graph-section'}).inject(w);
+		new Element('header', {html: mapconf.graph_names[2] + ':'}).inject(s);
+		var grid = new Element('div', {class: 'pure-g'}).inject(s);
+		var pie = new Element('div', {class: 'pure-u-1 pure-u-md-1-3 ct-chart'}).inject(grid);
+		var bar = new Element('div', {class: 'pure-u-1 pure-u-md-2-3 ct-chart'}).inject(grid);
+		var data = this.data.points;
+		var c_d = {};
+		var y_d = {};
+		for (var i = 0; i < data.length; i++)
+		{
+			var c = data[i].c;
+			var d = data[i].data;
+
+			if (!c_d[c])
+			{
+				c_d[c] = 0;
+			}
+			c_d[c]++;
+			for (var yr in d)
+			{
+				if (!y_d[yr])
+				{
+					y_d[yr] = {};
+				}
+				if (!y_d[yr][c])
+				{
+					y_d[yr][c] = 0;
+				}
+				var yr_d = d[yr];
+				y_d[yr][c] = yr_d.length;
+			}
+
+		}
+		var i = 0;
+		var r = [];
+		var l = [];
+		for (var pid in c_d)
+		{
+			l[i] = pid;
+			r[i] = {
+				data: c_d[pid],
+				className: 'graph-' + (i % 17)
+			};
+			i++;
+		}
+		new Chartist.Pie(pie, {
+			series: r,
+			labels: l
+		}, {showLabel: false});
+
+		r = [];
+		l = [];
+		i = 0;
+		for (var yr in y_d)
+		{
+			l[i] = yr;
+			r[i] = [];
+			for (var ct in y_d[yr])
+			{
+				r[i].include(y_d[yr][ct]);
+			}
+			i++;
+		}
+		new Chartist.Bar(bar, {
+			labels: l,
+			series: r
+		}, {stackBars: true});
 	}
 });
+var DPager = new Class({
+	Implements: [Events, Options],
+	initialize: function (el, options)
+	{
+		this.setOptions(options);
+		this.pagination = {};
+		var e = new Element('div', {
+			class: 'pure-menu pure-menu-horizontal'
+		}).inject(el);
+		this.w = new Element('ul', {class: 'pure-menu-list'}).inject(e);
+	},
+	set_data: function (p)
+	{
+		this.pagination = p;
+		this.rebuild();
+	},
+	rebuild: function ()
+	{
+		var p = this.pagination;
+		var page = p.page;
+		var w = this.w;
+		w.empty();
+		var pages = Math.ceil(p.count / p.limit) - 1;
+		if (page > 0)
+		{
+			var li = new Element('li', {class: 'pure-menu-item'}).inject(w);
+			new Element('a', {
+				html: '<i class="el el-fast-backward"></i>',
+				class: 'pure-button pure-menu-link',
+				events: {
+					click: this.change_page.bind(this, (0))
+				}
+			}).inject(li);
+
+			var li = new Element('li', {class: 'pure-menu-item'}).inject(w);
+			new Element('a', {
+				html: '<i class="el el-backward"></i>',
+				class: 'pure-button pure-menu-link',
+				events: {
+					click: this.change_page.bind(this, (page - 1))
+				}
+			}).inject(li);
+		}
+
+		var start = page - 3;
+		if (start < 0)
+		{
+			start = 0;
+		}
+		var end = page + 3;
+		if (start == 0)
+		{
+			end = start + 6;
+		}
+		if (end > pages)
+		{
+			end = pages;
+		}
+		if (end >= pages)
+		{
+			start = end - (6 - (pages - end));
+		}
+		if (start < 0)
+		{
+			start = 0;
+		}
+
+		for (var i = start; i <= end; i++)
+		{
+			if (i == page)
+			{
+				var li = new Element('li', {
+					html: '<span class="pure-button pure-button-active">' + (i + 1) + '</span>',
+					class: 'pure-menu-selected pure-menu-item'
+				}).inject(w);
+			}
+			else
+			{
+				var li = new Element('li', {class: 'pure-menu-item'}).inject(w);
+				new Element('a', {
+					html: (i + 1),
+					class: 'pure-button pure-menu-link',
+					events: {
+						click: this.change_page.bind(this, (i))
+					}
+				}).inject(li);
+			}
+
+		}
+		if (page < pages)
+		{
+			var li = new Element('li', {class: 'pure-menu-item'}).inject(w);
+			new Element('a', {
+				html: '<i class="el el-forward"></i>',
+				class: 'pure-button pure-menu-link',
+				events: {
+					click: this.change_page.bind(this, (page + 1))
+				}
+			}).inject(li);
+
+			var li = new Element('li', {class: 'pure-menu-item'}).inject(w);
+			new Element('a', {
+				html: '<i class="el el-fast-forward"></i>',
+				class: 'pure-button pure-menu-link',
+				events: {
+					click: this.change_page.bind(this, (pages))
+				}
+			}).inject(li);
+		}
+		this.set_page();
+	},
+	change_page: function (i, e)
+	{
+		if (e)
+		{
+			e.stop();
+		}
+		this.pagination.page = i;
+		this.rebuild();
+	},
+	set_page: function ()
+	{
+		this.fireEvent('pagechanged', this.pagination);
+	}
+
+});
+var DTable = new Class({
+	Implements: [
+		Events,
+		Options
+	],
+	options: {
+		table_headers: [
+			{
+				name: 'City',
+				pid: 'city',
+				type: 's'
+			},
+			{
+				name: 'Year',
+				pid: 'year',
+				type: 'n'
+			},
+			{
+				name: 'Applicant',
+				pid: 'applicant',
+				type: 's'
+			},
+			{
+				name: 'Project title',
+				pid: 'project',
+				type: 's'
+			}
+		],
+		sort_els: {
+			'asc': '<i class="el el-caret-up"></i>',
+			'desc': '<i class="el el-caret-down"></i>'
+		}
+	},
+	initialize: function (el, options)
+	{
+		this.setOptions(options);
+		this.pagination = {
+			limit: 50,
+			page: 0,
+			count: 0
+		};
+
+
+		var t = new Element('table', {class: 'pure-table pure-table-bordered pure-table-striped'}).inject(el);
+		this.build_head(t);
+		this.pager = new DPager(el, {onPagechanged: this.change_page.bind(this)});
+		this.el = new Element('tbody').inject(t);
+	},
+	build_head: function (t)
+	{
+		var h = new Element('thead').inject(t);
+		var r = new Element('tr').inject(h);
+		var o = this.options;
+		var ho = o.table_headers;
+		var se = o.sort_els;
+		for (var i = 0; i < ho.length; i++)
+		{
+			var th = new Element('th').inject(r);
+			var e = new Element('div', {
+				class: 'pure-menu pure-menu-horizontal'
+			}).inject(th);
+			new Element('span', {class: 'pure-menu-heading', text: ho[i].name}).inject(e);
+			var ul = new Element('ul', {class: 'pure-menu-list'}).inject(e);
+			for (var pid in se)
+			{
+				var li = new Element('li', {class: 'pure-menu-item'}).inject(ul);
+				new Element('a', {
+					html: se[pid],
+					class: 'pure-button pure-menu-link',
+					events: {
+						click: this.sort_table.bind(this, {col: ho[i], sort_type: pid})
+					}
+				}).inject(li);
+			}
+		}
+	},
+	set_data: function (data)
+	{
+		this.pagination.page = 0;
+		var d = data.points;
+		var a = [];
+		for (var i = 0; i < d.length; i++)
+		{
+			var dt = d[i].data;
+			for (var yr in dt)
+			{
+				var y_d = dt[yr];
+				for (var k = 0; k < y_d.length; k++)
+				{
+					var ae = {
+						city: d[i].s,
+						year: yr,
+						applicant: y_d[k].a,
+						project: y_d[k].name
+					};
+					a.include(ae);
+				}
+			}
+		}
+		this.pagination.count = a.length;
+		this.table_data = a;
+		this.pager.set_data(this.pagination);
+	},
+	change_page: function (p)
+	{
+		this.pagination = p;
+		this.fill_table();
+	},
+	sort_table: function (o, e)
+	{
+		if (e)
+		{
+			e.stop();
+		}
+		console.log(o);
+		var st = '';
+		if (o.sort_type == 'desc')
+		{
+			st = 'DESC_';
+		}
+		switch (o.col.type)
+		{
+			case 's':
+				st += 'STRING'
+				break;
+			case 'n':
+				st += 'NUMERIC';
+				break;
+		}
+		console.log(o.col.pid);
+		console.log(Array[st]);
+		this.table_data.sortOn(o.col.pid, Array[st]);
+		this.pager.change_page(0);
+	},
+	fill_table: function ()
+	{
+
+		var w = this.el;
+		w.empty();
+		var pg = this.pagination;
+		var d = this.table_data;
+		var min = pg.page * pg.limit;
+		var max = min + pg.limit;
+		if (max > d.length)
+		{
+			max = d.length;
+		}
+
+		for (var i = min; i < max; i++)
+		{
+			var r = new Element('tr');
+			for (var pid in d[i])
+			{
+				new Element('td', {text: d[i][pid]}).inject(r);
+			}
+			r.inject(w);
+		}
+	}
+});
+Number.prototype.map = function (in_min, in_max, out_min, out_max)
+{
+	return ( this - in_min ) * ( out_max - out_min ) / ( in_max - in_min ) + out_min;
+};
+
+var DataUtil = {
+	point_graph: function ()
+	{
+
+	},
+	point_total: function ()
+	{
+
+	}
+};
 var FilterWin = new Class({
 	Implements: [
 		Events,
@@ -903,138 +889,378 @@ var FilterWin = new Class({
 		this.el.removeClass('visible');
 	}
 });
-var SelectFilter = new Class({
+var GraphMarker = new Class({
 	Implements: [
 		Events,
 		Options
 	],
-	initialize: function (el, a, n, options)
+	options: {
+		tips: null,
+		pane: null
+	},
+	initialize: function (pt, map, graph_f, options)
 	{
-		this.created = false;
 		this.setOptions(options);
-		this.el = el;
-		this.filter = [];
-		this.els = [];
-		a.addEvent('click', this.select_all.bind(this));
-		n.addEvent('click', this.select_none.bind(this));
-	},
-	get_message: function ()
-	{
-		var els = this.els;
-		var a = this.filter;
-		var r_a = [];
-		var all = true;
-		var m = 'none';
-		for (var pid in els)
-		{
-			if (a.contains(pid))
-			{
-				r_a.include(els[pid].get('text'));
+		this.graph_f = graph_f;
+		var o = this.options;
+		this.tooltip_visible = false;
+		var el = new Element('div', {
+			styles: {
+				title: pt.s,
+				position: 'absolute',
+				'z-index': 998
+			},
+			events: {
+				mouseenter: this.to_front.bind(this),
+				mouseleave: this.to_back.bind(this)
 			}
-			else
+		}).inject(o.pane);
+
+		var g_el = new Element('div', {
+			styles: {
+				position: 'absolute',
+				width: 200,
+				height: 200,
+				left: -100,
+				top: -100,
+				background: '#fff',
+				'border-radius': '50%'
+			},
+			class: 'ct-chart'
+		}).inject(el);
+
+		var g_d = {
+			point_data: pt.data,
+			graph_descs: graph_f
+		}
+
+		new PieGraph(g_el, g_d, {
+			tips: this.options.tips
+		});
+
+		var g = new Chartist.Pie(g_el,
 			{
-				all = false;
-			}
-		}
-		if (all == true)
-		{
-			m = 'all'
-		}
-		else if (r_a.length > 0)
-		{
-			m = r_a.join(', ');
-		}
-		return m;
-	},
-	set_data: function (data)
-	{
-		this.rebuild(data);
-		this.select_all();
-	},
-	rebuild: function (data)
-	{
-		var el = this.el;
-		el.empty();
-		var els = {}
-		for (var pid in data)
-		{
-			var e = new Element('option', {
-				value: pid,
-				text: data[pid],
+				series: this.mk_graph(pt)
+			},
+			{
+				donut: true,
+				donutWidth: 50,
+				showLabel: false
+			});
+		g.on('created', this.graph_bind_events.bind(this, g_el));
+
+		new Element('div',
+			{
+				html: '<div><header>' + pt.s + '</header></div><div>' + pt.total + '</div>',
+				class: 'graph-inner',
 				events: {
-					mousedown: this.prevent.bind(this),
-					mouseup: this.prevent.bind(this),
-					click: this.change_filters.bind(this, pid)
+					click: this.destroy.bind(this, map)
 				}
 			}).inject(el);
-			els[pid] = e;
-		}
-		this.els = els;
+		this.pt = pt;
+		this.g = g;
+
+
+		this.el = el;
+		this.reposition(map);
+
+		map.on('zoomstart', this.before_zoom.bind(this));
+		map.on('zoomend', this.reposition.bind(this, map));
 	},
-	prevent: function (e)
+	graph_bind_events: function (el)
 	{
-		e.stop();
-	},
-	change_filters: function (pid, e)
-	{
-		if (e)
+		var s = el.getElements('.ct-series');
+		var l = s.length;
+		for (var i = 0; i < s.length; i++)
 		{
-			e.stop();
+			var j = (l - 1 - i);
+			s[i].addEvents({
+				click: this.show_hide_tooltip.bind(this, j)
+			});
+			s[i].store('tip:title', this.pt.s);
+			s[i].store('tip:text', this.mk_text(j));
 		}
-		var els = this.els;
-		if (els[pid].selected == true)
+		this.slices = s;
+		var o = this.options;
+		if (o.tips !== null)
 		{
-			els[pid].selected = false;
+			o.tips.attach(s);
+		}
+	},
+	mk_text: function (i)
+	{
+
+		var g = this.g_data[i].v;
+		var p = this.pt_data;
+		var d = this.desc;
+		var str = d[i].nm + ': <strong>' + d[i].count + '</strong>';
+		return str;
+	},
+	show_tooltip: function (i)
+	{
+		this.options.tips.show();
+		this.tooltip_visible = true;
+	},
+	hide_tooltip: function (i)
+	{
+		this.tooltip_visible = false;
+	},
+	show_hide_tooltip: function (i)
+	{
+		if (this.tooltip_visible == true)
+		{
+			this.hide_tooltip(i);
 		}
 		else
 		{
-			els[pid].selected = true;
+			this.show_tooltip(i);
 		}
-		var tmps = [];
-		for (var pid in els)
+	},
+	mk_graph: function (p)
+	{
+		var graph_f = this.graph_f;
+		var d = {};
+		var pdt = [];
+		for (var pid in p.data)
 		{
-			if (els[pid].selected == true)
+			var a = p.data[pid];
+			for (var i = 0; i < a.length; i++)
 			{
-				tmps.push(pid);
+				var dt = a[i].c;
+				for (var j = 0; j < dt.length; j++)
+				{
+					var t = dt[j];
+					if (!d[t])
+					{
+						d[t] = 0;
+					}
+					d[t]++;
+				}
 			}
 		}
-		this.filter = tmps;
-		this.select_change();
+		for (var pid in d)
+		{
+			pdt.include({
+				name: pid,
+				value: d[pid]
+			});
+		}
+		pdt.sortOn("value", Array.NUMERIC);
+		var g_data = [];
+		var desc = [];
+		var r = [];
+		var l = pdt.length - 1;
+		for (var i = 0; i <= l; i++)
+		{
+			var k = l - i;
+			desc[i] = {
+				nm: graph_f.c[pdt[k].name],
+				count: pdt[k].value
+			}
+			g_data[i] = {
+				v: pdt[k].value,
+				t: pdt[k].name
+			}
+			r[i] = {
+				data: pdt[k].value,
+				className: 'graph-' + (i % 17)
+			}
+		}
+		this.pt_data = p;
+		this.g_data = g_data;
+		this.desc = desc;
+		return (r);
 	},
-	select_all: function (e)
+	before_zoom: function ()
+	{
+		this.el.setStyles({
+			display: 'none'
+		});
+	},
+	reposition: function (map)
+	{
+		var ps = map.latLngToLayerPoint([
+			this.pt.lat,
+			this.pt.lon
+		]);
+
+		this.el.setStyles({
+			display: 'block',
+			transform: 'translate3d(' + ps.x + 'px, ' + ps.y + 'px, 0px)'
+		});
+
+	},
+	destroy: function (map)
+	{
+		this.options.tips.detach(this.slices);
+		this.g.detach();
+		this.el.destroy();
+		map.off('zoomstart', this.before_zoom.bind(this));
+		map.off('zoomend', this.reposition.bind.bind(this, map));
+
+		this.fireEvent('destroy');
+		this.removeEvents();
+	},
+	to_front: function ()
+	{
+		this.el.setStyles({
+			'z-index': 999
+		});
+	},
+	to_back: function ()
+	{
+		this.el.setStyles({
+			'z-index': 998
+		});
+	}
+});
+var MessageWin = new Class({
+	initialize: function (el)
+	{
+		this.el = el;
+	},
+	set_message: function (m)
+	{
+		this.el.empty();
+		this.el.set('html', m);
+	}
+});
+var PageScroller = new Class({
+	Implements: [Events, Options],
+	initialize: function (els, options)
+	{
+		var titles = [];
+		for (var i = 0; i < els.length; i++)
+		{
+			titles[i] = els[i].get('title');
+		}
+		this.titles = titles;
+		this.els = els;
+		this.s = 0;
+		this.classes = [
+			'el el-arrow-up scroll-btn pure-button light-bg',
+			'el el-arrow-down scroll-btn pure-button light-bg'
+		];
+		this.setOptions(options);
+		this.build_html();
+		this.recalculate();
+		window.addEvents(
+			{
+				resize: this.recalculate.bind(this),
+				scroll: this.recalculate.bind(this)
+			}
+		);
+	},
+	build_html: function ()
+	{
+		var c = this.classes;
+		var s = [];
+		var w = new Element('div', {class: 'page-scroller'}).inject(document.body);
+		for (var i = 0; i < 2; i++)
+		{
+			s[i] = new Element('i', {class: c[i], events: {click: this.sc_clicked.bind(this, i)}}).inject(w);
+		}
+		this.c = s;
+	},
+	sc_clicked: function (i, e)
 	{
 		if (e)
 		{
 			e.stop();
 		}
-		var els = this.els;
-		var tmps = [];
-		for (var pid in els)
+		var s = this.s;
+		switch (i)
 		{
-			els[pid].selected = true;
-			tmps.push(pid);
+			case 0:
+				s--;
+				break;
+			case 1:
+				s++;
+				break;
 		}
-		this.filter = tmps;
-		this.select_change();
+		if (s < 0)
+		{
+			s = 0;
+		}
+		if (s >= this.els.length)
+		{
+			s = this.els.length - 1;
+		}
+		this.scroll_to(s);
 	},
-	select_none: function (e)
+	scroll_to: function (i)
 	{
-		if (e)
+		if (i != this.s)
 		{
-			e.stop();
+			new Fx.Scroll(window).toElement(this.els[i], 'y');
+			this.s = i;
 		}
-		var els = this.els;
-		for (var pid in els)
-		{
-			els[pid].selected = false;
-		}
-		this.filter = [];
-		this.select_change();
 	},
-	select_change: function ()
+	recalculate: function ()
 	{
-		var msg = this.get_message();
-		this.fireEvent('filterchange', {filter: this.filter, msg: msg});
+		var els = this.els;
+		var ws = window.getScroll();
+		var s = 0;
+		for (var i = 0; i < els.length; i++)
+		{
+			var c = els[i].getCoordinates();
+			if (ws.y >= c.top)
+			{
+				s = i;
+			}
+		}
+		if (s <= 0)
+		{
+			this.c[0].addClass('c-hidden');
+		}
+		else
+		{
+			this.c[0].set('title', this.titles[s - 1]);
+			this.c[0].removeClass('c-hidden');
+		}
+
+		if (s >= this.els.length - 1)
+		{
+			this.c[1].addClass('c-hidden');
+		}
+		else
+		{
+			this.c[1].set('title', this.titles[s + 1]);
+			this.c[1].removeClass('c-hidden');
+		}
+		this.s = s;
+	}
+});
+var PieGraph = new Class({
+	options: {
+		tips: null
+	},
+	Implements: [Events, Options],
+	initialize: function (el, data, options)
+	{
+		this.data = data;
+		this.setOptions(options);
+		console.log(data);
+		/*
+		var g = new Chartist.Pie(el,
+			{
+				series: this.mk_graph()
+			},
+			{
+				donut: true,
+				donutWidth: 50,
+				showLabel: false
+			});
+		g.on('created', this.graph_bind_events.bind(this, el));
+		*/
+	},
+	mk_graph: function ()
+	{
+
+	},
+	graph_bind_events: function ()
+	{
+
 	}
 });
 var PlaceFilter = new Class({
@@ -1413,584 +1639,138 @@ var PlaceFilter = new Class({
 		this.fireEvent('filterchanged', r);
 	}
 });
-var DPager = new Class({
-	Implements: [Events, Options],
-	initialize: function (el, options)
+var SelectFilter = new Class({
+	Implements: [
+		Events,
+		Options
+	],
+	initialize: function (el, a, n, options)
 	{
+		this.created = false;
 		this.setOptions(options);
-		this.pagination = {};
-		var e = new Element('div', {
-			class: 'pure-menu pure-menu-horizontal'
-		}).inject(el);
-		this.w = new Element('ul', {class: 'pure-menu-list'}).inject(e);
+		this.el = el;
+		this.filter = [];
+		this.els = [];
+		a.addEvent('click', this.select_all.bind(this));
+		n.addEvent('click', this.select_none.bind(this));
 	},
-	set_data: function (p)
+	get_message: function ()
 	{
-		this.pagination = p;
-		this.rebuild();
-	},
-	rebuild: function ()
-	{
-		var p = this.pagination;
-		var page = p.page;
-		var w = this.w;
-		w.empty();
-		var pages = Math.ceil(p.count / p.limit) - 1;
-		if (page > 0)
+		var els = this.els;
+		var a = this.filter;
+		var r_a = [];
+		var all = true;
+		var m = 'none';
+		for (var pid in els)
 		{
-			var li = new Element('li', {class: 'pure-menu-item'}).inject(w);
-			new Element('a', {
-				html: '<i class="el el-fast-backward"></i>',
-				class: 'pure-button pure-menu-link',
-				events: {
-					click: this.change_page.bind(this, (0))
-				}
-			}).inject(li);
-
-			var li = new Element('li', {class: 'pure-menu-item'}).inject(w);
-			new Element('a', {
-				html: '<i class="el el-backward"></i>',
-				class: 'pure-button pure-menu-link',
-				events: {
-					click: this.change_page.bind(this, (page - 1))
-				}
-			}).inject(li);
-		}
-
-		var start = page - 3;
-		if (start < 0)
-		{
-			start = 0;
-		}
-		var end = page + 3;
-		if (start == 0)
-		{
-			end = start + 6;
-		}
-		if (end > pages)
-		{
-			end = pages;
-		}
-		if (end >= pages)
-		{
-			start = end - (6 - (pages - end));
-		}
-		if (start < 0)
-		{
-			start = 0;
-		}
-
-		for (var i = start; i <= end; i++)
-		{
-			if (i == page)
+			if (a.contains(pid))
 			{
-				var li = new Element('li', {
-					html: '<span class="pure-button pure-button-active">' + (i + 1) + '</span>',
-					class: 'pure-menu-selected pure-menu-item'
-				}).inject(w);
+				r_a.include(els[pid].get('text'));
 			}
 			else
 			{
-				var li = new Element('li', {class: 'pure-menu-item'}).inject(w);
-				new Element('a', {
-					html: (i + 1),
-					class: 'pure-button pure-menu-link',
-					events: {
-						click: this.change_page.bind(this, (i))
-					}
-				}).inject(li);
+				all = false;
 			}
-
 		}
-		if (page < pages)
+		if (all == true)
 		{
-			var li = new Element('li', {class: 'pure-menu-item'}).inject(w);
-			new Element('a', {
-				html: '<i class="el el-forward"></i>',
-				class: 'pure-button pure-menu-link',
-				events: {
-					click: this.change_page.bind(this, (page + 1))
-				}
-			}).inject(li);
-
-			var li = new Element('li', {class: 'pure-menu-item'}).inject(w);
-			new Element('a', {
-				html: '<i class="el el-fast-forward"></i>',
-				class: 'pure-button pure-menu-link',
-				events: {
-					click: this.change_page.bind(this, (pages))
-				}
-			}).inject(li);
+			m = 'all'
 		}
-		this.set_page();
-	},
-	change_page: function (i, e)
-	{
-		if (e)
+		else if (r_a.length > 0)
 		{
-			e.stop();
+			m = r_a.join(', ');
 		}
-		this.pagination.page = i;
-		this.rebuild();
-	},
-	set_page: function ()
-	{
-		this.fireEvent('pagechanged', this.pagination);
-	}
-
-});
-var DTable = new Class({
-	Implements: [
-		Events,
-		Options
-	],
-	initialize: function (el, options)
-	{
-		this.setOptions(options);
-		this.pagination = {
-			limit: 50,
-			page: 0,
-			count: 0
-		};
-
-
-		var t = new Element('table', {class: 'pure-table pure-table-bordered pure-table-striped'}).inject(el);
-		this.build_head(t);
-		this.pager = new DPager(el, {onPagechanged: this.change_page.bind(this)});
-		this.el = new Element('tbody').inject(t);
-	},
-	build_head: function (t)
-	{
-		var h = new Element('thead').inject(t);
-		var r = new Element('tr').inject(h);
-		new Element('th', {text: mapconf.table_headers[0]}).inject(r);
-		new Element('th', {text: mapconf.table_headers[1]}).inject(r);
-		new Element('th', {text: mapconf.table_headers[3]}).inject(r);
-		new Element('th', {text: mapconf.table_headers[3]}).inject(r);
+		return m;
 	},
 	set_data: function (data)
 	{
-		this.pagination.page = 0;
-		var d = data.points;
-		var a = [];
-		for (var i = 0; i < d.length; i++)
-		{
-			var dt = d[i].data;
-			for (var yr in dt)
-			{
-				var y_d = dt[yr];
-				for (var k = 0; k < y_d.length; k++)
-				{
-					var ae = {
-						city: d[i].s,
-						yr: yr,
-						org: y_d[k].a,
-						nm: y_d[k].name
-					};
-					a.include(ae);
-				}
-			}
-		}
-		this.pagination.count = a.length;
-		this.table_data = a;
-		this.pager.set_data(this.pagination);
+		this.rebuild(data);
+		this.select_all();
 	},
-	change_page: function (p)
+	rebuild: function (data)
 	{
-		this.pagination = p;
-		this.fill_table();
-	},
-	fill_table: function ()
-	{
-
-		var w = this.el;
-		w.empty();
-		var pg = this.pagination;
-		var d = this.table_data;
-		var min = pg.page * pg.limit;
-		var max = min + pg.limit;
-		if (max > d.length)
+		var el = this.el;
+		el.empty();
+		var els = {}
+		for (var pid in data)
 		{
-			max = d.length;
-		}
-
-		for (var i = min; i < max; i++)
-		{
-			var r = new Element('tr');
-			new Element('td', {text: d[i].city}).inject(r);
-			new Element('td', {text: d[i].yr}).inject(r);
-			new Element('td', {text: d[i].org}).inject(r);
-			new Element('td', {text: d[i].nm}).inject(r);
-			r.inject(w);
-		}
-	}
-});
-var DGraph = new Class({
-	Implements: [
-		Events,
-		Options
-	],
-	initialize: function (el, options)
-	{
-		this.setOptions(options);
-		this.g = [];
-		this.el = el;
-	},
-	set_data: function (data)
-	{
-		this.data = data;
-		this.el.empty();
-		this.build_graphs();
-	},
-	build_graphs: function ()
-	{
-		this.build_topic_graph();
-		this.build_tag_graph();
-		this.build_country_graph();
-	},
-	build_topic_graph: function ()
-	{
-		var w = this.el;
-		var s = new Element('section', {class: 'graph-section'}).inject(w);
-		new Element('header', {html: mapconf.graph_names[0] + ':'}).inject(s);
-		var grid = new Element('div', {class: 'pure-g'}).inject(s);
-		var pie = new Element('div', {class: 'pure-u-1 pure-u-md-1-3 ct-chart'}).inject(grid);
-		var bar = new Element('div', {class: 'pure-u-1 pure-u-md-2-3 ct-chart'}).inject(grid);
-		var data = this.data.points;
-
-		var c_d = {};
-		var y_d = {};
-
-		for (var i = 0; i < data.length; i++)
-		{
-			var d = data[i].data;
-			for (var yr in d)
-			{
-				var dd = d[yr];
-				if (!y_d[yr])
-				{
-					y_d[yr] = {};
+			var e = new Element('option', {
+				value: pid,
+				text: data[pid],
+				events: {
+					mousedown: this.prevent.bind(this),
+					mouseup: this.prevent.bind(this),
+					click: this.change_filters.bind(this, pid)
 				}
-				for (var k = 0; k < dd.length; k++)
-				{
-					var g_g = dd[k].g
-					if (!c_d[g_g])
-					{
-						c_d[g_g] = 0;
-					}
-					if (!y_d[yr][g_g])
-					{
-						y_d[yr][g_g] = 0;
-					}
-					y_d[yr][g_g]++;
-					c_d[g_g]++;
-				}
-			}
+			}).inject(el);
+			els[pid] = e;
 		}
-		var i = 0;
-		var r = [];
-		var l = [];
-		for (var pid in c_d)
-		{
-			l[i] = pid;
-			r[i] = {
-				data: c_d[pid],
-				className: 'graph-' + (i % 17)
-			};
-			i++;
-		}
-		new Chartist.Pie(pie, {
-			series: r,
-			labels: l
-		}, {showLabel: false});
-
-
-		r = [];
-		l = [];
-		i = 0;
-		for (var yr in y_d)
-		{
-			l[i] = yr;
-			r[i] = [];
-			for (var ct in y_d[yr])
-			{
-				r[i].include(y_d[yr][ct]);
-			}
-			i++;
-		}
-		new Chartist.Bar(bar, {
-			labels: l,
-			series: r
-		}, {stackBars: true});
-	},
-	build_tag_graph: function ()
-	{
-
-		var w = this.el;
-		var s = new Element('section', {class: 'graph-section'}).inject(w);
-		new Element('header', {html: mapconf.graph_names[1] + ':'}).inject(s);
-		var grid = new Element('div', {class: 'pure-g'}).inject(s);
-		var pie = new Element('div', {class: 'pure-u-1 pure-u-md-1-3 ct-chart'}).inject(grid);
-		var bar = new Element('div', {class: 'pure-u-1 pure-u-md-2-3 ct-chart'}).inject(grid);
-		var data = this.data.points;
-
-		var c_d = {};
-		var y_d = {};
-
-		for (var i = 0; i < data.length; i++)
-		{
-			var d = data[i].data;
-			for (var yr in d)
-			{
-				var dd = d[yr];
-				if (!y_d[yr])
-				{
-					y_d[yr] = {};
-				}
-				for (var k = 0; k < dd.length; k++)
-				{
-					var qg_g = dd[k].c;
-					for (var j = 0; j < qg_g.length; j++)
-					{
-						var g_g = qg_g[j];
-						if (!c_d[g_g])
-						{
-							c_d[g_g] = 0;
-						}
-						if (!y_d[yr][g_g])
-						{
-							y_d[yr][g_g] = 0;
-						}
-						y_d[yr][g_g]++;
-						c_d[g_g]++;
-					}
-
-				}
-			}
-		}
-		var i = 0;
-		var r = [];
-		var l = [];
-		for (var pid in c_d)
-		{
-			l[i] = pid;
-			r[i] = {
-				data: c_d[pid],
-				className: 'graph-' + (i % 17)
-			};
-			i++;
-		}
-		new Chartist.Pie(pie, {
-			series: r,
-			labels: l
-		}, {showLabel: false});
-
-
-		r = [];
-		l = [];
-		i = 0;
-		for (var yr in y_d)
-		{
-			l[i] = yr;
-			r[i] = [];
-			for (var ct in y_d[yr])
-			{
-				r[i].include(y_d[yr][ct]);
-			}
-			i++;
-		}
-		new Chartist.Bar(bar, {
-			labels: l,
-			series: r
-		}, {stackBars: true});
-	},
-	build_country_graph: function ()
-	{
-		var w = this.el;
-		var s = new Element('section', {class: 'graph-section'}).inject(w);
-		new Element('header', {html: mapconf.graph_names[2] + ':'}).inject(s);
-		var grid = new Element('div', {class: 'pure-g'}).inject(s);
-		var pie = new Element('div', {class: 'pure-u-1 pure-u-md-1-3 ct-chart'}).inject(grid);
-		var bar = new Element('div', {class: 'pure-u-1 pure-u-md-2-3 ct-chart'}).inject(grid);
-		var data = this.data.points;
-		var c_d = {};
-		var y_d = {};
-		for (var i = 0; i < data.length; i++)
-		{
-			var c = data[i].c;
-			var d = data[i].data;
-
-			if (!c_d[c])
-			{
-				c_d[c] = 0;
-			}
-			c_d[c]++;
-			for (var yr in d)
-			{
-				if (!y_d[yr])
-				{
-					y_d[yr] = {};
-				}
-				if (!y_d[yr][c])
-				{
-					y_d[yr][c] = 0;
-				}
-				var yr_d = d[yr];
-				y_d[yr][c] = yr_d.length;
-			}
-
-		}
-		var i = 0;
-		var r = [];
-		var l = [];
-		for (var pid in c_d)
-		{
-			l[i] = pid;
-			r[i] = {
-				data: c_d[pid],
-				className: 'graph-' + (i % 17)
-			};
-			i++;
-		}
-		new Chartist.Pie(pie, {
-			series: r,
-			labels: l
-		}, {showLabel: false});
-
-		r = [];
-		l = [];
-		i = 0;
-		for (var yr in y_d)
-		{
-			l[i] = yr;
-			r[i] = [];
-			for (var ct in y_d[yr])
-			{
-				r[i].include(y_d[yr][ct]);
-			}
-			i++;
-		}
-		new Chartist.Bar(bar, {
-			labels: l,
-			series: r
-		}, {stackBars: true});
-	}
-});
-var PageScroller = new Class({
-	Implements: [Events, Options],
-	initialize: function (els, options)
-	{
-		var titles = [];
-		for (var i = 0; i < els.length; i++)
-		{
-			titles[i] = els[i].get('title');
-		}
-		this.titles = titles;
 		this.els = els;
-		this.s = 0;
-		this.classes = [
-			'el el-arrow-up scroll-btn pure-button light-bg',
-			'el el-arrow-down scroll-btn pure-button light-bg'
-		];
-		this.setOptions(options);
-		this.build_html();
-		this.recalculate();
-		window.addEvents(
-			{
-				resize: this.recalculate.bind(this),
-				scroll: this.recalculate.bind(this)
-			}
-		);
 	},
-	build_html: function ()
+	prevent: function (e)
 	{
-		var c = this.classes;
-		var s = [];
-		var w = new Element('div', {class: 'page-scroller'}).inject(document.body);
-		for (var i = 0; i < 2; i++)
-		{
-			s[i] = new Element('i', {class: c[i], events: {click: this.sc_clicked.bind(this, i)}}).inject(w);
-		}
-		this.c = s;
+		e.stop();
 	},
-	sc_clicked: function (i, e)
+	change_filters: function (pid, e)
 	{
 		if (e)
 		{
 			e.stop();
 		}
-		var s = this.s;
-		switch (i)
-		{
-			case 0:
-				s--;
-				break;
-			case 1:
-				s++;
-				break;
-		}
-		if (s < 0)
-		{
-			s = 0;
-		}
-		if (s >= this.els.length)
-		{
-			s = this.els.length - 1;
-		}
-		this.scroll_to(s);
-	},
-	scroll_to: function (i)
-	{
-		if (i != this.s)
-		{
-			new Fx.Scroll(window).toElement(this.els[i], 'y');
-			this.s = i;
-		}
-	},
-	recalculate: function ()
-	{
 		var els = this.els;
-		var ws = window.getScroll();
-		var s = 0;
-		for (var i = 0; i < els.length; i++)
+		if (els[pid].selected == true)
 		{
-			var c = els[i].getCoordinates();
-			if (ws.y >= c.top)
+			els[pid].selected = false;
+		}
+		else
+		{
+			els[pid].selected = true;
+		}
+		var tmps = [];
+		for (var pid in els)
+		{
+			if (els[pid].selected == true)
 			{
-				s = i;
+				tmps.push(pid);
 			}
 		}
-		if (s <= 0)
-		{
-			this.c[0].addClass('c-hidden');
-		}
-		else
-		{
-			this.c[0].set('title', this.titles[s - 1]);
-			this.c[0].removeClass('c-hidden');
-		}
-
-		if (s >= this.els.length - 1)
-		{
-			this.c[1].addClass('c-hidden');
-		}
-		else
-		{
-			this.c[1].set('title', this.titles[s + 1]);
-			this.c[1].removeClass('c-hidden');
-		}
-		this.s = s;
-	}
-});
-var MessageWin = new Class({
-	initialize: function (el)
-	{
-		this.el = el;
+		this.filter = tmps;
+		this.select_change();
 	},
-	set_message: function (m)
+	select_all: function (e)
 	{
-		this.el.empty();
-		this.el.set('html', m);
+		if (e)
+		{
+			e.stop();
+		}
+		var els = this.els;
+		var tmps = [];
+		for (var pid in els)
+		{
+			els[pid].selected = true;
+			tmps.push(pid);
+		}
+		this.filter = tmps;
+		this.select_change();
+	},
+	select_none: function (e)
+	{
+		if (e)
+		{
+			e.stop();
+		}
+		var els = this.els;
+		for (var pid in els)
+		{
+			els[pid].selected = false;
+		}
+		this.filter = [];
+		this.select_change();
+	},
+	select_change: function ()
+	{
+		var msg = this.get_message();
+		this.fireEvent('filterchange', {filter: this.filter, msg: msg});
 	}
 });
 var VisegradApp = {
@@ -2005,7 +1785,7 @@ var VisegradApp = {
 
 			new PageScroller($$('section.page-section'));
 			var tips = new Tips();
-			this.map = new AppMap($(mapid), $('map-controls'), tips);
+			this.map = new AppMap($(mapid), $('map-controls'), mapconf, {tips: tips});
 			this.graph = new DGraph($('e-graphs'));
 			this.table = new DTable($('e-table'));
 			this.filter = new PlaceFilter(mapdata, filters, filter_countries, {
@@ -2026,3 +1806,339 @@ var VisegradApp = {
 };
 
 window.addEvent('domready', VisegradApp.init.bind(VisegradApp));
+var YearDrag = new Class({
+	Implements: [
+		Events,
+		Options
+	],
+	drags: [
+		'min',
+		'max'
+	],
+	initialize: function (el, divs, options)
+	{
+		this.setOptions(options);
+		var w = el.getParent();
+		w.setStyles({
+			position: 'relative'
+		});
+
+		var el = new Element('div', {
+			styles: {
+				position: 'absolute',
+				width: '100%',
+				height: '20px',
+				bottom: 10,
+				left: 0,
+				padding: '1em'
+			}
+		}).inject(w);
+		var d_w = new Element('div', {
+			styles: {
+				position: 'relative',
+				'border-top': '2px solid #000'
+			}
+		}).inject(el);
+		var sliders = [];
+		for (var i = 0; i < 2; i++)
+		{
+			sliders[i] = new Element('a', {
+				styles: {
+					display: 'block',
+					width: 20,
+					height: 30,
+					top: -15,
+					cursor: 'pointer',
+					'text-align': 'center',
+					'padding-top': '0.2em',
+					position: 'absolute'
+				},
+				html: '<i class="el el-caret-up"></i>'
+			}).inject(d_w);
+		}
+		new YearSlider(d_w, sliders, divs, {
+			onChanged: this.sliders_changed.bind(this)
+		});
+	},
+	sliders_changed: function (range)
+	{
+		this.fireEvent('changed', range);
+	}
+});
+var YearSel = new Class({
+	Implements: [
+		Events,
+		Options
+	],
+	initialize: function (el, bounds, options)
+	{
+		this.created = false;
+		this.setOptions(options);
+		this.p_d = {
+			data: {},
+			max: 0
+		};
+		this.bounds = bounds;
+		this.build_elements(bounds, el);
+		this.data = [];
+		this.drag = new YearDrag(el, this.vals.length, {
+			onChanged: this.change_vals.bind(this)
+		});
+	},
+	get_message: function ()
+	{
+		var f = this.range;
+		var min = f[0];
+		var max;
+		var m;
+		for (pid in f)
+		{
+			max = f[pid];
+		}
+		if (min != max)
+		{
+			m = min + '-' + max
+		}
+		else
+		{
+			m = min;
+		}
+		return m;
+	},
+	build_elements: function (b, el)
+	{
+		var bars = [];
+		var vals = [];
+		for (var i = b.min; i <= b.max; i++)
+		{
+			var li = new Element('li');
+			var y_c = new Element('div', {
+				class: 'year-container'
+			}).inject(li);
+
+			var ba = new Element('div').inject(y_c);
+			var va = new Element('div', {class: 'year-val', text: i}).inject(li);
+			li.inject(el);
+			vals.include(va);
+			bars.include(ba);
+		}
+		this.bars = bars;
+		this.vals = vals;
+	},
+	set_data: function (data)
+	{
+		this.data = data;
+		this.p_d = this.prepare_data(data);
+		this.redraw_divs();
+		if (this.created == false)
+		{
+			this.created = true;
+			this.fireEvent('filtercreated');
+		}
+	},
+	redraw_divs: function ()
+	{
+		var bars = this.bars;
+		var vals = this.vals;
+		var lim = this.limit;
+		var f = {};
+		var dt = this.p_d;
+
+		var m = dt.max / 100;
+		var yr = 0;
+
+		for (var i = 0; i < vals.length; i++)
+		{
+			var y = vals[i].get('text');
+			if (dt.data[y])
+			{
+				var hg = (dt.data[y] / m);
+				bars[i].set('text', dt.data[y]).setStyles(
+					{height: hg + '%'}
+				);
+			}
+			else
+			{
+				bars[i].set('text', '');
+				bars[i].setStyles({'height': 0});
+			}
+			if (i >= lim.min && i < lim.max)
+			{
+				bars[i].addClass('sel');
+				f[yr] = y;
+				yr++;
+			}
+			else
+			{
+				bars[i].removeClass('sel');
+			}
+		}
+		this.range = f;
+		var ret = {
+			years: f,
+			msg: this.get_message()
+		}
+		this.fireEvent('rangechanged', ret);
+	},
+	change_vals: function (d)
+	{
+		this.limit = d;
+		this.redraw_divs();
+	},
+	prepare_data: function (data)
+	{
+		var dt = {};
+		var max = 0;
+		for (var i = 0; i < data.length; i++)
+		{
+			var d = data[i];
+			for (var pid in d.data)
+			{
+				var dx = d.data[pid];
+				if (!dt[pid])
+				{
+					dt[pid] = 0;
+				}
+				for (var j = 0; j < dx.length; j++)
+				{
+					dt[pid]++;
+					if (dt[pid] > max)
+					{
+						max = dt[pid];
+					}
+				}
+			}
+		}
+		var r = {
+			data: dt,
+			max: max
+		};
+		return r;
+	}
+});
+var YearSlider = new Class({
+	Implements: [
+		Events,
+		Options
+	],
+	initialize: function (wrapper, sliders, divs, options)
+	{
+		this.setOptions(options);
+		this.w = wrapper;
+		this.sliders = sliders;
+
+		var d = [];
+		var l = sliders.length - 1;
+
+		this.bounds = {};
+		this.bounds['divs'] = divs;
+
+		for (var i = 0; i < l + 1; i++)
+		{
+			d[i] = new Drag(sliders[i], {
+				onComplete: this.snap.bind(this, i)
+			});
+		}
+		this.drags = d;
+
+		this.slidersel = [0, divs];
+		this.set_size();
+		this.chng();
+		window.addEvent('resize', this.set_size.bind(this));
+	},
+	set_size: function ()
+	{
+		var wrapper = this.w;
+		var w_s = wrapper.getSize();
+		var divs = this.bounds.divs;
+
+		var grid = Math.round(w_s.x / divs);
+		var d = this.drags;
+		var sliders = this.sliders;
+		var slidersel = this.slidersel;
+		var l = sliders.length - 1;
+
+		for (var i = 0; i < d.length; i++)
+		{
+			var s_s = sliders[i].getSize();
+			var x = Math.round(s_s.x / 2);
+			var y = Math.round(s_s.y / 2);
+
+			var s_p = (slidersel[i] * grid - x);
+			sliders[i].setStyles({
+				left: s_p
+			});
+			var min_x = 0 - x;
+			var max_x = w_s.x - x;
+
+			d[i].options.limit = {
+				x: [
+					min_x + (Math.round(w_s.x / divs) * i),
+					max_x - Math.round(w_s.x / divs) * (l - i)
+				],
+				y: [
+					0 - y,
+					0 - y
+				]
+			};
+			d[i].options.grid = grid;
+		}
+		this.bounds['x'] = {
+			min: min_x,
+			max: max_x
+		};
+		this.bounds['grid'] = grid;
+	},
+	snap: function (i, el)
+	{
+		var b = this.bounds;
+		var p = el.getPosition(this.w);
+		switch (i)
+		{
+			case 0:
+				this.drags[1].options.limit.x[0] = p.x + b.grid;
+				this.slidersel[0] = Math.round((p.x - b.x.min) / b.grid);
+				break;
+			case 1:
+				this.drags[0].options.limit.x[1] = p.x - b.grid;
+				this.slidersel[1] = Math.round((p.x - b.x.min) / b.grid);
+				break;
+		}
+		this.chng();
+	},
+	chng: function ()
+	{
+		var s = this.slidersel;
+		var r = {
+			min: s[0],
+			max: s[1]
+		}
+		this.fireEvent('changed', r);
+	}
+});
+var mapconf = {
+	url: 'http://{s}.tile.stamen.com/{id}/{z}/{x}/{y}.png',
+	attr: 'one',
+	graph_names: ["Grant programs", "Activity fields", "Countries"],
+	visegrad: ["CZ", "HU", "PL", "SK"],
+	subdomains: 'a.b.c.d'.split('.'),
+	map_id: 'toner',
+	min_z: 5,
+	max_z: 10,
+	min_radius: 5,
+	v4_bounds: [
+		[
+			55.0721744,
+			12.1004461
+		],
+		[
+			45.7268402,
+			24.1729511
+		]
+	],
+	year_bounds: {
+		min: 2000,
+		max: 2015
+	}
+};
+var mapid = 'map-main';

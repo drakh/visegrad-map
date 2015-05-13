@@ -3,11 +3,15 @@ var GraphMarker = new Class({
 		Events,
 		Options
 	],
-	initialize: function (pt, map, pane, tips, graph_f, options)
+	options: {
+		tips: null,
+		pane: null
+	},
+	initialize: function (pt, map, graph_f, options)
 	{
 		this.setOptions(options);
 		this.graph_f = graph_f;
-		this.tips = tips;
+		var o = this.options;
 		this.tooltip_visible = false;
 		var el = new Element('div', {
 			styles: {
@@ -19,7 +23,7 @@ var GraphMarker = new Class({
 				mouseenter: this.to_front.bind(this),
 				mouseleave: this.to_back.bind(this)
 			}
-		}).inject(pane);
+		}).inject(o.pane);
 
 		var g_el = new Element('div', {
 			styles: {
@@ -33,13 +37,25 @@ var GraphMarker = new Class({
 			},
 			class: 'ct-chart'
 		}).inject(el);
-		var g = new Chartist.Pie(g_el, {
-			series: this.mk_graph(pt)
-		}, {
-			donut: true,
-			donutWidth: 50,
-			showLabel: false
+
+		var g_d = {
+			point_data: pt.data,
+			graph_descs: graph_f
+		}
+
+		new PieGraph(g_el, g_d, {
+			tips: this.options.tips
 		});
+
+		var g = new Chartist.Pie(g_el,
+			{
+				series: this.mk_graph(pt)
+			},
+			{
+				donut: true,
+				donutWidth: 50,
+				showLabel: false
+			});
 		g.on('created', this.graph_bind_events.bind(this, g_el));
 
 		new Element('div',
@@ -60,7 +76,7 @@ var GraphMarker = new Class({
 		map.on('zoomstart', this.before_zoom.bind(this));
 		map.on('zoomend', this.reposition.bind(this, map));
 	},
-	graph_bind_events: function (el, d)
+	graph_bind_events: function (el)
 	{
 		var s = el.getElements('.ct-series');
 		var l = s.length;
@@ -74,7 +90,11 @@ var GraphMarker = new Class({
 			s[i].store('tip:text', this.mk_text(j));
 		}
 		this.slices = s;
-		this.tips.attach(s);
+		var o = this.options;
+		if (o.tips !== null)
+		{
+			o.tips.attach(s);
+		}
 	},
 	mk_text: function (i)
 	{
@@ -87,7 +107,7 @@ var GraphMarker = new Class({
 	},
 	show_tooltip: function (i)
 	{
-		this.tips.show();
+		this.options.tips.show();
 		this.tooltip_visible = true;
 	},
 	hide_tooltip: function (i)
@@ -138,11 +158,10 @@ var GraphMarker = new Class({
 		var g_data = [];
 		var desc = [];
 		var r = [];
-		var k = 0;
 		var l = pdt.length - 1;
-		for (var k = l; k >= 0; k--)
+		for (var i = 0; i <= l; i++)
 		{
-			var i = l - k;
+			var k = l - i;
 			desc[i] = {
 				nm: graph_f.c[pdt[k].name],
 				count: pdt[k].value
@@ -156,25 +175,6 @@ var GraphMarker = new Class({
 				className: 'graph-' + (i % 17)
 			}
 		}
-		/*
-		 for (var pid in d)
-		 {
-		 desc[i] = {
-		 nm: graph_f.c[pid],
-		 count: d[pid]
-		 };
-		 g_data[i] = {
-		 v: d[pid],
-		 t: pid
-		 };
-
-		 r[i] = {
-		 data: d[pid],
-		 className: 'graph-' + (i % 17)
-		 };
-		 i++
-		 }
-		 */
 		this.pt_data = p;
 		this.g_data = g_data;
 		this.desc = desc;
@@ -201,7 +201,7 @@ var GraphMarker = new Class({
 	},
 	destroy: function (map)
 	{
-		this.tips.detach(this.slices);
+		this.options.tips.detach(this.slices);
 		this.g.detach();
 		this.el.destroy();
 		map.off('zoomstart', this.before_zoom.bind(this));

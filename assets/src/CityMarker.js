@@ -3,12 +3,18 @@ var CityMarker = new Class({
 		Events,
 		Options
 	],
-	initialize: function (map, pt, pane, b, tips, options)
+	options: {
+		pane: null,
+		front_z: 997,
+		max_z: 996,
+		min_z: 1
+	},
+	initialize: function (map, pt, b, options)
 	{
 		this.setOptions(options);
-		this.tips = tips;
-		var max_z = 996;
-		var min_z = 1;
+		var o = this.options;
+		var max_z = o.max_z;
+		var min_z = o.min_z;
 		var r = pt.total / b.min;
 		var l = Math.log(r);
 		var z = max_z - Math.round(l * 10);
@@ -25,9 +31,9 @@ var CityMarker = new Class({
 				'z-index': z
 			},
 			events: {
-				click: this.fire_click.bind(this, map, pane)
+				click: this.fire_click.bind(this)
 			}
-		}).inject(pane);
+		}).inject(o.pane);
 
 		new Element('div', {
 			styles: {
@@ -55,7 +61,7 @@ var CityMarker = new Class({
 	to_front: function ()
 	{
 		this.el.setStyles({
-			'z-index': 997
+			'z-index': this.options.front_z
 		});
 	},
 	to_back: function ()
@@ -82,30 +88,8 @@ var CityMarker = new Class({
 			transform: 'translate3d(' + ps.x + 'px, ' + ps.y + 'px, 0px)'
 		});
 	},
-	show_graph: function (map, pane)
+	destroy: function ()
 	{
-
-		var p = this.pt;
-		map.panTo([
-			p.lat,
-			p.lon
-		]);
-		this.g = new GraphMarker(p, map, pane, this.tips, {onDestroy: this.graph_destroyed.bind(this, map)});
-	},
-	graph_destroyed: function ()
-	{
-		this.g = null;
-	},
-	destroy_graph: function (map)
-	{
-		if (this.g != null)
-		{
-			this.g.destroy(map);
-		}
-	},
-	destroy: function (map)
-	{
-		this.destroy_graph(map);
 		this.el.destroy();
 	}
 });

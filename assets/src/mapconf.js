@@ -1,7 +1,6 @@
 var mapconf = {
 	url: 'http://{s}.tile.stamen.com/{id}/{z}/{x}/{y}.png',
 	attr: 'one',
-	table_headers: ["City", "Year", "Applicant", "Project title"],
 	graph_names: ["Grant programs", "Activity fields", "Countries"],
 	visegrad: ["CZ", "HU", "PL", "SK"],
 	subdomains: 'a.b.c.d'.split('.'),

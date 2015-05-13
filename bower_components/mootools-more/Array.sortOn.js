@@ -25,8 +25,11 @@ Array.CASEINSENSITIVE = 1;
 Array.DESCENDING = 2;
 Array.UNIQUESORT = 4;
 Array.RETURNINDEXEDARRAY = 8;
+
 Array.NUMERIC = 16;
-Array.DESCNUMERIC = 17;
+Array.DESC_NUMERIC = 17;
+Array.STRING=18;
+Array.DESC_STRING=19;
 
 (function ()
 {
@@ -56,7 +59,6 @@ Array.DESCNUMERIC = 17;
 			var ret, a, b,
 				opts = options[0],
 				sub_fields = fields[0].match(/[^.]+/g);
-
 			(function get_values(s_fields, s_a, s_b)
 			{
 				var field = s_fields[0];
@@ -70,15 +72,15 @@ Array.DESCNUMERIC = 17;
 					b = s_b[field].toString();
 				}
 			})(sub_fields, item_a, item_b);
-
-			if ((opts & Array.NUMERIC) || (opts & Array.DESCNUMERIC))
+			if ((opts == Array.NUMERIC) || (opts == Array.DESC_NUMERIC))
 			{
 				ret = (a.toFloat() - b.toFloat());
 			}
 			else
 			{
-				if (opts & Array.CASEINSENSITIVE)
+				if ((opts == Array.CASEINSENSITIVE) || (opts == Array.STRING) || (opts == Array.DESC_STRING))
 				{
+
 					a = a.toLowerCase();
 					b = b.toLowerCase();
 				}
@@ -90,7 +92,7 @@ Array.DESCNUMERIC = 17;
 			{
 				ret = sort_by(fields.slice(1), options.slice(1));
 			}
-			else if ((opts & Array.DESCENDING) || (opts & Array.DESCNUMERIC))
+			else if ((opts == Array.DESCENDING) || (opts == Array.DESC_NUMERIC) || (opts == Array.DESC_STRING))
 			{
 				ret *= -1;
 			}
