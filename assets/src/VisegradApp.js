@@ -32,7 +32,7 @@ var VisegradApp = {
 		var sel = d.sel;
 		this.msg_win.set_message(message);
 		this.map.draw_points(data, pts, filters[sel]);
-		this.graph.set_data(data);
+		this.graph.set_data(data,filters[sel]);
 		this.table.set_data(data);
 	}
 };

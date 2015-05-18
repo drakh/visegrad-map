@@ -35,6 +35,9 @@ var PieGraph = new Class({
 			case 'c':
 				c_d = DataUtil.group_by_c(data.graph_data);
 				break;
+			case 'g':
+				c_d = DataUtil.group_by_g(data.graph_data);
+				break;
 			case 'country':
 				c_d = DataUtil.group_by_country(data.graph_data);
 				break;
@@ -67,6 +70,9 @@ var PieGraph = new Class({
 				case 'c':
 					s[i].store('tip:title', d[map[j]].n);
 					s[i].store('tip:text', d[map[j]].d);
+					break;
+				case 'g':
+					s[i].store('tip:title', d[map[j]]);
 					break;
 				case 'country':
 					s[i].store('tip:title', d[map[j]].s);
