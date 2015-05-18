@@ -2,7 +2,6 @@ var PlaceFilter = new Class({
 	Implements: [Events, Options],
 	initialize: function (data, filterdata, country_filters, options)
 	{
-		console.log(data);
 		this.setOptions(options);
 
 		this.created_filter = {years: false, countries: false, types: false, tags: false};

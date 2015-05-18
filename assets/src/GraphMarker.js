@@ -43,23 +43,11 @@ var GraphMarker = new Class({
 			graph_data: pt.data,
 			graph_descs: graph_f.c,
 			graph_group: 'c'
-		}
+		};
 
-		new PieGraph(g_el, g_d, {
+		this.g = new PieGraph(g_el, g_d, {
 			tips: this.options.tips
 		});
-		/*
-		 var g = new Chartist.Pie(g_el,
-		 {
-		 series: this.mk_graph(pt)
-		 },
-		 {
-		 donut: true,
-		 donutWidth: 50,
-		 showLabel: false
-		 });
-		 g.on('created', this.graph_bind_events.bind(this, g_el));
-		 */
 
 		new Element('div',
 			{
@@ -69,7 +57,6 @@ var GraphMarker = new Class({
 					click: this.destroy.bind(this, map)
 				}
 			}).inject(el);
-		//this.g = g;
 
 
 		this.el = el;

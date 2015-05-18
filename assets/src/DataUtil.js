@@ -58,7 +58,7 @@ var DataUtil = {
 		}
 		return r;
 	},
-	group_by_place: function (data)
+	group_by_city: function (data)
 	{
 		var r = {};
 		for (var i = 0; i < data.length; i++)
@@ -108,22 +108,13 @@ var DataUtil = {
 	{
 		var d = [];//data
 		var p = {};
-		var pd = [];//point data
-		var pxd = {};
-		var pid = 0;
 		for (var i = 0; i < data.length; i++)
 		{
 			var dx = data[i];
-			if (!p[dx.s])
+			var pid = dx.s;
+			if (!p[pid])
 			{
-				p[dx.s] = {idx: pid};
-				pxd[pid] = {s: dx.s, lat: dx.lat, lon: dx.lon, c: dx.c};
-				pd.include({s: dx.s, lat: dx.lat, lon: dx.lon});
-				pid = pd.length - 1;
-			}
-			else
-			{
-				pid = p[dx.s].idx;
+				p[pid] = {s: dx.s, lat: dx.lat, lon: dx.lon, c: dx.c};
 			}
 			var dt = dx.data;
 			for (var pt_year in dt)
@@ -133,12 +124,14 @@ var DataUtil = {
 				{
 					var fd = y_d[j];
 					var f_tp = [];
-					for (var k = 0; k < fd.c.length; k++)
+					if (fd['c'])
 					{
-						f_tp[k] = String.from(fd.c[k]);
+						for (var k = 0; k < fd.c.length; k++)
+						{
+							f_tp[k] = String.from(fd.c[k]);
+						}
 					}
 					var o = {
-						pt_name: pd[pid].s,
 						pt_id: pid,
 						city: dx.s,
 						country: dx.c,
@@ -155,7 +148,7 @@ var DataUtil = {
 		}
 		return {
 			data: d,
-			points: pxd
+			points: p
 		}
 	}
 };

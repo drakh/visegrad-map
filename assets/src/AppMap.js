@@ -82,7 +82,7 @@ var AppMap = new Class({
 
 		this.remove_markers();
 
-		var pts_data = DataUtil.group_by_place(data);
+		var pts_data = DataUtil.group_by_city(data);
 		var cts_data = DataUtil.group_by_country(data);
 		var data = {
 			cities: pts_data,
@@ -194,6 +194,7 @@ var AppMap = new Class({
 			tips: this.options.tips,
 			onDestroy: this.graph_destroyed.bind(this, map)
 		});
+		this.fireEvent('graphshow',data);
 	},
 	destroy_graph: function (map)
 	{

@@ -92,7 +92,6 @@ var DTable = new Class({
 		{
 			e.stop();
 		}
-		console.log(o);
 		var st = '';
 		if (o.sort_type == 'desc')
 		{
@@ -107,8 +106,6 @@ var DTable = new Class({
 				st += 'NUMERIC';
 				break;
 		}
-		console.log(o.col.pid);
-		console.log(Array[st]);
 		this.table_data.sortOn(o.col.pid, Array[st]);
 		this.pager.change_page(0);
 	},

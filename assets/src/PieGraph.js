@@ -21,12 +21,27 @@ var PieGraph = new Class({
 			});
 		g.on('created', this.graph_bind_events.bind(this, el));
 	},
+	get_g_data: function ()
+	{
+		return this.g_data;
+	},
 	mk_graph: function (data)
 	{
-		console.log(data);
-		var c_d = DataUtil.group_by_c(data.graph_data);
+		var gr = data.graph_group;
+		this.gr = gr;
+		var c_d;
+		switch (gr)
+		{
+			case 'c':
+				c_d = DataUtil.group_by_c(data.graph_data);
+				break;
+			case 'country':
+				c_d = DataUtil.group_by_country(data.graph_data);
+				break;
+		}
 		var s = DataUtil.count_arr(c_d);
 		s.sortOn("count", Array.DESC_NUMERIC);
+
 		var c = [];
 		var d = [];
 		for (var i = 0; i < s.length; i++)
@@ -38,30 +53,31 @@ var PieGraph = new Class({
 	},
 	graph_bind_events: function (el)
 	{
-		console.log('bind tips');
-		console.log(this.data);
 		var d = this.data.graph_descs;
+		var gr = this.gr;
 		var map = this.g_data.d;
-
 		var s = el.getElements('.ct-series');
 		var l = s.length;
 		var l1 = l - 1;
 		for (var i = 0; i < l; i++)
 		{
-			console.log(i);
 			var j = (l1 - i);
-			s[i].store('tip:title', d[map[j]]);
-			/*
-			 s[i].store('tip:text', this.mk_text(j));
-			 */
+			switch (gr)
+			{
+				case 'c':
+					s[i].store('tip:title', d[map[j]].n);
+					s[i].store('tip:text', d[map[j]].d);
+					break;
+				case 'country':
+					s[i].store('tip:title', d[map[j]].s);
+					break;
+			}
 		}
 		this.slices = s;
 		var o = this.options;
-
 		if (o.tips !== null)
 		{
 			o.tips.attach(s);
 		}
-
 	}
 });

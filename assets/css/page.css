@@ -269,7 +269,10 @@ ul.years li div.year-container div
 {
 	opacity: 0;
 }
-
+.ct-chart .ct-bar
+{
+	stroke-width: 5%;
+}
 @media screen and (max-width : 35.5em)
 {
 	/*
