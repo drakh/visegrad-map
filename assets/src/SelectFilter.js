@@ -55,7 +55,7 @@ var SelectFilter = new Class({
 		{
 			var e = new Element('option', {
 				value: pid,
-				text: data[pid],
+				text: (data[pid]['n']?data[pid]['n']:data[pid]),
 				events: {
 					mousedown: this.prevent.bind(this),
 					mouseup: this.prevent.bind(this),
