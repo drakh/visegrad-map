@@ -10,6 +10,7 @@ var GraphMarker = new Class({
 	initialize: function (pt, map, graph_f, options)
 	{
 		this.setOptions(options);
+		this.pt = pt;
 		this.graph_f = graph_f;
 		var o = this.options;
 		this.tooltip_visible = false;
@@ -39,35 +40,36 @@ var GraphMarker = new Class({
 		}).inject(el);
 
 		var g_d = {
-			point_data: pt.data,
-			graph_descs: graph_f
+			graph_data: pt.data,
+			graph_descs: graph_f.c,
+			graph_group: 'c'
 		}
 
 		new PieGraph(g_el, g_d, {
 			tips: this.options.tips
 		});
-
-		var g = new Chartist.Pie(g_el,
-			{
-				series: this.mk_graph(pt)
-			},
-			{
-				donut: true,
-				donutWidth: 50,
-				showLabel: false
-			});
-		g.on('created', this.graph_bind_events.bind(this, g_el));
+		/*
+		 var g = new Chartist.Pie(g_el,
+		 {
+		 series: this.mk_graph(pt)
+		 },
+		 {
+		 donut: true,
+		 donutWidth: 50,
+		 showLabel: false
+		 });
+		 g.on('created', this.graph_bind_events.bind(this, g_el));
+		 */
 
 		new Element('div',
 			{
-				html: '<div><header>' + pt.s + '</header></div><div>' + pt.total + '</div>',
+				html: '<div><header>' + pt.pt.s + '</header></div><div>' + pt.data.length + '</div>',
 				class: 'graph-inner',
 				events: {
 					click: this.destroy.bind(this, map)
 				}
 			}).inject(el);
-		this.pt = pt;
-		this.g = g;
+		//this.g = g;
 
 
 		this.el = el;
@@ -188,9 +190,10 @@ var GraphMarker = new Class({
 	},
 	reposition: function (map)
 	{
+		var pt = this.pt;
 		var ps = map.latLngToLayerPoint([
-			this.pt.lat,
-			this.pt.lon
+			pt.pt.lat,
+			pt.pt.lon
 		]);
 
 		this.el.setStyles({
@@ -202,7 +205,7 @@ var GraphMarker = new Class({
 	destroy: function (map)
 	{
 		this.options.tips.detach(this.slices);
-		this.g.detach();
+		//this.g.detach();
 		this.el.destroy();
 		map.off('zoomstart', this.before_zoom.bind(this));
 		map.off('zoomend', this.reposition.bind.bind(this, map));

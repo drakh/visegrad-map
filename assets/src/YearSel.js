@@ -23,10 +23,10 @@ var YearSel = new Class({
 		var f = this.range;
 		var min = f[0];
 		var max;
-		var m;
-		for (pid in f)
+		var m = '';
+		for (var i = 0; i < f.length; i++)
 		{
-			max = f[pid];
+			max = Number.from(f[i]);
 		}
 		if (min != max)
 		{
@@ -60,9 +60,10 @@ var YearSel = new Class({
 	},
 	set_data: function (data)
 	{
-		this.data = data;
-		this.p_d = this.prepare_data(data);
+		this.p_d = this.prepare_data(DataUtil.group_by_year(data));
+
 		this.redraw_divs();
+
 		if (this.created == false)
 		{
 			this.created = true;
@@ -74,32 +75,35 @@ var YearSel = new Class({
 		var bars = this.bars;
 		var vals = this.vals;
 		var lim = this.limit;
-		var f = {};
-		var dt = this.p_d;
 
+		var f = [];
+
+		var dt = this.p_d;
+		var data = dt.data;
 		var m = dt.max / 100;
-		var yr = 0;
 
 		for (var i = 0; i < vals.length; i++)
 		{
 			var y = vals[i].get('text');
-			if (dt.data[y])
+			var v = 0;
+			var hg = 0;
+			var t = '';
+			if (data[y])
 			{
-				var hg = (dt.data[y] / m);
-				bars[i].set('text', dt.data[y]).setStyles(
-					{height: hg + '%'}
-				);
+				v = data[y].length;
 			}
-			else
+			if (v > 0)
 			{
-				bars[i].set('text', '');
-				bars[i].setStyles({'height': 0});
+				hg = v / m;
+				t = String.from(v);
 			}
+			bars[i].set('text', t).setStyles({
+				height: hg + '%'
+			});
 			if (i >= lim.min && i < lim.max)
 			{
 				bars[i].addClass('sel');
-				f[yr] = y;
-				yr++;
+				f.include(y);
 			}
 			else
 			{
@@ -112,6 +116,7 @@ var YearSel = new Class({
 			msg: this.get_message()
 		}
 		this.fireEvent('rangechanged', ret);
+
 	},
 	change_vals: function (d)
 	{
@@ -120,32 +125,7 @@ var YearSel = new Class({
 	},
 	prepare_data: function (data)
 	{
-		var dt = {};
-		var max = 0;
-		for (var i = 0; i < data.length; i++)
-		{
-			var d = data[i];
-			for (var pid in d.data)
-			{
-				var dx = d.data[pid];
-				if (!dt[pid])
-				{
-					dt[pid] = 0;
-				}
-				for (var j = 0; j < dx.length; j++)
-				{
-					dt[pid]++;
-					if (dt[pid] > max)
-					{
-						max = dt[pid];
-					}
-				}
-			}
-		}
-		var r = {
-			data: dt,
-			max: max
-		};
-		return r;
+		var max = DataUtil.get_max_len(data);
+		return {data: data, max: max};
 	}
 });

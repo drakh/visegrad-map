@@ -12,9 +12,13 @@ var CityMarker = new Class({
 	initialize: function (map, pt, b, options)
 	{
 		this.setOptions(options);
+
 		var o = this.options;
 		var max_z = o.max_z;
 		var min_z = o.min_z;
+		this.pt = pt;
+
+
 		var r = pt.total / b.min;
 		var l = Math.log(r);
 		var z = max_z - Math.round(l * 10);
@@ -22,10 +26,12 @@ var CityMarker = new Class({
 		{
 			z = min_z;
 		}
-		var w = Math.round((mapconf.min_radius + (l * 5)));
 
+		var w = Math.round((mapconf.min_radius + (l * 5)));
+		w=20;
+		z=30;
 		var el = new Element('div', {
-			title: pt.s,
+			title: pt.pt.s,
 			styles: {
 				position: 'absolute',
 				'z-index': z
@@ -46,7 +52,7 @@ var CityMarker = new Class({
 			class: 'marker-circle'
 		}).inject(el);
 		this.z = z;
-		this.pt = pt;
+
 		this.el = el;
 		this.g = null;
 		this.reposition(map);
@@ -56,7 +62,7 @@ var CityMarker = new Class({
 	},
 	fire_click: function ()
 	{
-		this.fireEvent('click');
+		this.fireEvent('click', this.pt);
 	},
 	to_front: function ()
 	{
@@ -79,8 +85,8 @@ var CityMarker = new Class({
 	reposition: function (map)
 	{
 		var ps = map.latLngToLayerPoint([
-			this.pt.lat,
-			this.pt.lon
+			this.pt.pt.lat,
+			this.pt.pt.lon
 		]);
 
 		this.el.setStyles({

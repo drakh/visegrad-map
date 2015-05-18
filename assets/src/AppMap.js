@@ -7,7 +7,7 @@ var AppMap = new Class({
 	{
 		this.setOptions(options);
 		this.conf = conf;
-		this.markers = {};
+		this.markers = [];
 		var a_map = L.map($(mapid), {
 			attributionControl: false,
 			zoomControl: false
@@ -40,6 +40,7 @@ var AppMap = new Class({
 		els[2].addEvent('click', this.zoom_in.bind(this));
 		els[3].addEvent('click', this.zoom_out.bind(this));
 	},
+
 	zoom_in: function (e)
 	{
 		if (e)
@@ -76,56 +77,119 @@ var AppMap = new Class({
 			this.map.fitBounds(this.bounds);
 		}
 	},
-	draw_points: function (data, f)
+	draw_points: function (data, points, f)
 	{
-		this.graph_f = f;
+
 		this.remove_markers();
 
+		var pts_data = DataUtil.group_by_place(data);
+		var cts_data = DataUtil.group_by_country(data);
+		var data = {
+			cities: pts_data,
+			countries: cts_data
+		};
+		var pts = {
+			cities: points,
+			countries: countries_geo
+		};
+		var w = 'cities';
+		this.data = data;
+		this.graph_f = f;
+		var dt = data[w];
+		var pt_d = pts[w];
+		var max = DataUtil.get_max_len(dt);
+		var markers = [];
+		var o = this.options;
 		var pane = this.pane;
 		var map = this.map;
-
-		var points = data.points;
-		var bounds = data.bounds;
-		this.map.options.minZoom = 0;
-		var conf = this.conf;
-
-		if (points.length > 0)
+		var b_arr = [];
+		for (var pid in pt_d)
 		{
-			var z = this.map.getBoundsZoom(bounds);
-			if (z > conf.max_z)
+			if (dt[pid] && dt[pid].length > 0)
 			{
-				z = conf.max_z;
-			}
-			if (z < conf.min_z)
-			{
-				z = conf.min_z;
-			}
-
-			this.map.setMaxBounds(bounds);
-			this.map.options.minZoom = z;
-			this.bounds = bounds;
-			this.points = points;
-			var rel = points.rel;
-			for (var i = 0; i < points.length; i++)
-			{
-				var p = points[i];
-				this.markers[i] = new CityMarker(map, p, rel, {
-					tips: this.options.tips,
+				var p = {
+					pt: pt_d[pid],
+					data: dt[pid]
+				};
+				var marker = new CityMarker(map, p, max, {
+					tips: o.tips,
 					pane: pane,
-					onClick: this.show_graph.bind(this, i)
+					onClick: this.show_graph.bind(this)
 				});
+				markers.include(marker);
+				b_arr.include([p.pt.lat, p.pt.lon]);
 			}
-			this.zoom_to_bounds();
 		}
+		this.markers = markers;
+		var conf = this.conf;
+		if (markers.length > 0)
+		{
+			var bounds = L.bounds(b_arr);
+			this.bounds = bounds;
+
+			//var z = this.map.getBoundsZoom(bounds);
+			/*
+			 if (z > conf.max_z)
+			 {
+			 z = conf.max_z;
+			 }
+			 if (z < conf.min_z)
+			 {
+			 z = conf.min_z;
+			 }
+			 */
+			//map.setMaxBounds(bounds);
+			//map.options.minZoom = z;
+			//this.zoom_to_bounds();
+		}
+		/*
+		 this.graph_f = f;
+
+		 var pane = this.pane;
+		 var map = this.map;
+
+		 var points = data.points;
+		 var bounds = data.bounds;
+		 this.map.options.minZoom = 0;
+		 var conf = this.conf;
+
+		 if (points.length > 0)
+		 {
+		 var z = this.map.getBoundsZoom(bounds);
+		 if (z > conf.max_z)
+		 {
+		 z = conf.max_z;
+		 }
+		 if (z < conf.min_z)
+		 {
+		 z = conf.min_z;
+		 }
+
+		 this.map.setMaxBounds(bounds);
+		 this.map.options.minZoom = z;
+		 this.bounds = bounds;
+		 this.points = points;
+		 var rel = points.rel;
+		 for (var i = 0; i < points.length; i++)
+		 {
+		 var p = points[i];
+		 this.markers[i] = new CityMarker(map, p, rel, {
+		 tips: this.options.tips,
+		 pane: pane,
+		 onClick: this.show_graph.bind(this, i)
+		 });
+		 }
+		 this.zoom_to_bounds();
+		 }
+		 */
 	},
-	show_graph: function (i)
+	show_graph: function (data)
 	{
-		var points = this.points;
 		var map = this.map;
 		var pane = this.pane;
 		var graph_f = this.graph_f;
 		this.destroy_graph(map);
-		this.graph = new GraphMarker(points[i], map, graph_f, {
+		this.graph = new GraphMarker(data, map, graph_f, {
 			pane: pane,
 			tips: this.options.tips,
 			onDestroy: this.graph_destroyed.bind(this, map)
@@ -146,12 +210,11 @@ var AppMap = new Class({
 	{
 		var m = this.markers;
 		var map = this.map;
-		for (var pid in m)
+		for (var i = 0; i < m.length; i++)
 		{
-			m[pid].destroy(map)
+			m[i].destroy(map);
 		}
-		this.markers = {};
+		this.markers = [];
 		this.destroy_graph(map);
-
 	}
 });

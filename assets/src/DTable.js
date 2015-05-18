@@ -17,12 +17,12 @@ var DTable = new Class({
 			},
 			{
 				name: 'Applicant',
-				pid: 'applicant',
+				pid: 'a',
 				type: 's'
 			},
 			{
 				name: 'Project title',
-				pid: 'project',
+				pid: 'name',
 				type: 's'
 			}
 		],
@@ -77,28 +77,8 @@ var DTable = new Class({
 	set_data: function (data)
 	{
 		this.pagination.page = 0;
-		var d = data.points;
-		var a = [];
-		for (var i = 0; i < d.length; i++)
-		{
-			var dt = d[i].data;
-			for (var yr in dt)
-			{
-				var y_d = dt[yr];
-				for (var k = 0; k < y_d.length; k++)
-				{
-					var ae = {
-						city: d[i].s,
-						year: yr,
-						applicant: y_d[k].a,
-						project: y_d[k].name
-					};
-					a.include(ae);
-				}
-			}
-		}
-		this.pagination.count = a.length;
-		this.table_data = a;
+		this.pagination.count = data.length;
+		this.table_data = data;
 		this.pager.set_data(this.pagination);
 	},
 	change_page: function (p)
@@ -141,16 +121,17 @@ var DTable = new Class({
 		var d = this.table_data;
 		var min = pg.page * pg.limit;
 		var max = min + pg.limit;
+		var ho = this.options.table_headers;
 		if (max > d.length)
 		{
 			max = d.length;
 		}
-
 		for (var i = min; i < max; i++)
 		{
 			var r = new Element('tr');
-			for (var pid in d[i])
+			for (var j = 0; j < ho.length; j++)
 			{
+				var pid = ho[j].pid;
 				new Element('td', {text: d[i][pid]}).inject(r);
 			}
 			r.inject(w);

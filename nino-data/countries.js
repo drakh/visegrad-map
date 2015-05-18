@@ -1,5 +1,11 @@
 var countries_geo =
 {
+	/* keep this as first four rows!!*/
+	"CZ": {"s": "Czech Republic", "lon": 15.472962, "lat": 49.817492, "c": "CZ"},
+	"HU": {"s": "Hungary", "lon": 19.503304, "lat": 47.162494, "c": "HU"},
+	"PL": {"s": "Poland", "lon": 19.145136, "lat": 51.919438, "c": "PL"},
+	"SK": {"s": "Slovakia", "lon": 19.699024, "lat": 48.669026, "c": "SK"},
+	/* keep this as first four rows!!*/
 	"AF": {"s": "Afghanistan", "lon": 67.709953, "lat": 33.93911, "c": "AF"},
 	"AL": {"s": "Albania", "lon": 20.168331, "lat": 41.153332, "c": "AL"},
 	"DZ": {"s": "Algeria", "lon": 1.659626, "lat": 28.033886, "c": "DZ"},
@@ -57,7 +63,6 @@ var countries_geo =
 	"CU": {"s": "Cuba", "lon": -77.781167, "lat": 21.521757, "c": "CU"},
 	"CW": "Curaçao",
 	"CY": {"s": "Cyprus", "lon": 33.429859, "lat": 35.126413, "c": "CY"},
-	"CZ": {"s": "Czech Republic", "lon": 15.472962, "lat": 49.817492, "c": "CZ"},
 	"DK": {"s": "Denmark", "lon": 9.501785, "lat": 56.26392, "c": "DK"},
 	"DJ": {"s": "Djibouti", "lon": 42.590275, "lat": 11.825138, "c": "DJ"},
 	"DM": {"s": "Dominica", "lon": -61.370976, "lat": 15.414999, "c": "DM"},
@@ -98,7 +103,6 @@ var countries_geo =
 	"VA": {"s": "Holy See (Vatican City State)", "lon": 12.453389, "lat": 41.902916, "c": "VA"},
 	"HN": {"s": "Honduras", "lon": -86.241905, "lat": 15.199999, "c": "HN"},
 	"HK": {"s": "Hong Kong", "lon": 114.109497, "lat": 22.396428, "c": "HK"},
-	"HU": {"s": "Hungary", "lon": 19.503304, "lat": 47.162494, "c": "HU"},
 	"IS": {"s": "Iceland", "lon": -19.020835, "lat": 64.963051, "c": "IS"},
 	"IN": {"s": "India", "lon": 78.96288, "lat": 20.593684, "c": "IN"},
 	"ID": {"s": "Indonesia", "lon": 113.921327, "lat": -0.789275, "c": "ID"},
@@ -175,7 +179,6 @@ var countries_geo =
 	"PE": {"s": "Peru", "lon": -75.015152, "lat": -9.189967, "c": "PE"},
 	"PH": {"s": "Philippines", "lon": 121.774017, "lat": 12.879721, "c": "PH"},
 	"PN": {"s": "Pitcairn", "lon": -127.439308, "lat": -24.703615, "c": "PN"},
-	"PL": {"s": "Poland", "lon": 19.145136, "lat": 51.919438, "c": "PL"},
 	"PT": {"s": "Portugal", "lon": -8.224454, "lat": 39.399872, "c": "PT"},
 	"PR": {"s": "Puerto Rico", "lon": -66.590149, "lat": 18.220833, "c": "PR"},
 	"QA": {"s": "Qatar", "lon": 51.183884, "lat": 25.354826, "c": "QA"},
@@ -197,7 +200,6 @@ var countries_geo =
 	"SC": {"s": "Seychelles", "lon": 55.491977, "lat": -4.679574, "c": "SC"},
 	"SL": {"s": "Sierra Leone", "lon": -11.779889, "lat": 8.460555, "c": "SL"},
 	"SG": {"s": "Singapore", "lon": 103.819836, "lat": 1.352083, "c": "SG"},
-	"SK": {"s": "Slovakia", "lon": 19.699024, "lat": 48.669026, "c": "SK"},
 	"SI": {"s": "Slovenia", "lon": 14.995463, "lat": 46.151241, "c": "SI"},
 	"SB": {"s": "Solomon Islands", "lon": 160.156194, "lat": -9.64571, "c": "SB"},
 	"SO": {"s": "Somalia", "lon": 46.199616, "lat": 5.152149, "c": "SO"},
@@ -248,6 +250,12 @@ var countries_geo =
 };
 
 var filter_countries = {
+	/* keep this as first four rows!!*/
+	"CZ": "Czech Republic",
+	"HU": "Hungary",
+	"PL": "Poland",
+	"SK": "Slovakia",
+	/* keep this as first four rows!!*/
 	"AF": "Afghanistan",
 	"AX": "Åland Islands",
 	"AL": "Albania",
@@ -307,7 +315,6 @@ var filter_countries = {
 	"CU": "Cuba",
 	"CW": "Curaçao",
 	"CY": "Cyprus",
-	"CZ": "Czech Republic",
 	"DK": "Denmark",
 	"DJ": "Djibouti",
 	"DM": "Dominica",
@@ -348,7 +355,6 @@ var filter_countries = {
 	"VA": "Holy See (Vatican City State)",
 	"HN": "Honduras",
 	"HK": "Hong Kong",
-	"HU": "Hungary",
 	"IS": "Iceland",
 	"IN": "India",
 	"ID": "Indonesia",
@@ -425,7 +431,6 @@ var filter_countries = {
 	"PE": "Peru",
 	"PH": "Philippines",
 	"PN": "Pitcairn",
-	"PL": "Poland",
 	"PT": "Portugal",
 	"PR": "Puerto Rico",
 	"QA": "Qatar",
@@ -449,7 +454,6 @@ var filter_countries = {
 	"SC": "Seychelles",
 	"SL": "Sierra Leone",
 	"SG": "Singapore",
-	"SK": "Slovakia",
 	"SX": "Sint Maarten (Dutch Part)",
 	"SI": "Slovenia",
 	"SB": "Solomon Islands",

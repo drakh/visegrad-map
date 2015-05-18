@@ -2,19 +2,28 @@ var PlaceFilter = new Class({
 	Implements: [Events, Options],
 	initialize: function (data, filterdata, country_filters, options)
 	{
-		this.created_filter = {years: false, countries: false, types: false, tags: false};
+		console.log(data);
 		this.setOptions(options);
 
-		this.select_filters = [
-			'countries',
-			'types',
-			'tags'
-		];
+		this.created_filter = {years: false, countries: false, types: false, tags: false};
+
+		var p = $('filter_pane');
+
+
+		this.select_filters = ['countries', 'types', 'tags'];
 		this.cc_s = 0;
+
 		this.msg = {};
-		this.data = data;//all points data
+
+		this.data = data;
+		this.p_data = [];
+		this.f_data = [];
+		this.f_points = [];
+		this.f_filters = {};
+
 		this.filterdata = filterdata;
 		this.country_filters = country_filters;
+
 		this.pref = [];
 		this.filtered_data = [];//all filtersdata
 
@@ -23,16 +32,17 @@ var PlaceFilter = new Class({
 			onRangechanged: this.filter_years.bind(this)
 		});
 
-		var p = $('filter_pane');
 		this.build_selects(p);
 
 		new FilterWin(p, {
 			onTypeswitch: this.switch_data.bind(this)
 		});
+
 		this.cc_switches = $$('#city-country a');
 		this.cc_switches_bind();
 
 	},
+
 	check_created: function ()
 	{
 		var c = this.created_filter;
@@ -119,28 +129,20 @@ var PlaceFilter = new Class({
 		}
 		return r;
 	},
-	prepare_countries: function ()
+	prepare_countries: function (d)
 	{
-		var d = this.filtered_data;
 		var cts = this.country_filters;
-
 		var a = mapconf.visegrad;
-
-		for (var i = 0; i < d.length; i++)
+		var r = {};
+		for (var pid in cts)
 		{
-			var c = d[i].c;
-			if (!a.contains(c))
+			if (a.contains(pid) || d[pid])
 			{
-				a.include(c);
+				r[pid] = cts[pid];
 			}
 		}
-		var r = {};
-		for (var i = 0; i < a.length; i++)
-		{
-			var pid = a[i];
-			r[pid] = cts[pid];
-		}
 		this.countries_prefiltered = r;
+		return r;
 	},
 	get_msg: function ()
 	{
@@ -212,161 +214,48 @@ var PlaceFilter = new Class({
 		this.msg[i] = d.msg;
 		this.filt_arr[i] = d.filter;
 		var prefiltered = this.prefilter();
-		this.pref = prefiltered;
+		this.p_data = prefiltered;
 		this.year_sel.set_data(prefiltered);
 	},
 	switch_data: function (i)
 	{
 		this.sel_filter = i;
-		var d = this.get_cc_data(this.data[i]);
-		this.filtered_data = d;
-		this.filtered_filters = this.filterdata[i];
+
 		var s = this.selects;
-		this.prepare_countries();
-		s['countries'].set_data(this.countries_prefiltered);
-		s['types'].set_data(this.filtered_filters.g);
-		s['tags'].set_data(this.filtered_filters.c);
+		var data = this.data;
+		var fd = this.filterdata[i];
+
+		this.f_points = data[i].points;
+		this.f_data = data[i].data;
+		this.p_data = [];
+
+		this.f_filters = fd;
+
+		var dc = DataUtil.group_by_country(data[i].data);
+		s['countries'].set_data(this.prepare_countries(dc));
+		s['types'].set_data(fd.g);
+		s['tags'].set_data(fd.c);
 	},
 	filter_years: function (y)
 	{
-		var yrs = y.years;
 		this.msg['years'] = y.msg;
-		var f_yrs = {};
-		for (var pid in yrs)
-		{
-			f_yrs[yrs[pid]] = true;
-		}
-		var points = this.pref;
-
-		var b = [];
-		var min = null;
-		var max = null;
-		var fpts = [];
-
-		var f = 0;
-		for (var i = 0; i < points.length; i++)
-		{
-
-			var p = points[i];
-			var s = 0;
-			var dta = {};
-			for (var pid in p.data)
-			{
-				var d = p.data[pid];
-				for (var j = 0; j < d.length; j++)
-				{
-					if (f_yrs[pid])
-					{
-						//s += d[j].amount;
-						s++;
-						dta[pid] = p.data[pid];
-					}
-				}
-			}
-			if (s > 0)
-			{
-				b[f] = [
-					p.lat,
-					p.lon
-				];
-				p['total'] = s;
-				p['data'] = dta;
-				fpts[f] = p;
-				f++;
-				if (min === null)
-				{
-					min = s;
-				}
-				else if (min > s)
-				{
-					min = s
-				}
-
-				if (max === null)
-				{
-					max = s;
-				}
-				else if (s > max)
-				{
-					max = s;
-				}
-			}
-		}
-		fpts['rel'] = {
-			min: min,
-			max: max
-		};
-
-		var bounds = L.latLngBounds(b);
-
-		var data = {
-			points: fpts,
-			bounds: bounds
-		};
-		this.filter(data);
+		var yrs = y.years;
+		var d = this.p_data;
+		var f = {years: yrs};
+		var tmp_d = d.filterOn(f);
+		this.filter(tmp_d);
 	},
 	prefilter: function ()
 	{
-		var p = this.filtered_data;
 		var f = this.filt_arr;
-
-		var pts = [];
-
-		for (var i = 0; i < p.length; i++)
-		{
-			var d = p[i];
-			if (f.countries.contains(d.c))
-			{
-				var pt_dt = {};
-				var dt = d.data;
-				var empty = true;
-				for (var yr in dt)
-				{
-					var y_dt = dt[yr];
-					var f_y_dt = [];
-					for (var j = 0; j < y_dt.length; j++)
-					{
-						var j_y_dt = y_dt[j];
-
-						var type_c = false;
-						if (f['types'].contains(String.from(j_y_dt.g)))
-						{
-							type_c = true;
-						}
-						var tag_c = false;
-						for (var k = 0; k < y_dt[j].c.length; k++)
-						{
-							if (f['tags'].contains(String.from(y_dt[j].c[k])))
-							{
-								tag_c = true;
-							}
-						}
-						if (type_c === true && tag_c === true)
-						{
-							f_y_dt.include(y_dt[j]);
-						}
-
-					}
-					if (f_y_dt.length > 0)
-					{
-						pt_dt[yr] = f_y_dt;
-						empty = false;
-					}
-				}
-				if (empty === false)
-				{
-					var pt = d;
-					pt['data'] = pt_dt;
-					pts.include(pt);
-				}
-			}
-		}
-		return pts;
+		var data = this.f_data;
+		return data.filterOn(f);
 	},
 	filter: function (data)
 	{
 		var msg = this.get_msg();
 		var r = {
+			points: this.f_points,
 			data: data,
 			message: msg,
 			sel: this.sel_filter
