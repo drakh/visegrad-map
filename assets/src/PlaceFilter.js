@@ -36,10 +36,6 @@ var PlaceFilter = new Class({
 		new FilterWin(p, {
 			onTypeswitch: this.switch_data.bind(this)
 		});
-		/*
-		 this.cc_switches = $$('#city-country a');
-		 this.cc_switches_bind();
-		 */
 	},
 
 	check_created: function ()
@@ -58,78 +54,6 @@ var PlaceFilter = new Class({
 			this.fireEvent('created');
 		}
 	},
-	/*
-	 cc_switches_bind: function ()
-	 {
-	 var cc = this.cc_switches;
-	 for (var i = 0; i < cc.length; i++)
-	 {
-	 cc[i].addEvent('click', this.cc_sw.bind(this, i));
-	 }
-	 this.cc_sw(this.cc_s);
-	 },
-	 cc_sw: function (i, e)
-	 {
-	 if (e)
-	 {
-	 e.stop();
-	 }
-	 var cc = this.cc_switches;
-	 for (var j = 0; j < cc.length; j++)
-	 {
-	 if (j == i)
-	 {
-	 cc[j].removeClass('dark-bg');
-	 cc[j].addClass('light-bg');
-	 }
-	 else
-	 {
-	 cc[j].removeClass('light-bg');
-	 cc[j].addClass('dark-bg');
-	 }
-	 }
-	 if (i != this.cc_s)
-	 {
-	 this.cc_s = i;
-	 this.switch_data(this.sel_filter);
-	 }
-	 },
-	 get_cc_data: function (data)
-	 {
-	 var r = [];
-	 var cc = this.cc_s;
-	 if (cc == 0)
-	 {
-	 r = data;
-	 }
-	 else
-	 {
-	 var c = {};
-	 for (var i = 0; i < data.length; i++)
-	 {
-	 var d = data[i];
-	 if (!c[d.c])
-	 {
-	 c[d.c] = countries_geo[d.c]
-	 c[d.c]['data'] = {};
-	 }
-	 for (var pid in d.data)
-	 {
-	 if (!c[d.c]['data'][pid])
-	 {
-	 c[d.c]['data'][pid] = [];
-	 }
-	 c[d.c]['data'][pid].append(d.data[pid]);
-	 }
-	 }
-	 for (var pid in c)
-	 {
-	 r.include(c[pid]);
-	 }
-	 }
-	 return r;
-	 },
-	 */
 	prepare_countries: function (d)
 	{
 		var cts = this.country_filters;

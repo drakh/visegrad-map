@@ -27,11 +27,50 @@ var AppMap = new Class({
 		{
 			this.initialize_controls(c);
 		}
+		this.cc_s_w = ['cities', 'countries'];
+		this.cc_s = 0;
+		this.cc_switches = $$('#city-country a');
+		this.cc_switches_bind();
+
 		this.map = a_map;
 		this.zoom_to_v4();
-
 	},
+	cc_switches_bind: function ()
+	{
+		var cc = this.cc_switches;
+		for (var i = 0; i < cc.length; i++)
+		{
+			cc[i].addEvent('click', this.cc_sw.bind(this, i));
+		}
+		this.cc_sw(this.cc_s);
+	},
+	cc_sw: function (i, e)
+	{
+		if (e)
+		{
+			e.stop();
+		}
 
+		var cc = this.cc_switches;
+		for (var j = 0; j < cc.length; j++)
+		{
+			if (j == i)
+			{
+				cc[j].removeClass('dark-bg');
+				cc[j].addClass('light-bg');
+			}
+			else
+			{
+				cc[j].removeClass('light-bg');
+				cc[j].addClass('dark-bg');
+			}
+		}
+		if (i != this.cc_s)
+		{
+			this.cc_s = i;
+			this.redraw(i);
+		}
+	},
 	initialize_controls: function (el)
 	{
 		var els = el.getElements('a');
@@ -77,24 +116,13 @@ var AppMap = new Class({
 			this.map.fitBounds(this.bounds);
 		}
 	},
-	draw_points: function (data_in, points, f)
+	redraw: function (i)
 	{
-
 		this.remove_markers();
+		var w = this.cc_s_w[i];
+		var pts = this.pts_g;
+		var data = this.data;
 
-		var pts_data = DataUtil.group_by_city(data_in);
-		var cts_data = DataUtil.group_by_country(data_in);
-		var data = {
-			cities: pts_data,
-			countries: cts_data
-		};
-		var pts = {
-			cities: points,
-			countries: countries_geo
-		};
-		var w = 'cities';
-		this.data = data;
-		this.graph_f = f;
 		var dt = data[w];
 		var pt_d = pts[w];
 		var max = DataUtil.get_max_len(dt);
@@ -142,6 +170,23 @@ var AppMap = new Class({
 			this.zoom_to_bounds();
 		}
 	},
+	draw_points: function (data_in, points, f)
+	{
+		var pts_data = DataUtil.group_by_city(data_in);
+		var cts_data = DataUtil.group_by_country(data_in);
+		var data = {
+			cities: pts_data,
+			countries: cts_data
+		};
+		var pts = {
+			cities: points,
+			countries: countries_geo
+		};
+		this.pts_g = pts;
+		this.data = data;
+		this.graph_f = f;
+		this.redraw(this.cc_s);
+	},
 	show_graph: function (data)
 	{
 		var map = this.map;
@@ -152,13 +197,13 @@ var AppMap = new Class({
 			pane: pane,
 			tips: this.options.tips,
 			onDestroy: this.graph_destroyed.bind(this),
-			onCreate:this.graph_created.bind(this)
+			onCreate: this.graph_created.bind(this)
 		});
 		this.fireEvent('graphshow', data);
 	},
-	graph_created:function(data)
+	graph_created: function (data)
 	{
-		this.fireEvent('graphcreated',data);
+		this.fireEvent('graphcreated', data);
 	},
 	destroy_graph: function (map)
 	{
