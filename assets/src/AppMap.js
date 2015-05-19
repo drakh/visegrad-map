@@ -124,64 +124,23 @@ var AppMap = new Class({
 		var conf = this.conf;
 		if (markers.length > 0)
 		{
-			var bounds = L.bounds(b_arr);
+			var bounds = L.latLngBounds(b_arr);
 			this.bounds = bounds;
 
-			//var z = this.map.getBoundsZoom(bounds);
-			/*
-			 if (z > conf.max_z)
-			 {
-			 z = conf.max_z;
-			 }
-			 if (z < conf.min_z)
-			 {
-			 z = conf.min_z;
-			 }
-			 */
-			//map.setMaxBounds(bounds);
-			//map.options.minZoom = z;
-			//this.zoom_to_bounds();
+			var z = this.map.getBoundsZoom(bounds);
+			if (z > conf.max_z)
+			{
+				z = conf.max_z;
+			}
+			if (z < conf.min_z)
+			{
+				z = conf.min_z;
+			}
+
+			map.setMaxBounds(bounds);
+			map.options.minZoom = z;
+			this.zoom_to_bounds();
 		}
-		/*
-		 this.graph_f = f;
-
-		 var pane = this.pane;
-		 var map = this.map;
-
-		 var points = data.points;
-		 var bounds = data.bounds;
-		 this.map.options.minZoom = 0;
-		 var conf = this.conf;
-
-		 if (points.length > 0)
-		 {
-		 var z = this.map.getBoundsZoom(bounds);
-		 if (z > conf.max_z)
-		 {
-		 z = conf.max_z;
-		 }
-		 if (z < conf.min_z)
-		 {
-		 z = conf.min_z;
-		 }
-
-		 this.map.setMaxBounds(bounds);
-		 this.map.options.minZoom = z;
-		 this.bounds = bounds;
-		 this.points = points;
-		 var rel = points.rel;
-		 for (var i = 0; i < points.length; i++)
-		 {
-		 var p = points[i];
-		 this.markers[i] = new CityMarker(map, p, rel, {
-		 tips: this.options.tips,
-		 pane: pane,
-		 onClick: this.show_graph.bind(this, i)
-		 });
-		 }
-		 this.zoom_to_bounds();
-		 }
-		 */
 	},
 	show_graph: function (data)
 	{
@@ -194,7 +153,7 @@ var AppMap = new Class({
 			tips: this.options.tips,
 			onDestroy: this.graph_destroyed.bind(this, map)
 		});
-		this.fireEvent('graphshow',data);
+		this.fireEvent('graphshow', data);
 	},
 	destroy_graph: function (map)
 	{
