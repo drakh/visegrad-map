@@ -64,6 +64,7 @@ var GraphMarker = new Class({
 
 		map.on('zoomstart', this.before_zoom.bind(this));
 		map.on('zoomend', this.reposition.bind(this, map));
+		this.fireEvent('create', pt);
 	},
 	graph_bind_events: function (el)
 	{

@@ -77,13 +77,13 @@ var AppMap = new Class({
 			this.map.fitBounds(this.bounds);
 		}
 	},
-	draw_points: function (data, points, f)
+	draw_points: function (data_in, points, f)
 	{
 
 		this.remove_markers();
 
-		var pts_data = DataUtil.group_by_city(data);
-		var cts_data = DataUtil.group_by_country(data);
+		var pts_data = DataUtil.group_by_city(data_in);
+		var cts_data = DataUtil.group_by_country(data_in);
 		var data = {
 			cities: pts_data,
 			countries: cts_data
@@ -151,9 +151,14 @@ var AppMap = new Class({
 		this.graph = new GraphMarker(data, map, graph_f, {
 			pane: pane,
 			tips: this.options.tips,
-			onDestroy: this.graph_destroyed.bind(this, map)
+			onDestroy: this.graph_destroyed.bind(this),
+			onCreate:this.graph_created.bind(this)
 		});
 		this.fireEvent('graphshow', data);
+	},
+	graph_created:function(data)
+	{
+		this.fireEvent('graphcreated',data);
 	},
 	destroy_graph: function (map)
 	{
@@ -162,9 +167,10 @@ var AppMap = new Class({
 			this.graph.destroy(map);
 		}
 	},
-	graph_destroyed: function (map)
+	graph_destroyed: function ()
 	{
 		this.graph = null;
+		this.fireEvent('graphdestroyed');
 	},
 	remove_markers: function ()
 	{

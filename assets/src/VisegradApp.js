@@ -1,5 +1,6 @@
 var VisegradApp = {
 	initiated: false,
+	first_time: true,
 	init: function ()
 	{
 		if (this.initiated == false)
@@ -14,7 +15,11 @@ var VisegradApp = {
 				dt[i] = DataUtil.flatten_data(mapdata[i]);
 			}
 			this.msg_win = new MessageWin($('filter-message'));
-			this.map = new AppMap($(mapid), $('map-controls'), mapconf, {tips: tips});
+			this.map = new AppMap($(mapid), $('map-controls'), mapconf, {
+				tips: tips,
+				onGraphcreated: this.draw_graph.bind(this),
+				onGraphdestroyed: this.graph_closed.bind(this)
+			});
 			this.graph = new DGraph($('e-graphs'), {tips: tips});
 			this.table = new DTable($('e-table'));
 
@@ -32,8 +37,24 @@ var VisegradApp = {
 		var sel = d.sel;
 		this.msg_win.set_message(message);
 		this.map.draw_points(data, pts, filters[sel]);
-		this.graph.set_data(data,filters[sel]);
+		this.refill(d);
+	},
+	refill: function (d)
+	{
+		var data = d.data;
+		var sel = d.sel;
+		this.graph.set_data(data, filters[sel]);
 		this.table.set_data(data);
+	},
+	draw_graph: function (d_in)
+	{
+		var d = this.all_data;
+		var di = {data: d_in.data, sel: d.sel};
+		this.refill(di);
+	},
+	graph_closed: function ()
+	{
+		this.refill(this.all_data);
 	}
 };
 
