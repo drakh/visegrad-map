@@ -27,11 +27,50 @@ var AppMap = new Class({
 		{
 			this.initialize_controls(c);
 		}
+		this.cc_s_w = ['cities', 'countries'];
+		this.cc_s = 0;
+		this.cc_switches = $$('#city-country a');
+		this.cc_switches_bind();
+
 		this.map = a_map;
 		this.zoom_to_v4();
-
 	},
+	cc_switches_bind: function ()
+	{
+		var cc = this.cc_switches;
+		for (var i = 0; i < cc.length; i++)
+		{
+			cc[i].addEvent('click', this.cc_sw.bind(this, i));
+		}
+		this.cc_sw(this.cc_s);
+	},
+	cc_sw: function (i, e)
+	{
+		if (e)
+		{
+			e.stop();
+		}
 
+		var cc = this.cc_switches;
+		for (var j = 0; j < cc.length; j++)
+		{
+			if (j == i)
+			{
+				cc[j].removeClass('dark-bg');
+				cc[j].addClass('light-bg');
+			}
+			else
+			{
+				cc[j].removeClass('light-bg');
+				cc[j].addClass('dark-bg');
+			}
+		}
+		if (i != this.cc_s)
+		{
+			this.cc_s = i;
+			this.redraw(i);
+		}
+	},
 	initialize_controls: function (el)
 	{
 		var els = el.getElements('a');
@@ -77,24 +116,13 @@ var AppMap = new Class({
 			this.map.fitBounds(this.bounds);
 		}
 	},
-	draw_points: function (data, points, f)
+	redraw: function (i)
 	{
-
 		this.remove_markers();
+		var w = this.cc_s_w[i];
+		var pts = this.pts_g;
+		var data = this.data;
 
-		var pts_data = DataUtil.group_by_city(data);
-		var cts_data = DataUtil.group_by_country(data);
-		var data = {
-			cities: pts_data,
-			countries: cts_data
-		};
-		var pts = {
-			cities: points,
-			countries: countries_geo
-		};
-		var w = 'cities';
-		this.data = data;
-		this.graph_f = f;
 		var dt = data[w];
 		var pt_d = pts[w];
 		var max = DataUtil.get_max_len(dt);
@@ -124,64 +152,40 @@ var AppMap = new Class({
 		var conf = this.conf;
 		if (markers.length > 0)
 		{
-			var bounds = L.bounds(b_arr);
+			var bounds = L.latLngBounds(b_arr);
 			this.bounds = bounds;
 
-			//var z = this.map.getBoundsZoom(bounds);
-			/*
-			 if (z > conf.max_z)
-			 {
-			 z = conf.max_z;
-			 }
-			 if (z < conf.min_z)
-			 {
-			 z = conf.min_z;
-			 }
-			 */
-			//map.setMaxBounds(bounds);
-			//map.options.minZoom = z;
-			//this.zoom_to_bounds();
+			var z = this.map.getBoundsZoom(bounds);
+			if (z > conf.max_z)
+			{
+				z = conf.max_z;
+			}
+			if (z < conf.min_z)
+			{
+				z = conf.min_z;
+			}
+
+			map.setMaxBounds(bounds);
+			map.options.minZoom = z;
+			this.zoom_to_bounds();
 		}
-		/*
-		 this.graph_f = f;
-
-		 var pane = this.pane;
-		 var map = this.map;
-
-		 var points = data.points;
-		 var bounds = data.bounds;
-		 this.map.options.minZoom = 0;
-		 var conf = this.conf;
-
-		 if (points.length > 0)
-		 {
-		 var z = this.map.getBoundsZoom(bounds);
-		 if (z > conf.max_z)
-		 {
-		 z = conf.max_z;
-		 }
-		 if (z < conf.min_z)
-		 {
-		 z = conf.min_z;
-		 }
-
-		 this.map.setMaxBounds(bounds);
-		 this.map.options.minZoom = z;
-		 this.bounds = bounds;
-		 this.points = points;
-		 var rel = points.rel;
-		 for (var i = 0; i < points.length; i++)
-		 {
-		 var p = points[i];
-		 this.markers[i] = new CityMarker(map, p, rel, {
-		 tips: this.options.tips,
-		 pane: pane,
-		 onClick: this.show_graph.bind(this, i)
-		 });
-		 }
-		 this.zoom_to_bounds();
-		 }
-		 */
+	},
+	draw_points: function (data_in, points, f)
+	{
+		var pts_data = DataUtil.group_by_city(data_in);
+		var cts_data = DataUtil.group_by_country(data_in);
+		var data = {
+			cities: pts_data,
+			countries: cts_data
+		};
+		var pts = {
+			cities: points,
+			countries: countries_geo
+		};
+		this.pts_g = pts;
+		this.data = data;
+		this.graph_f = f;
+		this.redraw(this.cc_s);
 	},
 	show_graph: function (data)
 	{
@@ -192,9 +196,14 @@ var AppMap = new Class({
 		this.graph = new GraphMarker(data, map, graph_f, {
 			pane: pane,
 			tips: this.options.tips,
-			onDestroy: this.graph_destroyed.bind(this, map)
+			onDestroy: this.graph_destroyed.bind(this),
+			onCreate: this.graph_created.bind(this)
 		});
-		this.fireEvent('graphshow',data);
+		this.fireEvent('graphshow', data);
+	},
+	graph_created: function (data)
+	{
+		this.fireEvent('graphcreated', data);
 	},
 	destroy_graph: function (map)
 	{
@@ -203,9 +212,10 @@ var AppMap = new Class({
 			this.graph.destroy(map);
 		}
 	},
-	graph_destroyed: function (map)
+	graph_destroyed: function ()
 	{
 		this.graph = null;
+		this.fireEvent('graphdestroyed');
 	},
 	remove_markers: function ()
 	{
@@ -239,18 +249,9 @@ var CityMarker = new Class({
 		var min_z = o.min_z;
 		this.pt = pt;
 
-
-		var r = pt.total / b.min;
-		var l = Math.log(r);
-		var z = max_z - Math.round(l * 10);
-		if (z < min_z)
-		{
-			z = min_z;
-		}
-
-		var w = Math.round((mapconf.min_radius + (l * 5)));
-		w=20;
-		z=30;
+		var a=Number.from(pt.data.length);
+		var w= Math.round(a.map(0,b,mapconf.min_radius,mapconf.max_radius));
+		var z=Math.round(a.map(b,0,min_z,max_z));
 		var el = new Element('div', {
 			title: pt.pt.s,
 			styles: {
@@ -1153,6 +1154,7 @@ var GraphMarker = new Class({
 
 		map.on('zoomstart', this.before_zoom.bind(this));
 		map.on('zoomend', this.reposition.bind(this, map));
+		this.fireEvent('create', pt);
 	},
 	graph_bind_events: function (el)
 	{
@@ -1546,10 +1548,6 @@ var PlaceFilter = new Class({
 		new FilterWin(p, {
 			onTypeswitch: this.switch_data.bind(this)
 		});
-		/*
-		 this.cc_switches = $$('#city-country a');
-		 this.cc_switches_bind();
-		 */
 	},
 
 	check_created: function ()
@@ -1568,78 +1566,6 @@ var PlaceFilter = new Class({
 			this.fireEvent('created');
 		}
 	},
-	/*
-	 cc_switches_bind: function ()
-	 {
-	 var cc = this.cc_switches;
-	 for (var i = 0; i < cc.length; i++)
-	 {
-	 cc[i].addEvent('click', this.cc_sw.bind(this, i));
-	 }
-	 this.cc_sw(this.cc_s);
-	 },
-	 cc_sw: function (i, e)
-	 {
-	 if (e)
-	 {
-	 e.stop();
-	 }
-	 var cc = this.cc_switches;
-	 for (var j = 0; j < cc.length; j++)
-	 {
-	 if (j == i)
-	 {
-	 cc[j].removeClass('dark-bg');
-	 cc[j].addClass('light-bg');
-	 }
-	 else
-	 {
-	 cc[j].removeClass('light-bg');
-	 cc[j].addClass('dark-bg');
-	 }
-	 }
-	 if (i != this.cc_s)
-	 {
-	 this.cc_s = i;
-	 this.switch_data(this.sel_filter);
-	 }
-	 },
-	 get_cc_data: function (data)
-	 {
-	 var r = [];
-	 var cc = this.cc_s;
-	 if (cc == 0)
-	 {
-	 r = data;
-	 }
-	 else
-	 {
-	 var c = {};
-	 for (var i = 0; i < data.length; i++)
-	 {
-	 var d = data[i];
-	 if (!c[d.c])
-	 {
-	 c[d.c] = countries_geo[d.c]
-	 c[d.c]['data'] = {};
-	 }
-	 for (var pid in d.data)
-	 {
-	 if (!c[d.c]['data'][pid])
-	 {
-	 c[d.c]['data'][pid] = [];
-	 }
-	 c[d.c]['data'][pid].append(d.data[pid]);
-	 }
-	 }
-	 for (var pid in c)
-	 {
-	 r.include(c[pid]);
-	 }
-	 }
-	 return r;
-	 },
-	 */
 	prepare_countries: function (d)
 	{
 		var cts = this.country_filters;
@@ -1910,6 +1836,7 @@ var SelectFilter = new Class({
 });
 var VisegradApp = {
 	initiated: false,
+	first_time: true,
 	init: function ()
 	{
 		if (this.initiated == false)
@@ -1924,7 +1851,11 @@ var VisegradApp = {
 				dt[i] = DataUtil.flatten_data(mapdata[i]);
 			}
 			this.msg_win = new MessageWin($('filter-message'));
-			this.map = new AppMap($(mapid), $('map-controls'), mapconf, {tips: tips});
+			this.map = new AppMap($(mapid), $('map-controls'), mapconf, {
+				tips: tips,
+				onGraphcreated: this.draw_graph.bind(this),
+				onGraphdestroyed: this.graph_closed.bind(this)
+			});
 			this.graph = new DGraph($('e-graphs'), {tips: tips});
 			this.table = new DTable($('e-table'));
 
@@ -1942,8 +1873,24 @@ var VisegradApp = {
 		var sel = d.sel;
 		this.msg_win.set_message(message);
 		this.map.draw_points(data, pts, filters[sel]);
-		this.graph.set_data(data,filters[sel]);
+		this.refill(d);
+	},
+	refill: function (d)
+	{
+		var data = d.data;
+		var sel = d.sel;
+		this.graph.set_data(data, filters[sel]);
 		this.table.set_data(data);
+	},
+	draw_graph: function (d_in)
+	{
+		var d = this.all_data;
+		var di = {data: d_in.data, sel: d.sel};
+		this.refill(di);
+	},
+	graph_closed: function ()
+	{
+		this.refill(this.all_data);
 	}
 };
 
@@ -2247,7 +2194,8 @@ var mapconf = {
 	map_id: 'toner',
 	min_z: 5,
 	max_z: 10,
-	min_radius: 5,
+	min_radius: 10,
+	max_radius:60,
 	v4_bounds: [
 		[
 			55.0721744,

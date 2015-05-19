@@ -7,7 +7,8 @@ var mapconf = {
 	map_id: 'toner',
 	min_z: 5,
 	max_z: 10,
-	min_radius: 5,
+	min_radius: 10,
+	max_radius:60,
 	v4_bounds: [
 		[
 			55.0721744,

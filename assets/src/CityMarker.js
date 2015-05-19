@@ -18,18 +18,9 @@ var CityMarker = new Class({
 		var min_z = o.min_z;
 		this.pt = pt;
 
-
-		var r = pt.total / b.min;
-		var l = Math.log(r);
-		var z = max_z - Math.round(l * 10);
-		if (z < min_z)
-		{
-			z = min_z;
-		}
-
-		var w = Math.round((mapconf.min_radius + (l * 5)));
-		w=20;
-		z=30;
+		var a=Number.from(pt.data.length);
+		var w= Math.round(a.map(0,b,mapconf.min_radius,mapconf.max_radius));
+		var z=Math.round(a.map(b,0,min_z,max_z));
 		var el = new Element('div', {
 			title: pt.pt.s,
 			styles: {
