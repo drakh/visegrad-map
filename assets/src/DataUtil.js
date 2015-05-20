@@ -48,12 +48,35 @@ var DataUtil = {
 		}
 		return {pt_arr: pt_a, ft_index: index};
 	},
-	count_arr: function (data)
+	count_arr: function (data, w)
 	{
 		var r = [];
+		var total = 0;
 		for (var pid in data)
 		{
-			r.include({pid: pid, count: data[pid].length});
+			var a = data[pid];
+			var l = a.length;
+			switch (w)
+			{
+				case 0:
+					total += data[pid].length;
+					r.include({pid: pid, count: l, p: 0});
+					break;
+				case 1:
+					var c = 0;
+					for (var i = 0; i < l; i++)
+					{
+						c += a[i].amount;
+					}
+					r.include({pid: pid, count: c, p: 0});
+					total += c;
+					break;
+			}
+
+		}
+		for (var i = 0; i < r.length; i++)
+		{
+			r[i]['p'] = r[i]['count'] / (total / 100);
 		}
 		return r;
 	},

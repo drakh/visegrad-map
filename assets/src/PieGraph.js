@@ -50,33 +50,36 @@ var PieGraph = new Class({
 		var d = [];
 		for (var i = 0; i < s.length; i++)
 		{
-			c.include({data: s[i].count, className: 'graph-' + (i % 17)});
+			c.include({data: s[i].p, className: 'graph-' + (i % 17)});
 			d.include(s[i].pid);
 		}
-		return {g: c, d: d};
+		return {g: c, d: d, u: unit};
 	},
 	graph_bind_events: function (el)
 	{
 		var d = this.data.graph_descs;
 		var gr = this.gr;
+		var p = this.g_data.g;
 		var map = this.g_data.d;
+		var u = this.g_data.u;
 		var s = el.getElements('.ct-series');
 		var l = s.length;
 		var l1 = l - 1;
 		for (var i = 0; i < l; i++)
 		{
 			var j = (l1 - i);
+			var ad = ': ' + (p[j].data).round(2) + '% (' + (u === 0 ? 'of total projects' : 'of total money') + ')';
 			switch (gr)
 			{
 				case 'c':
-					s[i].store('tip:title', d[map[j]].n);
+					s[i].store('tip:title', d[map[j]].n + ad);
 					s[i].store('tip:text', d[map[j]].d);
 					break;
 				case 'g':
-					s[i].store('tip:title', d[map[j]]);
+					s[i].store('tip:title', d[map[j]] + ad);
 					break;
 				case 'country':
-					s[i].store('tip:title', d[map[j]].s);
+					s[i].store('tip:title', d[map[j]].s + ad);
 					break;
 			}
 		}
