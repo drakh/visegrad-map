@@ -48,6 +48,20 @@ var DataUtil = {
 		}
 		return {pt_arr: pt_a, ft_index: index};
 	},
+	count_arr_o: function (data, w)
+	{
+		var d = this.count_arr(data, w);
+		var r = {};
+		for (var i = 0; i < d.length; i++)
+		{
+			var e = d[i];
+			r[e.pid] = {
+				count: e.count,
+				p: e.p
+			};
+		}
+		return r;
+	},
 	count_arr: function (data, w)
 	{
 		var r = [];
