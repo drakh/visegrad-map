@@ -63,7 +63,6 @@ var BarGraph = new Class({
 			r[c] = grd;
 		}
 		this.r_p = r_p;
-		this.s_d = r;
 		this.unit = unit;
 		var g = new Chartist.Bar(el, {
 			labels: l,
