@@ -19,7 +19,7 @@ var CityMarker = new Class({
 		this.pt = pt;
 
 		var a=Number.from(pt.data.length);
-		var w= Math.round(a.map(0,b,mapconf.min_radius,mapconf.max_radius));
+		var w=Math.round(Math.log(a.map(0,b,1.2,Math.E))*mapconf.max_radius);
 		var z=Math.round(a.map(b,0,min_z,max_z));
 		var el = new Element('div', {
 			title: pt.pt.s,
