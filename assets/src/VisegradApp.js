@@ -5,28 +5,39 @@ var VisegradApp = {
 	{
 		if (this.initiated == false)
 		{
-			var tips = new Tips();
+
 			new PageScroller($$('section.page-section'));
 
 			this.initiated = true;
 			var dt = [];
+			var cities = [];
 			for (var i = 0; i < mapdata.length; i++)
 			{
 				dt[i] = DataUtil.flatten_data(mapdata[i]);
+				cities[i] = dt[i].points;
 			}
+			/*
+			 var idx_arr = DataUtil.prepare_index({
+			 countries: countries_geo,
+			 cities: cities
+			 });
+			 */
 			this.msg_win = new MessageWin($('filter-message'));
 			this.map = new AppMap($(mapid), $('map-controls'), mapconf, {
-				tips: tips,
 				onGraphcreated: this.draw_graph.bind(this),
 				onGraphdestroyed: this.graph_closed.bind(this)
 			});
-			this.graph = new DGraph($('e-graphs'), {tips: tips});
+			this.graph = new DGraph($('e-graphs'));
 			this.table = new DTable($('e-table'));
 
 			this.filter = new PlaceFilter(dt, filters, filter_countries, {
 				onFilterchanged: this.draw.bind(this)
 			});
 		}
+	},
+	create_index: function ()
+	{
+
 	},
 	draw: function (d)
 	{

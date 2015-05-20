@@ -4,7 +4,6 @@ var GraphMarker = new Class({
 		Options
 	],
 	options: {
-		tips: null,
 		pane: null
 	},
 	initialize: function (pt, map, graph_f, options)
@@ -45,9 +44,7 @@ var GraphMarker = new Class({
 			graph_group: 'c'
 		};
 
-		this.g = new PieGraph(g_el, g_d, {
-			tips: this.options.tips
-		});
+		this.g = new PieGraph(g_el, g_d);
 
 		new Element('div',
 			{
@@ -65,110 +62,6 @@ var GraphMarker = new Class({
 		map.on('zoomstart', this.before_zoom.bind(this));
 		map.on('zoomend', this.reposition.bind(this, map));
 		this.fireEvent('create', pt);
-	},
-	graph_bind_events: function (el)
-	{
-		var s = el.getElements('.ct-series');
-		var l = s.length;
-		for (var i = 0; i < s.length; i++)
-		{
-			var j = (l - 1 - i);
-			s[i].addEvents({
-				click: this.show_hide_tooltip.bind(this, j)
-			});
-			s[i].store('tip:title', this.pt.s);
-			s[i].store('tip:text', this.mk_text(j));
-		}
-		this.slices = s;
-		var o = this.options;
-		if (o.tips !== null)
-		{
-			o.tips.attach(s);
-		}
-	},
-	mk_text: function (i)
-	{
-
-		var g = this.g_data[i].v;
-		var p = this.pt_data;
-		var d = this.desc;
-		var str = d[i].nm + ': <strong>' + d[i].count + '</strong>';
-		return str;
-	},
-	show_tooltip: function (i)
-	{
-		this.options.tips.show();
-		this.tooltip_visible = true;
-	},
-	hide_tooltip: function (i)
-	{
-		this.tooltip_visible = false;
-	},
-	show_hide_tooltip: function (i)
-	{
-		if (this.tooltip_visible == true)
-		{
-			this.hide_tooltip(i);
-		}
-		else
-		{
-			this.show_tooltip(i);
-		}
-	},
-	mk_graph: function (p)
-	{
-		var graph_f = this.graph_f;
-		var d = {};
-		var pdt = [];
-		for (var pid in p.data)
-		{
-			var a = p.data[pid];
-			for (var i = 0; i < a.length; i++)
-			{
-				var dt = a[i].c;
-				for (var j = 0; j < dt.length; j++)
-				{
-					var t = dt[j];
-					if (!d[t])
-					{
-						d[t] = 0;
-					}
-					d[t]++;
-				}
-			}
-		}
-		for (var pid in d)
-		{
-			pdt.include({
-				name: pid,
-				value: d[pid]
-			});
-		}
-		pdt.sortOn("value", Array.NUMERIC);
-		var g_data = [];
-		var desc = [];
-		var r = [];
-		var l = pdt.length - 1;
-		for (var i = 0; i <= l; i++)
-		{
-			var k = l - i;
-			desc[i] = {
-				nm: graph_f.c[pdt[k].name],
-				count: pdt[k].value
-			}
-			g_data[i] = {
-				v: pdt[k].value,
-				t: pdt[k].name
-			}
-			r[i] = {
-				data: pdt[k].value,
-				className: 'graph-' + (i % 17)
-			}
-		}
-		this.pt_data = p;
-		this.g_data = g_data;
-		this.desc = desc;
-		return (r);
 	},
 	before_zoom: function ()
 	{
@@ -192,8 +85,7 @@ var GraphMarker = new Class({
 	},
 	destroy: function (map)
 	{
-		this.options.tips.detach(this.slices);
-		//this.g.detach();
+		this.g.destroy();
 		this.el.destroy();
 		map.off('zoomstart', this.before_zoom.bind(this));
 		map.off('zoomend', this.reposition.bind.bind(this, map));

@@ -4,9 +4,49 @@ Number.prototype.map = function (in_min, in_max, out_min, out_max)
 };
 
 var DataUtil = {
-	point_graph: function ()
+	prepare_index: function (data)
 	{
-
+		//myString.standardize();
+		var index = lunr(function ()
+		{
+			this.field('name');
+			this.ref('pid');
+		});
+		var pt_a = [];
+		var uiq = {};
+		var cities = data.cities;
+		var countries = data.countries;
+		for (var i = 0; i < cities.length; i++)
+		{
+			var c = cities[i];
+			for (var pid in c)
+			{
+				if (!uiq[pid])
+				{
+					var pt = c[pid];
+					uiq[pid] = true
+					index.add({
+						name: pt.s,
+						pid: pt_a.length
+					});
+					pt_a.include(pt);
+				}
+			}
+		}
+		for (var pid in countries)
+		{
+			if (!uiq[pid])
+			{
+				var pt = countries[pid];
+				uiq[pid] = true
+				index.add({
+					name: pt.s,
+					pid: pt_a.length
+				});
+				pt_a.include(pt);
+			}
+		}
+		return {pt_arr: pt_a, ft_index: index};
 	},
 	count_arr: function (data)
 	{

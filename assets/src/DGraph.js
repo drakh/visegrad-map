@@ -13,8 +13,18 @@ var DGraph = new Class({
 	{
 		this.f = f;
 		this.data = data;
-		this.el.empty();
+		this.destroy();
 		this.build_graphs();
+	},
+	destroy: function ()
+	{
+		var g = this.g;
+		for (var i = 0; i < g.length; i++)
+		{
+			g[i].destroy();
+		}
+		this.g = [];
+		this.el.empty();
 	},
 	build_graph_head: function (n)
 	{
@@ -50,43 +60,15 @@ var DGraph = new Class({
 			var g = new PieGraph(re.pie, g_d, {
 				tips: this.options.tips
 			});
+			this.g.include(g);
+
 			var s_d = g.get_g_data();
-
-			var ord = s_d.d;
-			var l = [];
-			var r = [];
-			var c_d = DataUtil.group_by_g(data);
-			var y_d = DataUtil.group_by_year(data);
-			for (var yr in y_d)
-			{
-				l.include(yr);
-			}
-
-			for (var c = 0; c < ord.length; c++)
-			{
-				var grd = {data: [], className: 'graph-' + (c % 17)};
-				var cid = ord[c];
-				var c_y_d = {};
-
-				if (c_d[cid])
-				{
-					var crd = c_d[cid];
-					c_y_d = DataUtil.group_by_year(crd);
-				}
-				for (var i = 0; i < l.length; i++)
-				{
-					grd.data[i] = 0;
-					if (c_y_d[l[i]])
-					{
-						grd.data[i] = c_y_d[l[i]].length;
-					}
-				}
-				r[c] = grd;
-			}
-			new Chartist.Bar(re.bar, {
-				labels: l,
-				series: r
-			}, {stackBars: true});
+			var b = new BarGraph(re.bar, {
+				ord: s_d.d,
+				c_d: DataUtil.group_by_g(data),
+				y_d: DataUtil.group_by_year(data)
+			});
+			this.g.include(b);
 		}
 	},
 	build_tag_graph: function ()
@@ -107,43 +89,16 @@ var DGraph = new Class({
 			var g = new PieGraph(re.pie, g_d, {
 				tips: this.options.tips
 			});
+			this.g.include(g);
+
+
 			var s_d = g.get_g_data();
-
-			var ord = s_d.d;
-			var l = [];
-			var r = [];
-			var c_d = DataUtil.group_by_c(data);
-			var y_d = DataUtil.group_by_year(data);
-			for (var yr in y_d)
-			{
-				l.include(yr);
-			}
-
-			for (var c = 0; c < ord.length; c++)
-			{
-				var grd = {data: [], className: 'graph-' + (c % 17)};
-				var cid = ord[c];
-				var c_y_d = {};
-
-				if (c_d[cid])
-				{
-					var crd = c_d[cid];
-					c_y_d = DataUtil.group_by_year(crd);
-				}
-				for (var i = 0; i < l.length; i++)
-				{
-					grd.data[i] = 0;
-					if (c_y_d[l[i]])
-					{
-						grd.data[i] = c_y_d[l[i]].length;
-					}
-				}
-				r[c] = grd;
-			}
-			new Chartist.Bar(re.bar, {
-				labels: l,
-				series: r
-			}, {stackBars: true});
+			var b = new BarGraph(re.bar, {
+				ord: s_d.d,
+				c_d: DataUtil.group_by_c(data),
+				y_d: DataUtil.group_by_year(data)
+			});
+			this.g.include(b);
 		}
 	},
 	build_country_graph: function ()
@@ -161,42 +116,15 @@ var DGraph = new Class({
 		var g = new PieGraph(re.pie, g_d, {
 			tips: this.options.tips
 		});
+		this.g.include(g);
+
+
 		var s_d = g.get_g_data();
-
-		var ord = s_d.d;
-		var l = [];
-		var r = [];
-		var c_d = DataUtil.group_by_country(data);
-		var y_d = DataUtil.group_by_year(data);
-		for (var yr in y_d)
-		{
-			l.include(yr);
-		}
-
-		for (var c = 0; c < ord.length; c++)
-		{
-			var grd = {data: [], className: 'graph-' + (c % 17)};
-			var cid = ord[c];
-			var c_y_d = {};
-
-			if (c_d[cid])
-			{
-				var crd = c_d[cid];
-				c_y_d = DataUtil.group_by_year(crd);
-			}
-			for (var i = 0; i < l.length; i++)
-			{
-				grd.data[i] = 0;
-				if (c_y_d[l[i]])
-				{
-					grd.data[i] = c_y_d[l[i]].length;
-				}
-			}
-			r[c] = grd;
-		}
-		new Chartist.Bar(re.bar, {
-			labels: l,
-			series: r
-		}, {stackBars: true});
+		var b = new BarGraph(re.bar, {
+			ord: s_d.d,
+			c_d: DataUtil.group_by_country(data),
+			y_d: DataUtil.group_by_year(data)
+		});
+		this.g.include(b);
 	}
 });

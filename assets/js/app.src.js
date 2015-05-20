@@ -1,8 +1,5 @@
 var AppMap = new Class({
 	Implements: [Events, Options],
-	options: {
-		tips: null
-	},
 	initialize: function (el, c, conf, options)
 	{
 		this.setOptions(options);
@@ -10,7 +7,8 @@ var AppMap = new Class({
 		this.markers = [];
 		var a_map = L.map($(mapid), {
 			attributionControl: false,
-			zoomControl: false
+			zoomControl: false,
+			padding: [200, 200]
 		});
 
 		L.tileLayer(conf.url, {
@@ -140,7 +138,6 @@ var AppMap = new Class({
 					data: dt[pid]
 				};
 				var marker = new CityMarker(map, p, max, {
-					tips: o.tips,
 					pane: pane,
 					onClick: this.show_graph.bind(this)
 				});
@@ -195,7 +192,6 @@ var AppMap = new Class({
 		this.destroy_graph(map);
 		this.graph = new GraphMarker(data, map, graph_f, {
 			pane: pane,
-			tips: this.options.tips,
 			onDestroy: this.graph_destroyed.bind(this),
 			onCreate: this.graph_created.bind(this)
 		});
@@ -229,6 +225,55 @@ var AppMap = new Class({
 		this.destroy_graph(map);
 	}
 });
+var BarGraph = new Class({
+	Implements: [Events, Options],
+	initialize: function (el, in_d, options)
+	{
+		this.setOptions(options);
+
+		var ord = in_d.ord;
+		var y_d = in_d.y_d;
+		var c_d = in_d.c_d;
+
+		var l = [];
+		var r = [];
+		for (var yr in y_d)
+		{
+			l.include(yr);
+		}
+
+		for (var c = 0; c < ord.length; c++)
+		{
+			var grd = {data: [], className: 'graph-' + (c % 17)};
+			var cid = ord[c];
+			var c_y_d = {};
+
+			if (c_d[cid])
+			{
+				var crd = c_d[cid];
+				c_y_d = DataUtil.group_by_year(crd);
+			}
+			for (var i = 0; i < l.length; i++)
+			{
+				grd.data[i] = 0;
+				if (c_y_d[l[i]])
+				{
+					grd.data[i] = c_y_d[l[i]].length;
+				}
+			}
+			r[c] = grd;
+		}
+		this.g = new Chartist.Bar(el, {
+			labels: l,
+			series: r
+		}, {stackBars: true});
+	},
+	destroy: function ()
+	{
+
+	}
+});
+
 var CityMarker = new Class({
 	Implements: [
 		Events,
@@ -250,7 +295,7 @@ var CityMarker = new Class({
 		this.pt = pt;
 
 		var a=Number.from(pt.data.length);
-		var w= Math.round(a.map(0,b,mapconf.min_radius,mapconf.max_radius));
+		var w=Math.round(Math.log(a.map(0,b,1.2,Math.E))*mapconf.max_radius);
 		var z=Math.round(a.map(b,0,min_z,max_z));
 		var el = new Element('div', {
 			title: pt.pt.s,
@@ -336,8 +381,18 @@ var DGraph = new Class({
 	{
 		this.f = f;
 		this.data = data;
-		this.el.empty();
+		this.destroy();
 		this.build_graphs();
+	},
+	destroy: function ()
+	{
+		var g = this.g;
+		for (var i = 0; i < g.length; i++)
+		{
+			g[i].destroy();
+		}
+		this.g = [];
+		this.el.empty();
 	},
 	build_graph_head: function (n)
 	{
@@ -373,43 +428,15 @@ var DGraph = new Class({
 			var g = new PieGraph(re.pie, g_d, {
 				tips: this.options.tips
 			});
+			this.g.include(g);
+
 			var s_d = g.get_g_data();
-
-			var ord = s_d.d;
-			var l = [];
-			var r = [];
-			var c_d = DataUtil.group_by_g(data);
-			var y_d = DataUtil.group_by_year(data);
-			for (var yr in y_d)
-			{
-				l.include(yr);
-			}
-
-			for (var c = 0; c < ord.length; c++)
-			{
-				var grd = {data: [], className: 'graph-' + (c % 17)};
-				var cid = ord[c];
-				var c_y_d = {};
-
-				if (c_d[cid])
-				{
-					var crd = c_d[cid];
-					c_y_d = DataUtil.group_by_year(crd);
-				}
-				for (var i = 0; i < l.length; i++)
-				{
-					grd.data[i] = 0;
-					if (c_y_d[l[i]])
-					{
-						grd.data[i] = c_y_d[l[i]].length;
-					}
-				}
-				r[c] = grd;
-			}
-			new Chartist.Bar(re.bar, {
-				labels: l,
-				series: r
-			}, {stackBars: true});
+			var b = new BarGraph(re.bar, {
+				ord: s_d.d,
+				c_d: DataUtil.group_by_g(data),
+				y_d: DataUtil.group_by_year(data)
+			});
+			this.g.include(b);
 		}
 	},
 	build_tag_graph: function ()
@@ -430,43 +457,16 @@ var DGraph = new Class({
 			var g = new PieGraph(re.pie, g_d, {
 				tips: this.options.tips
 			});
+			this.g.include(g);
+
+
 			var s_d = g.get_g_data();
-
-			var ord = s_d.d;
-			var l = [];
-			var r = [];
-			var c_d = DataUtil.group_by_c(data);
-			var y_d = DataUtil.group_by_year(data);
-			for (var yr in y_d)
-			{
-				l.include(yr);
-			}
-
-			for (var c = 0; c < ord.length; c++)
-			{
-				var grd = {data: [], className: 'graph-' + (c % 17)};
-				var cid = ord[c];
-				var c_y_d = {};
-
-				if (c_d[cid])
-				{
-					var crd = c_d[cid];
-					c_y_d = DataUtil.group_by_year(crd);
-				}
-				for (var i = 0; i < l.length; i++)
-				{
-					grd.data[i] = 0;
-					if (c_y_d[l[i]])
-					{
-						grd.data[i] = c_y_d[l[i]].length;
-					}
-				}
-				r[c] = grd;
-			}
-			new Chartist.Bar(re.bar, {
-				labels: l,
-				series: r
-			}, {stackBars: true});
+			var b = new BarGraph(re.bar, {
+				ord: s_d.d,
+				c_d: DataUtil.group_by_c(data),
+				y_d: DataUtil.group_by_year(data)
+			});
+			this.g.include(b);
 		}
 	},
 	build_country_graph: function ()
@@ -484,43 +484,16 @@ var DGraph = new Class({
 		var g = new PieGraph(re.pie, g_d, {
 			tips: this.options.tips
 		});
+		this.g.include(g);
+
+
 		var s_d = g.get_g_data();
-
-		var ord = s_d.d;
-		var l = [];
-		var r = [];
-		var c_d = DataUtil.group_by_country(data);
-		var y_d = DataUtil.group_by_year(data);
-		for (var yr in y_d)
-		{
-			l.include(yr);
-		}
-
-		for (var c = 0; c < ord.length; c++)
-		{
-			var grd = {data: [], className: 'graph-' + (c % 17)};
-			var cid = ord[c];
-			var c_y_d = {};
-
-			if (c_d[cid])
-			{
-				var crd = c_d[cid];
-				c_y_d = DataUtil.group_by_year(crd);
-			}
-			for (var i = 0; i < l.length; i++)
-			{
-				grd.data[i] = 0;
-				if (c_y_d[l[i]])
-				{
-					grd.data[i] = c_y_d[l[i]].length;
-				}
-			}
-			r[c] = grd;
-		}
-		new Chartist.Bar(re.bar, {
-			labels: l,
-			series: r
-		}, {stackBars: true});
+		var b = new BarGraph(re.bar, {
+			ord: s_d.d,
+			c_d: DataUtil.group_by_country(data),
+			y_d: DataUtil.group_by_year(data)
+		});
+		this.g.include(b);
 	}
 });
 var DPager = new Class({
@@ -792,9 +765,49 @@ Number.prototype.map = function (in_min, in_max, out_min, out_max)
 };
 
 var DataUtil = {
-	point_graph: function ()
+	prepare_index: function (data)
 	{
-
+		//myString.standardize();
+		var index = lunr(function ()
+		{
+			this.field('name');
+			this.ref('pid');
+		});
+		var pt_a = [];
+		var uiq = {};
+		var cities = data.cities;
+		var countries = data.countries;
+		for (var i = 0; i < cities.length; i++)
+		{
+			var c = cities[i];
+			for (var pid in c)
+			{
+				if (!uiq[pid])
+				{
+					var pt = c[pid];
+					uiq[pid] = true
+					index.add({
+						name: pt.s,
+						pid: pt_a.length
+					});
+					pt_a.include(pt);
+				}
+			}
+		}
+		for (var pid in countries)
+		{
+			if (!uiq[pid])
+			{
+				var pt = countries[pid];
+				uiq[pid] = true
+				index.add({
+					name: pt.s,
+					pid: pt_a.length
+				});
+				pt_a.include(pt);
+			}
+		}
+		return {pt_arr: pt_a, ft_index: index};
 	},
 	count_arr: function (data)
 	{
@@ -1094,7 +1107,6 @@ var GraphMarker = new Class({
 		Options
 	],
 	options: {
-		tips: null,
 		pane: null
 	},
 	initialize: function (pt, map, graph_f, options)
@@ -1135,9 +1147,7 @@ var GraphMarker = new Class({
 			graph_group: 'c'
 		};
 
-		this.g = new PieGraph(g_el, g_d, {
-			tips: this.options.tips
-		});
+		this.g = new PieGraph(g_el, g_d);
 
 		new Element('div',
 			{
@@ -1155,110 +1165,6 @@ var GraphMarker = new Class({
 		map.on('zoomstart', this.before_zoom.bind(this));
 		map.on('zoomend', this.reposition.bind(this, map));
 		this.fireEvent('create', pt);
-	},
-	graph_bind_events: function (el)
-	{
-		var s = el.getElements('.ct-series');
-		var l = s.length;
-		for (var i = 0; i < s.length; i++)
-		{
-			var j = (l - 1 - i);
-			s[i].addEvents({
-				click: this.show_hide_tooltip.bind(this, j)
-			});
-			s[i].store('tip:title', this.pt.s);
-			s[i].store('tip:text', this.mk_text(j));
-		}
-		this.slices = s;
-		var o = this.options;
-		if (o.tips !== null)
-		{
-			o.tips.attach(s);
-		}
-	},
-	mk_text: function (i)
-	{
-
-		var g = this.g_data[i].v;
-		var p = this.pt_data;
-		var d = this.desc;
-		var str = d[i].nm + ': <strong>' + d[i].count + '</strong>';
-		return str;
-	},
-	show_tooltip: function (i)
-	{
-		this.options.tips.show();
-		this.tooltip_visible = true;
-	},
-	hide_tooltip: function (i)
-	{
-		this.tooltip_visible = false;
-	},
-	show_hide_tooltip: function (i)
-	{
-		if (this.tooltip_visible == true)
-		{
-			this.hide_tooltip(i);
-		}
-		else
-		{
-			this.show_tooltip(i);
-		}
-	},
-	mk_graph: function (p)
-	{
-		var graph_f = this.graph_f;
-		var d = {};
-		var pdt = [];
-		for (var pid in p.data)
-		{
-			var a = p.data[pid];
-			for (var i = 0; i < a.length; i++)
-			{
-				var dt = a[i].c;
-				for (var j = 0; j < dt.length; j++)
-				{
-					var t = dt[j];
-					if (!d[t])
-					{
-						d[t] = 0;
-					}
-					d[t]++;
-				}
-			}
-		}
-		for (var pid in d)
-		{
-			pdt.include({
-				name: pid,
-				value: d[pid]
-			});
-		}
-		pdt.sortOn("value", Array.NUMERIC);
-		var g_data = [];
-		var desc = [];
-		var r = [];
-		var l = pdt.length - 1;
-		for (var i = 0; i <= l; i++)
-		{
-			var k = l - i;
-			desc[i] = {
-				nm: graph_f.c[pdt[k].name],
-				count: pdt[k].value
-			}
-			g_data[i] = {
-				v: pdt[k].value,
-				t: pdt[k].name
-			}
-			r[i] = {
-				data: pdt[k].value,
-				className: 'graph-' + (i % 17)
-			}
-		}
-		this.pt_data = p;
-		this.g_data = g_data;
-		this.desc = desc;
-		return (r);
 	},
 	before_zoom: function ()
 	{
@@ -1282,8 +1188,7 @@ var GraphMarker = new Class({
 	},
 	destroy: function (map)
 	{
-		this.options.tips.detach(this.slices);
-		//this.g.detach();
+		this.g.destroy();
 		this.el.destroy();
 		map.off('zoomstart', this.before_zoom.bind(this));
 		map.off('zoomend', this.reposition.bind.bind(this, map));
@@ -1422,9 +1327,6 @@ var PageScroller = new Class({
 	}
 });
 var PieGraph = new Class({
-	options: {
-		tips: null
-	},
 	Implements: [Events, Options],
 	initialize: function (el, data, options)
 	{
@@ -1432,7 +1334,7 @@ var PieGraph = new Class({
 		this.setOptions(options);
 		var g_data = this.mk_graph(data);
 		this.g_data = g_data;
-
+		this.tips = new Tips();
 		var g = new Chartist.Pie(el,
 			{
 				series: g_data.g
@@ -1503,11 +1405,14 @@ var PieGraph = new Class({
 			}
 		}
 		this.slices = s;
-		var o = this.options;
-		if (o.tips !== null)
+		if (this.tips)
 		{
-			o.tips.attach(s);
+			this.tips.attach(s);
 		}
+	},
+	destroy: function ()
+	{
+		this.tips.destroy();
 	}
 });
 var PlaceFilter = new Class({
@@ -1841,28 +1746,39 @@ var VisegradApp = {
 	{
 		if (this.initiated == false)
 		{
-			var tips = new Tips();
+
 			new PageScroller($$('section.page-section'));
 
 			this.initiated = true;
 			var dt = [];
+			var cities = [];
 			for (var i = 0; i < mapdata.length; i++)
 			{
 				dt[i] = DataUtil.flatten_data(mapdata[i]);
+				cities[i] = dt[i].points;
 			}
+			/*
+			 var idx_arr = DataUtil.prepare_index({
+			 countries: countries_geo,
+			 cities: cities
+			 });
+			 */
 			this.msg_win = new MessageWin($('filter-message'));
 			this.map = new AppMap($(mapid), $('map-controls'), mapconf, {
-				tips: tips,
 				onGraphcreated: this.draw_graph.bind(this),
 				onGraphdestroyed: this.graph_closed.bind(this)
 			});
-			this.graph = new DGraph($('e-graphs'), {tips: tips});
+			this.graph = new DGraph($('e-graphs'));
 			this.table = new DTable($('e-table'));
 
 			this.filter = new PlaceFilter(dt, filters, filter_countries, {
 				onFilterchanged: this.draw.bind(this)
 			});
 		}
+	},
+	create_index: function ()
+	{
+
 	},
 	draw: function (d)
 	{

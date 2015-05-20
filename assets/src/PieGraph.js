@@ -1,7 +1,4 @@
 var PieGraph = new Class({
-	options: {
-		tips: null
-	},
 	Implements: [Events, Options],
 	initialize: function (el, data, options)
 	{
@@ -9,7 +6,7 @@ var PieGraph = new Class({
 		this.setOptions(options);
 		var g_data = this.mk_graph(data);
 		this.g_data = g_data;
-
+		this.tips = new Tips();
 		var g = new Chartist.Pie(el,
 			{
 				series: g_data.g
@@ -80,10 +77,13 @@ var PieGraph = new Class({
 			}
 		}
 		this.slices = s;
-		var o = this.options;
-		if (o.tips !== null)
+		if (this.tips)
 		{
-			o.tips.attach(s);
+			this.tips.attach(s);
 		}
+	},
+	destroy: function ()
+	{
+		this.tips.destroy();
 	}
 });

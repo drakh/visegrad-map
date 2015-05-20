@@ -15,6 +15,7 @@ module.exports = function (grunt)
 				},
 				dist_js: {
 					src: [
+						'bower_components/lunr/lunr.min.js',
 						'bower_components/chartist/dist/chartist.min.js',
 						'bower_components/leaflet/dist/leaflet.js',
 						'bower_components/mootools-core/dist/mootools-core.min.js',

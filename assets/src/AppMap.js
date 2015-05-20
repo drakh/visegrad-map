@@ -1,8 +1,5 @@
 var AppMap = new Class({
 	Implements: [Events, Options],
-	options: {
-		tips: null
-	},
 	initialize: function (el, c, conf, options)
 	{
 		this.setOptions(options);
@@ -10,7 +7,8 @@ var AppMap = new Class({
 		this.markers = [];
 		var a_map = L.map($(mapid), {
 			attributionControl: false,
-			zoomControl: false
+			zoomControl: false,
+			padding: [200, 200]
 		});
 
 		L.tileLayer(conf.url, {
@@ -140,7 +138,6 @@ var AppMap = new Class({
 					data: dt[pid]
 				};
 				var marker = new CityMarker(map, p, max, {
-					tips: o.tips,
 					pane: pane,
 					onClick: this.show_graph.bind(this)
 				});
@@ -195,7 +192,6 @@ var AppMap = new Class({
 		this.destroy_graph(map);
 		this.graph = new GraphMarker(data, map, graph_f, {
 			pane: pane,
-			tips: this.options.tips,
 			onDestroy: this.graph_destroyed.bind(this),
 			onCreate: this.graph_created.bind(this)
 		});
