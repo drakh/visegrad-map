@@ -230,7 +230,8 @@ var BarGraph = new Class({
 	initialize: function (el, in_d, options)
 	{
 		this.setOptions(options);
-
+		this.tips = new Tips();
+		this.data = in_d;
 		var ord = in_d.ord;
 		var y_d = in_d.y_d;
 		var c_d = in_d.c_d;
@@ -263,14 +264,53 @@ var BarGraph = new Class({
 			}
 			r[c] = grd;
 		}
-		this.g = new Chartist.Bar(el, {
+		this.s_d = r;
+		var g = new Chartist.Bar(el, {
 			labels: l,
 			series: r
 		}, {stackBars: true});
+		g.on('created', this.graph_bind_events.bind(this, el));
+	},
+	graph_bind_events: function (el)
+	{
+		var d = this.data;
+		var sw = d.g_g;
+
+		var r = this.s_d;
+
+		var s = el.getElements('.ct-series');
+		var lns = [];
+		for (var i = 0; i < s.length; i++)
+		{
+			var cid = d.ord[i];
+
+			var l = s[i].getElements('.ct-bar');
+			for (var j = 0; j < l.length; j++)
+			{
+				switch (sw)
+				{
+					case 'country':
+						l[j].store('tip:title', d.g_d[cid].s);
+						break;
+					case 'c':
+						l[j].store('tip:title', d.g_d[cid].n);
+						l[j].store('tip:text', d.g_d[cid].d);
+						break;
+					case 'g':
+						l[j].store('tip:title', d.g_d[cid]);
+						break;
+				}
+				lns.include(l[j]);
+			}
+		}
+		if (this.tips)
+		{
+			this.tips.attach(lns);
+		}
 	},
 	destroy: function ()
 	{
-
+		this.tips.destroy();
 	}
 });
 
@@ -375,13 +415,66 @@ var DGraph = new Class({
 	{
 		this.setOptions(options);
 		this.g = [];
-		this.el = el;
+		this.btns = ['<i class="el el-tasks"></i>', '<i class="el el-eur"></i>'];
+		this.switches = [];
+		this.unit = 0;
+		this.build_switch(el);
+
+		var w = new Element('div').inject(el);
+		this.el = w;
+	},
+	build_switch: function (el)
+	{
+		var w = new Element('div', {
+			class: 'pure-menu pure-menu-horizontal'
+		}).inject(el);
+
+		var ul = new Element('ul', {class: 'pure-menu-list'}).inject(w);
+
+		var btns = this.btns;
+		for (var i = 0; i < btns.length; i++)
+		{
+			var li = new Element('li', {class: 'pure-menu-item'}).inject(ul);
+			var a = new Element('a', {
+				class: 'pure-button',
+				html: btns[i],
+				events: {click: this.switch_units.bind(this, i)}
+			}).inject(li);
+			this.switches.include(a);
+		}
+		this.switch_units(0);
+
+	},
+	switch_units: function (i, e)
+	{
+		if (e)
+		{
+			e.stop();
+		}
+		var b = this.switches;
+		for (var j = 0; j < b.length; j++)
+		{
+			if (j == i)
+			{
+				b[j].removeClass('dark-bg');
+				b[j].addClass('light-bg');
+			}
+			else
+			{
+				b[j].removeClass('light-bg');
+				b[j].addClass('dark-bg');
+			}
+		}
+		if (this.unit != i)
+		{
+			this.unit = i;
+			this.build_graphs();
+		}
 	},
 	set_data: function (data, f)
 	{
 		this.f = f;
 		this.data = data;
-		this.destroy();
 		this.build_graphs();
 	},
 	destroy: function ()
@@ -406,6 +499,7 @@ var DGraph = new Class({
 	},
 	build_graphs: function ()
 	{
+		this.destroy();
 		this.build_topic_graph();
 		this.build_tag_graph();
 		this.build_country_graph();
@@ -421,20 +515,22 @@ var DGraph = new Class({
 			var g_d = {
 				graph_data: data,
 				graph_descs: f.g,
-				graph_group: 'g'
+				graph_group: 'g',
+				unit:this.unit
 			};
 
 
-			var g = new PieGraph(re.pie, g_d, {
-				tips: this.options.tips
-			});
+			var g = new PieGraph(re.pie, g_d);
 			this.g.include(g);
 
 			var s_d = g.get_g_data();
 			var b = new BarGraph(re.bar, {
 				ord: s_d.d,
 				c_d: DataUtil.group_by_g(data),
-				y_d: DataUtil.group_by_year(data)
+				y_d: DataUtil.group_by_year(data),
+				g_d: f.g,
+				g_g: 'g',
+				unit:this.unit
 			});
 			this.g.include(b);
 		}
@@ -450,13 +546,12 @@ var DGraph = new Class({
 			var g_d = {
 				graph_data: data,
 				graph_descs: f.c,
-				graph_group: 'c'
+				graph_group: 'c',
+				unit:this.unit
 			};
 
 
-			var g = new PieGraph(re.pie, g_d, {
-				tips: this.options.tips
-			});
+			var g = new PieGraph(re.pie, g_d);
 			this.g.include(g);
 
 
@@ -464,7 +559,10 @@ var DGraph = new Class({
 			var b = new BarGraph(re.bar, {
 				ord: s_d.d,
 				c_d: DataUtil.group_by_c(data),
-				y_d: DataUtil.group_by_year(data)
+				y_d: DataUtil.group_by_year(data),
+				g_d: f.c,
+				g_g: 'c',
+				unit:this.unit
 			});
 			this.g.include(b);
 		}
@@ -477,13 +575,12 @@ var DGraph = new Class({
 		var g_d = {
 			graph_data: data,
 			graph_descs: countries_geo,
-			graph_group: 'country'
+			graph_group: 'country',
+			unit:this.unit
 		};
 
 
-		var g = new PieGraph(re.pie, g_d, {
-			tips: this.options.tips
-		});
+		var g = new PieGraph(re.pie, g_d);
 		this.g.include(g);
 
 
@@ -491,7 +588,10 @@ var DGraph = new Class({
 		var b = new BarGraph(re.bar, {
 			ord: s_d.d,
 			c_d: DataUtil.group_by_country(data),
-			y_d: DataUtil.group_by_year(data)
+			y_d: DataUtil.group_by_year(data),
+			g_d: countries_geo,
+			g_g: 'country',
+			unit:this.unit
 		});
 		this.g.include(b);
 	}
@@ -1144,7 +1244,8 @@ var GraphMarker = new Class({
 		var g_d = {
 			graph_data: pt.data,
 			graph_descs: graph_f.c,
-			graph_group: 'c'
+			graph_group: 'c',
+			unit: 0
 		};
 
 		this.g = new PieGraph(g_el, g_d);
@@ -1353,8 +1454,10 @@ var PieGraph = new Class({
 	mk_graph: function (data)
 	{
 		var gr = data.graph_group;
+		var unit = data.unit;
 		this.gr = gr;
 		var c_d;
+
 		switch (gr)
 		{
 			case 'c':
@@ -1367,7 +1470,9 @@ var PieGraph = new Class({
 				c_d = DataUtil.group_by_country(data.graph_data);
 				break;
 		}
-		var s = DataUtil.count_arr(c_d);
+
+		var s = DataUtil.count_arr(c_d, unit);
+
 		s.sortOn("count", Array.DESC_NUMERIC);
 
 		var c = [];
@@ -1404,7 +1509,6 @@ var PieGraph = new Class({
 					break;
 			}
 		}
-		this.slices = s;
 		if (this.tips)
 		{
 			this.tips.attach(s);

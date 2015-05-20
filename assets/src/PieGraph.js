@@ -25,8 +25,10 @@ var PieGraph = new Class({
 	mk_graph: function (data)
 	{
 		var gr = data.graph_group;
+		var unit = data.unit;
 		this.gr = gr;
 		var c_d;
+
 		switch (gr)
 		{
 			case 'c':
@@ -39,7 +41,9 @@ var PieGraph = new Class({
 				c_d = DataUtil.group_by_country(data.graph_data);
 				break;
 		}
-		var s = DataUtil.count_arr(c_d);
+
+		var s = DataUtil.count_arr(c_d, unit);
+
 		s.sortOn("count", Array.DESC_NUMERIC);
 
 		var c = [];
@@ -76,7 +80,6 @@ var PieGraph = new Class({
 					break;
 			}
 		}
-		this.slices = s;
 		if (this.tips)
 		{
 			this.tips.attach(s);

@@ -41,7 +41,8 @@ var GraphMarker = new Class({
 		var g_d = {
 			graph_data: pt.data,
 			graph_descs: graph_f.c,
-			graph_group: 'c'
+			graph_group: 'c',
+			unit: 0
 		};
 
 		this.g = new PieGraph(g_el, g_d);
