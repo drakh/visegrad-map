@@ -1,6 +1,6 @@
 var PlaceFilter = new Class({
 	Implements: [Events, Options],
-	initialize: function (data, filterdata, country_filters, options)
+	initialize: function (data, filterdata, options)
 	{
 		this.setOptions(options);
 
@@ -21,7 +21,6 @@ var PlaceFilter = new Class({
 		this.f_filters = {};
 
 		this.filterdata = filterdata;
-		this.country_filters = country_filters;
 
 		this.pref = [];
 		this.filtered_data = [];//all filtersdata
@@ -54,21 +53,6 @@ var PlaceFilter = new Class({
 			this.fireEvent('created');
 		}
 	},
-	prepare_countries: function (d)
-	{
-		var cts = this.country_filters;
-		var a = mapconf.visegrad;
-		var r = {};
-		for (var pid in cts)
-		{
-			if (a.contains(pid) || d[pid])
-			{
-				r[pid] = cts[pid];
-			}
-		}
-		this.countries_prefiltered = r;
-		return r;
-	},
 	get_msg: function ()
 	{
 		var m = 'Showing ';
@@ -98,7 +82,7 @@ var PlaceFilter = new Class({
 					}
 					else
 					{
-						m_a[0] = '' + msgs[pid]+' grants';
+						m_a[0] = '' + msgs[pid] + ' grants';
 					}
 					break;
 				case 'tags':
@@ -144,6 +128,17 @@ var PlaceFilter = new Class({
 	},
 	switch_data: function (i)
 	{
+		switch (i)
+		{
+			case 0:
+			case 2:
+				this.filt_arr = {countries: [], tags: [], types: []};
+				break;
+			case 1:
+				this.filt_arr = {countries: [], types: []};
+				break;
+		}
+
 		this.sel_filter = i;
 
 		var s = this.selects;
@@ -156,10 +151,36 @@ var PlaceFilter = new Class({
 
 		this.f_filters = fd;
 
-		var dc = DataUtil.group_by_country(data[i].data);
-		s['countries'].set_data(this.prepare_countries(dc));
-		s['types'].set_data(fd.g);
-		s['tags'].set_data(fd.c);
+		if (fd['countries'])
+		{
+			s['countries'].show();
+			s['countries'].set_data(fd.countries);
+			s['countries'].set_label(mapconf.filter_labels[i].countries);
+		}
+		else
+		{
+			s['countries'].hide();
+		}
+		if (fd['g'])
+		{
+			s['types'].show();
+			s['types'].set_data(fd.g);
+			s['types'].set_label(mapconf.filter_labels[i].g);
+		}
+		else
+		{
+			s['types'].hide();
+		}
+		if (fd['c'])
+		{
+			s['tags'].show();
+			s['tags'].set_data(fd.c);
+			s['tags'].set_label(mapconf.filter_labels[i].c);
+		}
+		else
+		{
+			s['tags'].hide();
+		}
 	},
 	filter_years: function (y)
 	{
@@ -173,6 +194,7 @@ var PlaceFilter = new Class({
 	prefilter: function ()
 	{
 		var f = this.filt_arr;
+		console.log(f);
 		var data = this.f_data;
 		return data.filterOn(f);
 	},
