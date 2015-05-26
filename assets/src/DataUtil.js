@@ -4,50 +4,6 @@ Number.prototype.map = function (in_min, in_max, out_min, out_max)
 };
 
 var DataUtil = {
-	prepare_index: function (data)
-	{
-		//myString.standardize();
-		var index = lunr(function ()
-		{
-			this.field('name');
-			this.ref('pid');
-		});
-		var pt_a = [];
-		var uiq = {};
-		var cities = data.cities;
-		var countries = data.countries;
-		for (var i = 0; i < cities.length; i++)
-		{
-			var c = cities[i];
-			for (var pid in c)
-			{
-				if (!uiq[pid])
-				{
-					var pt = c[pid];
-					uiq[pid] = true
-					index.add({
-						name: pt.s,
-						pid: pt_a.length
-					});
-					pt_a.include(pt);
-				}
-			}
-		}
-		for (var pid in countries)
-		{
-			if (!uiq[pid])
-			{
-				var pt = countries[pid];
-				uiq[pid] = true
-				index.add({
-					name: pt.s,
-					pid: pt_a.length
-				});
-				pt_a.include(pt);
-			}
-		}
-		return {pt_arr: pt_a, ft_index: index};
-	},
 	count_arr_o: function (data, w)
 	{
 		var d = this.count_arr(data, w);
@@ -181,54 +137,200 @@ var DataUtil = {
 		}
 		return r;
 	},
-	flatten_data: function (data)
+	flatten_data: function (data, filters, w)
 	{
+		var v_c = mapconf.visegrad;
+		var f_c = filter_countries;
 		var d = [];//data
 		var p = {};
-		for (var i = 0; i < data.length; i++)
+		var countries = {};
+		switch (w)
 		{
-			var dx = data[i];
-			var pid = dx.s;
-			if (!p[pid])
-			{
-				p[pid] = {s: dx.s, lat: dx.lat, lon: dx.lon, c: dx.c};
-			}
-			var dt = dx.data;
-			for (var pt_year in dt)
-			{
-				var y_d = dt[pt_year];
-				for (var j = 0; j < y_d.length; j++)
+			case 0:
+				for (var i = 0; i < data.length; i++)
 				{
-					var fd = y_d[j];
-					var f_tp = [];
-					if (fd['c'])
+					var dx = data[i];
+					var pid = dx.s;
+					if (!p[pid])
 					{
-						for (var k = 0; k < fd.c.length; k++)
+						p[pid] = {s: dx.s, lat: dx.lat, lon: dx.lon, c: dx.c};
+					}
+					var dt = dx.data;
+					for (var pt_year in dt)
+					{
+						var y_d = dt[pt_year];
+						for (var j = 0; j < y_d.length; j++)
 						{
-							f_tp[k] = String.from(fd.c[k]);
+							var fd = y_d[j];
+							var f_tp = [];
+							if (fd['c'])
+							{
+								for (var k = 0; k < fd.c.length; k++)
+								{
+									f_tp[k] = String.from(fd.c[k]);
+								}
+							}
+							var o = {
+								pt_id: pid,
+								city: dx.s,
+								country: dx.c,
+								year: String.from(pt_year),
+								a: fd.a,
+								c: f_tp,
+								g: String.from(fd.g),
+								amount: fd.amount,
+								name: fd.name
+							};
+							d.include(o);
+							if (!countries[dx.c])
+							{
+								countries[dx.c] = true;
+							}
 						}
 					}
-					var o = {
-						pt_id: pid,
-						city: dx.s,
-						country: dx.c,
-						year: String.from(pt_year),
-						a: fd.a,
-						c: f_tp,
-						g: String.from(fd.g),
-						amount: fd.amount,
-						name: fd.name
-					};
-					d.include(o);
 				}
+				break;
+			case 1:
+				var g_countries={};
+				for (var i = 0; i < data.length; i++)
+				{
+					var dx = data[i];
+					var pid = dx.s;
+					if (!p[pid])
+					{
+						p[pid] = {s: dx.s, lat: dx.lat, lon: dx.lon, c: dx.c};
+					}
+					var dt = dx.data;
+					for (var pt_year in dt)
+					{
+						var y_d = dt[pt_year];
+						for (var j = 0; j < y_d.length; j++)
+						{
+							var fd = y_d[j];
+							var f_tp = [];
+							if (fd['c'])
+							{
+								for (var k = 0; k < fd.c.length; k++)
+								{
+									f_tp[k] = String.from(fd.c[k]);
+								}
+							}
+							for(var cpid in fd)
+							{
+								var o = {
+									pt_id: pid,
+									city: dx.s,
+									country: dx.c,
+									year: String.from(pt_year),
+									a: '',
+									c: f_tp,
+									g: String.from(cpid),
+									amount: fd[cpid],
+									name: ''
+								};
+								d.include(o);
+								if(!g_countries[cpid])
+								{
+									g_countries[cpid]=true;
+								}
+							}
+							if (!countries[dx.c])
+							{
+								countries[dx.c] = true;
+							}
+						}
+					}
+				}
+				var r_countries = {};
+				for (var pid in f_c)
+				{
+					if (v_c.contains(pid) || g_countries[pid])
+					{
+						r_countries[pid] = f_c[pid];
+					}
+				}
+				filters['g'] = r_countries;
+				break;
+			case 2:
+				var g_countries={};
+				for (var i = 0; i < data.length; i++)
+				{
+					var dx = data[i];
+					var pid = dx.s;
+					if (!p[pid])
+					{
+						p[pid] = {s: dx.s, lat: dx.lat, lon: dx.lon, c: dx.c};
+					}
+					var dt = dx.data;
+					for (var pt_year in dt)
+					{
+						var y_d = dt[pt_year];
+						for (var j = 0; j < y_d.length; j++)
+						{
+							var fd = y_d[j];
+							var f_tp = [];
+							if (fd['c'])
+							{
+								for (var k = 0; k < fd.c.length; k++)
+								{
+									f_tp[k] = String.from(fd.c[k]);
+								}
+							}
+							var o = {
+								pt_id: pid,
+								city: dx.s,
+								country: dx.c,
+								year: String.from(pt_year),
+								a: fd.h,
+								c: f_tp,
+								g: String.from(fd.ci),
+								amount: 1,
+								name: fd.n
+							};
+							d.include(o);
+							if (!countries[dx.c])
+							{
+								countries[dx.c] = true;
+							}
+							if(!g_countries[fd.ci])
+							{
+								g_countries[fd.ci]=true;
+							}
+						}
+					}
+				}
+				var r_countries = {};
+				for (var pid in f_c)
+				{
+					if (v_c.contains(pid) || g_countries[pid])
+					{
+						r_countries[pid] = f_c[pid];
+					}
+				}
+				filters['g'] = r_countries;
+				break;
+
+		}
+
+		var f_countries = {};
+		for (var pid in f_c)
+		{
+			if (v_c.contains(pid) || countries[pid])
+			{
+				f_countries[pid] = f_c[pid];
 			}
 		}
-		return {
+		filters['countries'] = f_countries;
+		var ret = {
+			filters: filters,
 			data: d,
 			points: p
-		}
+		};
+		console.log(ret);
+		return ret;
 	}
 };
+
 
 (function ()
 {
