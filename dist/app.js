@@ -27914,6 +27914,9 @@ var AppMap = new Class({
 		var pane = this.pane;
 		var graph_f = this.graph_f;
 		this.destroy_graph(map);
+
+		console.log(data);
+
 		this.graph = new GraphMarker(data, map, graph_f, {
 			pane: pane,
 			onDestroy: this.graph_destroyed.bind(this),
@@ -28617,50 +28620,6 @@ Number.prototype.map = function (in_min, in_max, out_min, out_max)
 };
 
 var DataUtil = {
-	prepare_index: function (data)
-	{
-		//myString.standardize();
-		var index = lunr(function ()
-		{
-			this.field('name');
-			this.ref('pid');
-		});
-		var pt_a = [];
-		var uiq = {};
-		var cities = data.cities;
-		var countries = data.countries;
-		for (var i = 0; i < cities.length; i++)
-		{
-			var c = cities[i];
-			for (var pid in c)
-			{
-				if (!uiq[pid])
-				{
-					var pt = c[pid];
-					uiq[pid] = true
-					index.add({
-						name: pt.s,
-						pid: pt_a.length
-					});
-					pt_a.include(pt);
-				}
-			}
-		}
-		for (var pid in countries)
-		{
-			if (!uiq[pid])
-			{
-				var pt = countries[pid];
-				uiq[pid] = true
-				index.add({
-					name: pt.s,
-					pid: pt_a.length
-				});
-				pt_a.include(pt);
-			}
-		}
-		return {pt_arr: pt_a, ft_index: index};
-	},
 	count_arr_o: function (data, w)
 	{
 		var d = this.count_arr(data, w);
@@ -28794,54 +28753,199 @@ var DataUtil = {
 		}
 		return r;
 	},
-	flatten_data: function (data)
+	flatten_data: function (data, filters, w)
 	{
+		var v_c = mapconf.visegrad;
+		var f_c = filter_countries;
 		var d = [];//data
 		var p = {};
-		for (var i = 0; i < data.length; i++)
+		var countries = {};
+		switch (w)
 		{
-			var dx = data[i];
-			var pid = dx.s;
-			if (!p[pid])
-			{
-				p[pid] = {s: dx.s, lat: dx.lat, lon: dx.lon, c: dx.c};
-			}
-			var dt = dx.data;
-			for (var pt_year in dt)
-			{
-				var y_d = dt[pt_year];
-				for (var j = 0; j < y_d.length; j++)
+			case 0:
+				for (var i = 0; i < data.length; i++)
 				{
-					var fd = y_d[j];
-					var f_tp = [];
-					if (fd['c'])
+					var dx = data[i];
+					var pid = dx.s;
+					if (!p[pid])
 					{
-						for (var k = 0; k < fd.c.length; k++)
+						p[pid] = {s: dx.s, lat: dx.lat, lon: dx.lon, c: dx.c};
+					}
+					var dt = dx.data;
+					for (var pt_year in dt)
+					{
+						var y_d = dt[pt_year];
+						for (var j = 0; j < y_d.length; j++)
 						{
-							f_tp[k] = String.from(fd.c[k]);
+							var fd = y_d[j];
+							var f_tp = [];
+							if (fd['c'])
+							{
+								for (var k = 0; k < fd.c.length; k++)
+								{
+									f_tp[k] = String.from(fd.c[k]);
+								}
+							}
+							var o = {
+								pt_id: pid,
+								city: dx.s,
+								country: dx.c,
+								year: String.from(pt_year),
+								a: fd.a,
+								c: f_tp,
+								g: String.from(fd.g),
+								amount: fd.amount,
+								name: fd.name
+							};
+							d.include(o);
+							if (!countries[dx.c])
+							{
+								countries[dx.c] = true;
+							}
 						}
 					}
-					var o = {
-						pt_id: pid,
-						city: dx.s,
-						country: dx.c,
-						year: String.from(pt_year),
-						a: fd.a,
-						c: f_tp,
-						g: String.from(fd.g),
-						amount: fd.amount,
-						name: fd.name
-					};
-					d.include(o);
 				}
+				break;
+			case 1:
+				var g_countries={};
+				for (var i = 0; i < data.length; i++)
+				{
+					var dx = data[i];
+					var pid = dx.s;
+					if (!p[pid])
+					{
+						p[pid] = {s: dx.s, lat: dx.lat, lon: dx.lon, c: dx.c};
+					}
+					var dt = dx.data;
+					for (var pt_year in dt)
+					{
+						var y_d = dt[pt_year];
+						for (var j = 0; j < y_d.length; j++)
+						{
+							var fd = y_d[j];
+							var f_tp = [];
+							if (fd['c'])
+							{
+								for (var k = 0; k < fd.c.length; k++)
+								{
+									f_tp[k] = String.from(fd.c[k]);
+								}
+							}
+							for(var cpid in fd)
+							{
+								var o = {
+									pt_id: pid,
+									city: dx.s,
+									country: dx.c,
+									year: String.from(pt_year),
+									a: '',
+									c: f_tp,
+									g: String.from(cpid),
+									amount: fd[cpid],
+									name: ''
+								};
+								d.include(o);
+								if(!g_countries[cpid])
+								{
+									g_countries[cpid]=true;
+								}
+							}
+							if (!countries[dx.c])
+							{
+								countries[dx.c] = true;
+							}
+						}
+					}
+				}
+				var r_countries = {};
+				for (var pid in f_c)
+				{
+					if (v_c.contains(pid) || g_countries[pid])
+					{
+						r_countries[pid] = f_c[pid];
+					}
+				}
+				filters['g'] = r_countries;
+				break;
+			case 2:
+				var g_countries={};
+				for (var i = 0; i < data.length; i++)
+				{
+					var dx = data[i];
+					var pid = dx.s;
+					if (!p[pid])
+					{
+						p[pid] = {s: dx.s, lat: dx.lat, lon: dx.lon, c: dx.c};
+					}
+					var dt = dx.data;
+					for (var pt_year in dt)
+					{
+						var y_d = dt[pt_year];
+						for (var j = 0; j < y_d.length; j++)
+						{
+							var fd = y_d[j];
+							var f_tp = [];
+							if (fd['c'])
+							{
+								for (var k = 0; k < fd.c.length; k++)
+								{
+									f_tp[k] = String.from(fd.c[k]);
+								}
+							}
+							var o = {
+								pt_id: pid,
+								city: dx.s,
+								country: dx.c,
+								year: String.from(pt_year),
+								a: fd.h,
+								c: f_tp,
+								g: String.from(fd.ci),
+								amount: 1,
+								name: fd.n
+							};
+							d.include(o);
+							if (!countries[dx.c])
+							{
+								countries[dx.c] = true;
+							}
+							if(!g_countries[fd.ci])
+							{
+								g_countries[fd.ci]=true;
+							}
+						}
+					}
+				}
+				var r_countries = {};
+				for (var pid in f_c)
+				{
+					if (v_c.contains(pid) || g_countries[pid])
+					{
+						r_countries[pid] = f_c[pid];
+					}
+				}
+				filters['g'] = r_countries;
+				break;
+
+		}
+
+		var f_countries = {};
+		for (var pid in f_c)
+		{
+			if (v_c.contains(pid) || countries[pid])
+			{
+				f_countries[pid] = f_c[pid];
 			}
 		}
-		return {
+		filters['countries'] = f_countries;
+		var ret = {
+			filters: filters,
 			data: d,
 			points: p
-		}
+		};
+		return ret;
 	}
 };
+
 
 (function ()
 {
@@ -29313,7 +29417,7 @@ var PieGraph = new Class({
 });
 var PlaceFilter = new Class({
 	Implements: [Events, Options],
-	initialize: function (data, filterdata, country_filters, options)
+	initialize: function (data, filterdata, options)
 	{
 		this.setOptions(options);
 
@@ -29334,7 +29438,6 @@ var PlaceFilter = new Class({
 		this.f_filters = {};
 
 		this.filterdata = filterdata;
-		this.country_filters = country_filters;
 
 		this.pref = [];
 		this.filtered_data = [];//all filtersdata
@@ -29367,21 +29470,6 @@ var PlaceFilter = new Class({
 			this.fireEvent('created');
 		}
 	},
-	prepare_countries: function (d)
-	{
-		var cts = this.country_filters;
-		var a = mapconf.visegrad;
-		var r = {};
-		for (var pid in cts)
-		{
-			if (a.contains(pid) || d[pid])
-			{
-				r[pid] = cts[pid];
-			}
-		}
-		this.countries_prefiltered = r;
-		return r;
-	},
 	get_msg: function ()
 	{
 		var m = 'Showing ';
@@ -29411,7 +29499,7 @@ var PlaceFilter = new Class({
 					}
 					else
 					{
-						m_a[0] = '' + msgs[pid]+' grants';
+						m_a[0] = '' + msgs[pid] + ' grants';
 					}
 					break;
 				case 'tags':
@@ -29457,6 +29545,17 @@ var PlaceFilter = new Class({
 	},
 	switch_data: function (i)
 	{
+		switch (i)
+		{
+			case 0:
+			case 2:
+				this.filt_arr = {countries: [], tags: [], types: []};
+				break;
+			case 1:
+				this.filt_arr = {countries: [], types: []};
+				break;
+		}
+		this.fireEvent('datachanged', i);
 		this.sel_filter = i;
 
 		var s = this.selects;
@@ -29469,10 +29568,36 @@ var PlaceFilter = new Class({
 
 		this.f_filters = fd;
 
-		var dc = DataUtil.group_by_country(data[i].data);
-		s['countries'].set_data(this.prepare_countries(dc));
-		s['types'].set_data(fd.g);
-		s['tags'].set_data(fd.c);
+		if (fd['countries'])
+		{
+			s['countries'].show();
+			s['countries'].set_data(fd.countries);
+			s['countries'].set_label(mapconf.filter_labels[i].countries);
+		}
+		else
+		{
+			s['countries'].hide();
+		}
+		if (fd['g'])
+		{
+			s['types'].show();
+			s['types'].set_data(fd.g);
+			s['types'].set_label(mapconf.filter_labels[i].g);
+		}
+		else
+		{
+			s['types'].hide();
+		}
+		if (fd['c'])
+		{
+			s['tags'].show();
+			s['tags'].set_data(fd.c);
+			s['tags'].set_label(mapconf.filter_labels[i].c);
+		}
+		else
+		{
+			s['tags'].hide();
+		}
 	},
 	filter_years: function (y)
 	{
@@ -29511,10 +29636,29 @@ var SelectFilter = new Class({
 		this.created = false;
 		this.setOptions(options);
 		this.el = el;
+		var p = el.getParent()
+		this.head = p.getElement('header');
+		this.s = p.getParent();
 		this.filter = [];
 		this.els = [];
 		a.addEvent('click', this.select_all.bind(this));
 		n.addEvent('click', this.select_none.bind(this));
+	},
+	set_label: function (label)
+	{
+		this.head.set('html', label);
+	},
+	show: function ()
+	{
+		this.s.setStyles({
+			visibility: 'visible'
+		});
+	},
+	hide: function ()
+	{
+		this.s.setStyles({
+			visibility: 'hidden'
+		});
 	},
 	get_message: function ()
 	{
@@ -29558,7 +29702,7 @@ var SelectFilter = new Class({
 		{
 			var e = new Element('option', {
 				value: pid,
-				text: (data[pid]['n']?data[pid]['n']:data[pid]),
+				text: (data[pid]['n'] ? data[pid]['n'] : data[pid]),
 				events: {
 					mousedown: this.prevent.bind(this),
 					mouseup: this.prevent.bind(this),
@@ -29650,15 +29794,11 @@ var VisegradApp = {
 			var cities = [];
 			for (var i = 0; i < mapdata.length; i++)
 			{
-				dt[i] = DataUtil.flatten_data(mapdata[i]);
+				dt[i] = DataUtil.flatten_data(mapdata[i], filters[i], i);
 				cities[i] = dt[i].points;
+				filters[i] = dt[i].filters;
 			}
-			/*
-			 var idx_arr = DataUtil.prepare_index({
-			 countries: countries_geo,
-			 cities: cities
-			 });
-			 */
+
 			this.msg_win = new MessageWin($('filter-message'));
 			this.map = new AppMap($(mapid), $('map-controls'), mapconf, {
 				onGraphcreated: this.draw_graph.bind(this),
@@ -29667,12 +29807,13 @@ var VisegradApp = {
 			this.graph = new DGraph($('e-graphs'));
 			this.table = new DTable($('e-table'));
 
-			this.filter = new PlaceFilter(dt, filters, filter_countries, {
-				onFilterchanged: this.draw.bind(this)
+			this.filter = new PlaceFilter(dt, filters, {
+				onFilterchanged: this.draw.bind(this),
+				onDatachanged:this.data_changed(this)
 			});
 		}
 	},
-	create_index: function ()
+	data_changed:function(i)
 	{
 
 	},
@@ -30000,6 +30141,11 @@ var YearSlider = new Class({
 var mapconf = {
 	url: 'http://{s}.tile.stamen.com/{id}/{z}/{x}/{y}.png',
 	attr: 'one',
+	filter_labels: [
+		{countries: "Country:", g: "Grant program:", c: "Fields of activity:"},
+		{countries: "Country:", g: "Participant country:"},
+		{countries: "Country:", g: "Participant country:", c: "Disciplines"},
+	],
 	graph_names: ["Grant programs", "Activity fields", "Countries"],
 	visegrad: ["CZ", "HU", "PL", "SK"],
 	subdomains: 'a.b.c.d'.split('.'),
@@ -30007,7 +30153,7 @@ var mapconf = {
 	min_z: 5,
 	max_z: 10,
 	min_radius: 10,
-	max_radius:60,
+	max_radius: 60,
 	v4_bounds: [
 		[
 			55.0721744,

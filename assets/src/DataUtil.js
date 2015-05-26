@@ -326,7 +326,6 @@ var DataUtil = {
 			data: d,
 			points: p
 		};
-		console.log(ret);
 		return ret;
 	}
 };

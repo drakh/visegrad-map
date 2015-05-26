@@ -138,7 +138,7 @@ var PlaceFilter = new Class({
 				this.filt_arr = {countries: [], types: []};
 				break;
 		}
-
+		this.fireEvent('datachanged', i);
 		this.sel_filter = i;
 
 		var s = this.selects;
@@ -194,7 +194,6 @@ var PlaceFilter = new Class({
 	prefilter: function ()
 	{
 		var f = this.filt_arr;
-		console.log(f);
 		var data = this.f_data;
 		return data.filterOn(f);
 	},

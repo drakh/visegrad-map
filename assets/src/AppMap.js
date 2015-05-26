@@ -190,6 +190,9 @@ var AppMap = new Class({
 		var pane = this.pane;
 		var graph_f = this.graph_f;
 		this.destroy_graph(map);
+
+		console.log(data);
+
 		this.graph = new GraphMarker(data, map, graph_f, {
 			pane: pane,
 			onDestroy: this.graph_destroyed.bind(this),
