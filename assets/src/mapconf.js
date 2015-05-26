@@ -1,6 +1,11 @@
 var mapconf = {
 	url: 'http://{s}.tile.stamen.com/{id}/{z}/{x}/{y}.png',
 	attr: 'one',
+	filter_labels: [
+		{countries: "Country:", g: "Grant program:", c: "Fields of activity:"},
+		{countries: "Country:", g: "Participant country:"},
+		{countries: "Country:", g: "Participant country:", c: "Disciplines"},
+	],
 	graph_names: ["Grant programs", "Activity fields", "Countries"],
 	visegrad: ["CZ", "HU", "PL", "SK"],
 	subdomains: 'a.b.c.d'.split('.'),
@@ -8,7 +13,7 @@ var mapconf = {
 	min_z: 5,
 	max_z: 10,
 	min_radius: 10,
-	max_radius:60,
+	max_radius: 60,
 	v4_bounds: [
 		[
 			55.0721744,
