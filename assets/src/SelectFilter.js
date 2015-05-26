@@ -8,10 +8,29 @@ var SelectFilter = new Class({
 		this.created = false;
 		this.setOptions(options);
 		this.el = el;
+		var p = el.getParent()
+		this.head = p.getElement('header');
+		this.s = p.getParent();
 		this.filter = [];
 		this.els = [];
 		a.addEvent('click', this.select_all.bind(this));
 		n.addEvent('click', this.select_none.bind(this));
+	},
+	set_label: function (label)
+	{
+		this.head.set('html', label);
+	},
+	show: function ()
+	{
+		this.s.setStyles({
+			visibility: 'visible'
+		});
+	},
+	hide: function ()
+	{
+		this.s.setStyles({
+			visibility: 'hidden'
+		});
 	},
 	get_message: function ()
 	{
@@ -55,7 +74,7 @@ var SelectFilter = new Class({
 		{
 			var e = new Element('option', {
 				value: pid,
-				text: (data[pid]['n']?data[pid]['n']:data[pid]),
+				text: (data[pid]['n'] ? data[pid]['n'] : data[pid]),
 				events: {
 					mousedown: this.prevent.bind(this),
 					mouseup: this.prevent.bind(this),
