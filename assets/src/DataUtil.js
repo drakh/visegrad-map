@@ -191,7 +191,7 @@ var DataUtil = {
 				}
 				break;
 			case 1:
-				var g_countries={};
+				var g_countries = {};
 				for (var i = 0; i < data.length; i++)
 				{
 					var dx = data[i];
@@ -215,7 +215,7 @@ var DataUtil = {
 									f_tp[k] = String.from(fd.c[k]);
 								}
 							}
-							for(var cpid in fd)
+							for (var cpid in fd)
 							{
 								var o = {
 									pt_id: pid,
@@ -229,9 +229,9 @@ var DataUtil = {
 									name: ''
 								};
 								d.include(o);
-								if(!g_countries[cpid])
+								if (!g_countries[cpid])
 								{
-									g_countries[cpid]=true;
+									g_countries[cpid] = true;
 								}
 							}
 							if (!countries[dx.c])
@@ -242,17 +242,20 @@ var DataUtil = {
 					}
 				}
 				var r_countries = {};
+				var gr_countries = {};
 				for (var pid in f_c)
 				{
 					if (v_c.contains(pid) || g_countries[pid])
 					{
 						r_countries[pid] = f_c[pid];
+						gr_countries[pid] = {n: f_c[pid], d: ''};
 					}
 				}
 				filters['g'] = r_countries;
+				filters['gc'] = gr_countries;
 				break;
 			case 2:
-				var g_countries={};
+				var g_countries = {};
 				for (var i = 0; i < data.length; i++)
 				{
 					var dx = data[i];

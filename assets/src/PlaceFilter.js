@@ -122,30 +122,6 @@ var PlaceFilter = new Class({
 								m_a[1] = 'in ' + msgs[pid].m2;
 							}
 							break;
-						/*
-						 case 'types':
-						 if (msgs[pid].m1 == 'all')
-						 {
-						 m_a[0] = '' + msgs[pid].m1 + ' grants';
-						 }
-						 else
-						 {
-						 m_a[0] = '' + msgs[pid].m1 + ' grants';
-						 }
-						 break;
-						 */
-						/*
-						 case 'tags':
-						 if (msgs[pid].m1 == 'all')
-						 {
-						 m_a[2] = 'in ' + msgs[pid].m1 + ' fields';
-						 }
-						 else
-						 {
-						 m_a[2] = 'in the field(s) <i>' + msgs[pid].m1 + '</i>';
-						 }
-						 break;
-						 */
 					}
 				}
 				break;

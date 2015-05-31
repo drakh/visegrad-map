@@ -1155,7 +1155,7 @@ var DataUtil = {
 				}
 				break;
 			case 1:
-				var g_countries={};
+				var g_countries = {};
 				for (var i = 0; i < data.length; i++)
 				{
 					var dx = data[i];
@@ -1179,7 +1179,7 @@ var DataUtil = {
 									f_tp[k] = String.from(fd.c[k]);
 								}
 							}
-							for(var cpid in fd)
+							for (var cpid in fd)
 							{
 								var o = {
 									pt_id: pid,
@@ -1193,9 +1193,9 @@ var DataUtil = {
 									name: ''
 								};
 								d.include(o);
-								if(!g_countries[cpid])
+								if (!g_countries[cpid])
 								{
-									g_countries[cpid]=true;
+									g_countries[cpid] = true;
 								}
 							}
 							if (!countries[dx.c])
@@ -1206,17 +1206,20 @@ var DataUtil = {
 					}
 				}
 				var r_countries = {};
+				var gr_countries = {};
 				for (var pid in f_c)
 				{
 					if (v_c.contains(pid) || g_countries[pid])
 					{
 						r_countries[pid] = f_c[pid];
+						gr_countries[pid] = {n: f_c[pid], d: ''};
 					}
 				}
 				filters['g'] = r_countries;
+				filters['gc'] = gr_countries;
 				break;
 			case 2:
-				var g_countries={};
+				var g_countries = {};
 				for (var i = 0; i < data.length; i++)
 				{
 					var dx = data[i];
@@ -1481,10 +1484,15 @@ var GraphMarker = new Class({
 			},
 			class: 'ct-chart'
 		}).inject(el);
+		var g_f = graph_f['c'];
+		if (graph_f['gc'])
+		{
+			g_f = graph_f['gc'];
+		}
 
 		var g_d = {
 			graph_data: pt.data,
-			graph_descs: graph_f.c,
+			graph_descs: g_f,
 			graph_group: 'c',
 			unit: 0
 		};
@@ -1728,6 +1736,7 @@ var PieGraph = new Class({
 	graph_bind_events: function (el)
 	{
 		var d = this.data.graph_descs;
+		console.log(d);
 		var gr = this.gr;
 		var p = this.g_data.g;
 		var map = this.g_data.d;
@@ -1887,30 +1896,6 @@ var PlaceFilter = new Class({
 								m_a[1] = 'in ' + msgs[pid].m2;
 							}
 							break;
-						/*
-						 case 'types':
-						 if (msgs[pid].m1 == 'all')
-						 {
-						 m_a[0] = '' + msgs[pid].m1 + ' grants';
-						 }
-						 else
-						 {
-						 m_a[0] = '' + msgs[pid].m1 + ' grants';
-						 }
-						 break;
-						 */
-						/*
-						 case 'tags':
-						 if (msgs[pid].m1 == 'all')
-						 {
-						 m_a[2] = 'in ' + msgs[pid].m1 + ' fields';
-						 }
-						 else
-						 {
-						 m_a[2] = 'in the field(s) <i>' + msgs[pid].m1 + '</i>';
-						 }
-						 break;
-						 */
 					}
 				}
 				break;

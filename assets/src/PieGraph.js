@@ -58,6 +58,7 @@ var PieGraph = new Class({
 	graph_bind_events: function (el)
 	{
 		var d = this.data.graph_descs;
+		console.log(d);
 		var gr = this.gr;
 		var p = this.g_data.g;
 		var map = this.g_data.d;

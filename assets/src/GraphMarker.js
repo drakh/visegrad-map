@@ -37,10 +37,15 @@ var GraphMarker = new Class({
 			},
 			class: 'ct-chart'
 		}).inject(el);
+		var g_f = graph_f['c'];
+		if (graph_f['gc'])
+		{
+			g_f = graph_f['gc'];
+		}
 
 		var g_d = {
 			graph_data: pt.data,
-			graph_descs: graph_f.c,
+			graph_descs: g_f,
 			graph_group: 'c',
 			unit: 0
 		};
