@@ -12,6 +12,8 @@ var PlaceFilter = new Class({
 		this.select_filters = ['countries', 'types', 'tags'];
 		this.cc_s = 0;
 
+		this.sel_filter = 0;
+
 		this.msg = {};
 
 		this.data = data;
@@ -58,44 +60,137 @@ var PlaceFilter = new Class({
 		var m = 'Showing ';
 		var msgs = this.msg;
 		var m_a = [];
-		for (var pid in msgs)
+		switch (this.sel_filter)
 		{
-			switch (pid)
-			{
-				case 'years':
-					m_a[3] = 'in ' + msgs[pid];
-					break;
-				case 'countries':
-					if (msgs[pid].m1 == 'all')
+			case 0:
+				for (var pid in msgs)
+				{
+					switch (pid)
 					{
-						m_a[1] = 'in ' + msgs[pid].m1 + ' ' + pid;
+						case 'years':
+							m_a[3] = 'in ' + msgs[pid];
+							break;
+						case 'countries':
+							if (msgs[pid].m1 == 'all')
+							{
+								m_a[1] = 'in ' + msgs[pid].m1 + ' ' + pid;
+							}
+							else
+							{
+								m_a[1] = 'in ' + msgs[pid].m2;
+							}
+							break;
+						case 'types':
+							if (msgs[pid].m1 == 'all')
+							{
+								m_a[0] = '' + msgs[pid].m1 + ' grants';
+							}
+							else
+							{
+								m_a[0] = '' + msgs[pid].m1 + ' grants';
+							}
+							break;
+						case 'tags':
+							if (msgs[pid].m1 == 'all')
+							{
+								m_a[2] = 'in ' + msgs[pid].m1 + ' fields';
+							}
+							else
+							{
+								m_a[2] = 'in the field(s) <i>' + msgs[pid].m1 + '</i>';
+							}
+							break;
 					}
-					else
+				}
+				break;
+			case 1:
+				m = 'Showing total number of semesters in'
+				for (var pid in msgs)
+				{
+					switch (pid)
 					{
-						m_a[1] = 'in ' + msgs[pid].m2;
+						case 'years':
+							m_a[3] = 'in ' + msgs[pid];
+							break;
+						case 'countries':
+							if (msgs[pid].m1 == 'all')
+							{
+								m_a[1] = 'in ' + msgs[pid].m1 + ' ' + pid;
+							}
+							else
+							{
+								m_a[1] = 'in ' + msgs[pid].m2;
+							}
+							break;
+						/*
+						 case 'types':
+						 if (msgs[pid].m1 == 'all')
+						 {
+						 m_a[0] = '' + msgs[pid].m1 + ' grants';
+						 }
+						 else
+						 {
+						 m_a[0] = '' + msgs[pid].m1 + ' grants';
+						 }
+						 break;
+						 */
+						/*
+						 case 'tags':
+						 if (msgs[pid].m1 == 'all')
+						 {
+						 m_a[2] = 'in ' + msgs[pid].m1 + ' fields';
+						 }
+						 else
+						 {
+						 m_a[2] = 'in the field(s) <i>' + msgs[pid].m1 + '</i>';
+						 }
+						 break;
+						 */
 					}
-					break;
-				case 'types':
-					if (msgs[pid].m1 == 'all')
+				}
+				break;
+			case 2:
+				m = 'Showing residencies in '
+				for (var pid in msgs)
+				{
+					switch (pid)
 					{
-						m_a[0] = '' + msgs[pid].m1 + ' grants';
+						case 'years':
+							m_a[3] = 'in ' + msgs[pid];
+							break;
+						case 'countries':
+							if (msgs[pid].m1 == 'all')
+							{
+								m_a[1] = 'from ' + msgs[pid].m1 + ' ' + pid;
+							}
+							else
+							{
+								m_a[1] = 'from ' + msgs[pid].m2;
+							}
+							break;
+						case 'types':
+							if (msgs[pid].m1 == 'all')
+							{
+								m_a[0] = '' + msgs[pid].m1 + ' countries';
+							}
+							else
+							{
+								m_a[0] = '' + msgs[pid].m2;
+							}
+							break;
+						case 'tags':
+							if (msgs[pid].m1 == 'all')
+							{
+								m_a[2] = 'in ' + msgs[pid].m1 + ' disciplines';
+							}
+							else
+							{
+								m_a[2] = 'in the discipline(s) <i>' + msgs[pid].m1 + '</i>';
+							}
+							break;
 					}
-					else
-					{
-						m_a[0] = '' + msgs[pid].m1 + ' grants';
-					}
-					break;
-				case 'tags':
-					if (msgs[pid].m1 == 'all')
-					{
-						m_a[2] = 'in ' + msgs[pid].m1 + ' fields';
-					}
-					else
-					{
-						m_a[2] = 'in the field(s) <i>' + msgs[pid].m1 + '</i>';
-					}
-					break;
-			}
+				}
+				break;
 		}
 		m = m + m_a.join(' ');
 		return m;
