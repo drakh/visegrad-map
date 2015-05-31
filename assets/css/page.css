@@ -21,6 +21,10 @@ body, html
 	height: 100%;
 }
 
+body
+{
+	font-size: 75%;
+}
 header
 {
 	line-height: 2em;
@@ -34,7 +38,7 @@ header
 	position: absolute;
 	z-index: 2;
 	width: 100%;
-	height: 15em;
+	height: 20em;
 	bottom: 0em;
 	left: 0px;
 	display: block;
@@ -45,7 +49,7 @@ header
 
 .filters.visible
 {
-	bottom: -15em;
+	bottom: -20em;
 }
 
 .map
@@ -60,6 +64,12 @@ main.main-content
 {
 	position: relative;
 	top: calc(2em + 72px);
+}
+
+#filter-message
+{
+	padding-left: 1em;
+	align-self: center;
 }
 
 .filters nav.filter-btn
@@ -144,6 +154,8 @@ main.main-content
 	padding: 1em;
 	display: flex;
 	/*flex-wrap: wrap;*/
+	/*justify-content: center;*/
+	/*align-items: center;*/
 	width: 100%;
 }
 
@@ -300,6 +312,10 @@ ul.years li div.year-container div
 	stroke-width: 5%;
 }
 
+.pure-table
+{
+	width: 100%;
+}
 @media screen and (max-width: 35.5em)
 {
 	/*

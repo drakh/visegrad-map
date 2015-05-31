@@ -37,13 +37,16 @@ var SelectFilter = new Class({
 		var els = this.els;
 		var a = this.filter;
 		var r_a = [];
+		var r_a_ = [];
 		var all = true;
 		var m = 'none';
+		var m_ = 'none';
 		for (var pid in els)
 		{
 			if (a.contains(pid))
 			{
 				r_a.include(els[pid].get('text'));
+				r_a_.include(pid);
 			}
 			else
 			{
@@ -52,13 +55,15 @@ var SelectFilter = new Class({
 		}
 		if (all == true)
 		{
-			m = 'all'
+			m = 'all';
+			m_ = 'all'
 		}
 		else if (r_a.length > 0)
 		{
 			m = r_a.join(', ');
+			m_ = r_a_.join(', ');
 		}
-		return m;
+		return {m1: m, m2: m_};
 	},
 	set_data: function (data)
 	{

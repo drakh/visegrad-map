@@ -57,6 +57,7 @@ var PlaceFilter = new Class({
 	{
 		var m = 'Showing ';
 		var msgs = this.msg;
+		console.log(msgs);
 		var m_a = [];
 		for (var pid in msgs)
 		{
@@ -66,33 +67,33 @@ var PlaceFilter = new Class({
 					m_a[3] = 'in ' + msgs[pid];
 					break;
 				case 'countries':
-					if (msgs[pid] == 'all')
+					if (msgs[pid].m1 == 'all')
 					{
-						m_a[1] = 'in ' + msgs[pid] + ' ' + pid;
+						m_a[1] = 'in ' + msgs[pid].m1 + ' ' + pid;
 					}
 					else
 					{
-						m_a[1] = 'in ' + msgs[pid];
+						m_a[1] = 'in ' + msgs[pid].m2;
 					}
 					break;
 				case 'types':
-					if (msgs[pid] == 'all')
+					if (msgs[pid].m1 == 'all')
 					{
-						m_a[0] = '' + msgs[pid] + ' grants';
+						m_a[0] = '' + msgs[pid].m1 + ' grants';
 					}
 					else
 					{
-						m_a[0] = '' + msgs[pid] + ' grants';
+						m_a[0] = '' + msgs[pid].m1 + ' grants';
 					}
 					break;
 				case 'tags':
-					if (msgs[pid] == 'all')
+					if (msgs[pid].m1 == 'all')
 					{
-						m_a[2] = 'in ' + msgs[pid] + ' fields';
+						m_a[2] = 'in ' + msgs[pid].m1 + ' fields';
 					}
 					else
 					{
-						m_a[2] = 'in the field(s) ' + msgs[pid];
+						m_a[2] = 'in the field(s) ' + msgs[pid].m1;
 					}
 					break;
 			}

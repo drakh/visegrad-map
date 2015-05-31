@@ -30,7 +30,7 @@ var YearSel = new Class({
 		}
 		if (min != max)
 		{
-			m = min + '-' + max
+			m = min + '–' + max
 		}
 		else
 		{

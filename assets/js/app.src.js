@@ -1370,115 +1370,7 @@ var FilterWin = new Class({
 		this.el.removeClass('visible');
 	}
 });
-var GraphMarker = new Class({
-	Implements: [
-		Events,
-		Options
-	],
-	options: {
-		pane: null
-	},
-	initialize: function (pt, map, graph_f, options)
-	{
-		this.setOptions(options);
-		this.pt = pt;
-		this.graph_f = graph_f;
-		var o = this.options;
-		this.tooltip_visible = false;
-		var el = new Element('div', {
-			styles: {
-				title: pt.s,
-				position: 'absolute',
-				'z-index': 998
-			},
-			events: {
-				mouseenter: this.to_front.bind(this),
-				mouseleave: this.to_back.bind(this)
-			}
-		}).inject(o.pane);
 
-		var g_el = new Element('div', {
-			styles: {
-				position: 'absolute',
-				width: 200,
-				height: 200,
-				left: -100,
-				top: -100,
-				background: '#fff',
-				'border-radius': '50%'
-			},
-			class: 'ct-chart'
-		}).inject(el);
-
-		var g_d = {
-			graph_data: pt.data,
-			graph_descs: graph_f.c,
-			graph_group: 'c',
-			unit: 0
-		};
-
-		this.g = new PieGraph(g_el, g_d);
-
-		new Element('div',
-			{
-				html: '<div><header>' + pt.pt.s + '</header></div><div>' + pt.data.length + '</div>',
-				class: 'graph-inner',
-				events: {
-					click: this.destroy.bind(this, map)
-				}
-			}).inject(el);
-
-
-		this.el = el;
-		this.reposition(map);
-
-		map.on('zoomstart', this.before_zoom.bind(this));
-		map.on('zoomend', this.reposition.bind(this, map));
-		this.fireEvent('create', pt);
-	},
-	before_zoom: function ()
-	{
-		this.el.setStyles({
-			display: 'none'
-		});
-	},
-	reposition: function (map)
-	{
-		var pt = this.pt;
-		var ps = map.latLngToLayerPoint([
-			pt.pt.lat,
-			pt.pt.lon
-		]);
-
-		this.el.setStyles({
-			display: 'block',
-			transform: 'translate3d(' + ps.x + 'px, ' + ps.y + 'px, 0px)'
-		});
-
-	},
-	destroy: function (map)
-	{
-		this.g.destroy();
-		this.el.destroy();
-		map.off('zoomstart', this.before_zoom.bind(this));
-		map.off('zoomend', this.reposition.bind.bind(this, map));
-
-		this.fireEvent('destroy');
-		this.removeEvents();
-	},
-	to_front: function ()
-	{
-		this.el.setStyles({
-			'z-index': 999
-		});
-	},
-	to_back: function ()
-	{
-		this.el.setStyles({
-			'z-index': 998
-		});
-	}
-});
 var MessageWin = new Class({
 	initialize: function (el)
 	{
@@ -1750,6 +1642,7 @@ var PlaceFilter = new Class({
 	{
 		var m = 'Showing ';
 		var msgs = this.msg;
+		console.log(msgs);
 		var m_a = [];
 		for (var pid in msgs)
 		{
@@ -1759,33 +1652,33 @@ var PlaceFilter = new Class({
 					m_a[3] = 'in ' + msgs[pid];
 					break;
 				case 'countries':
-					if (msgs[pid] == 'all')
+					if (msgs[pid].m1 == 'all')
 					{
-						m_a[1] = 'in ' + msgs[pid] + ' ' + pid;
+						m_a[1] = 'in ' + msgs[pid].m1 + ' ' + pid;
 					}
 					else
 					{
-						m_a[1] = 'in ' + msgs[pid];
+						m_a[1] = 'in ' + msgs[pid].m2;
 					}
 					break;
 				case 'types':
-					if (msgs[pid] == 'all')
+					if (msgs[pid].m1 == 'all')
 					{
-						m_a[0] = '' + msgs[pid] + ' grants';
+						m_a[0] = '' + msgs[pid].m1 + ' grants';
 					}
 					else
 					{
-						m_a[0] = '' + msgs[pid] + ' grants';
+						m_a[0] = '' + msgs[pid].m1 + ' grants';
 					}
 					break;
 				case 'tags':
-					if (msgs[pid] == 'all')
+					if (msgs[pid].m1 == 'all')
 					{
-						m_a[2] = 'in ' + msgs[pid] + ' fields';
+						m_a[2] = 'in ' + msgs[pid].m1 + ' fields';
 					}
 					else
 					{
-						m_a[2] = 'in the field(s) ' + msgs[pid];
+						m_a[2] = 'in the field(s) ' + msgs[pid].m1;
 					}
 					break;
 			}
@@ -1941,13 +1834,16 @@ var SelectFilter = new Class({
 		var els = this.els;
 		var a = this.filter;
 		var r_a = [];
+		var r_a_ = [];
 		var all = true;
 		var m = 'none';
+		var m_ = 'none';
 		for (var pid in els)
 		{
 			if (a.contains(pid))
 			{
 				r_a.include(els[pid].get('text'));
+				r_a_.include(pid);
 			}
 			else
 			{
@@ -1956,13 +1852,15 @@ var SelectFilter = new Class({
 		}
 		if (all == true)
 		{
-			m = 'all'
+			m = 'all';
+			m_ = 'all'
 		}
 		else if (r_a.length > 0)
 		{
 			m = r_a.join(', ');
+			m_ = r_a_.join(', ');
 		}
-		return m;
+		return {m1: m, m2: m_};
 	},
 	set_data: function (data)
 	{
@@ -2215,7 +2113,7 @@ var YearSel = new Class({
 		}
 		if (min != max)
 		{
-			m = min + '-' + max
+			m = min + '–' + max
 		}
 		else
 		{
@@ -2419,8 +2317,8 @@ var mapconf = {
 	attr: 'one',
 	filter_labels: [
 		{countries: "Country:", g: "Grant program:", c: "Fields of activity:"},
-		{countries: "Country:", g: "Participant country:"},
-		{countries: "Country:", g: "Participant country:", c: "Disciplines"},
+		{countries: "Host countries:", g: "Scholars from:"},
+		{countries: "Host country:", g: "Artist from:", c: "Discipline"},
 	],
 	graph_names: ["Grant programs", "Activity fields", "Countries"],
 	visegrad: ["CZ", "HU", "PL", "SK"],
