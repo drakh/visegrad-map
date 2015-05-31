@@ -45,8 +45,15 @@ var SelectFilter = new Class({
 		{
 			if (a.contains(pid))
 			{
-				r_a.include(els[pid].get('text'));
-				r_a_.include(pid);
+				r_a.include(els[pid].get('html'));
+				if (countries_geo[pid] && countries_geo[pid]['st'])
+				{
+					r_a_.include('<span title="' + countries_geo[pid]['st'] + '">' + pid + '</span>');
+				}
+				else
+				{
+					r_a_.include(pid);
+				}
 			}
 			else
 			{
@@ -79,7 +86,7 @@ var SelectFilter = new Class({
 		{
 			var e = new Element('option', {
 				value: pid,
-				text: (data[pid]['n'] ? data[pid]['n'] : data[pid]),
+				html: (data[pid]['n'] ? data[pid]['n'] : data[pid]),
 				events: {
 					mousedown: this.prevent.bind(this),
 					mouseup: this.prevent.bind(this),

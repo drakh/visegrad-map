@@ -120,7 +120,7 @@ var countries_geo =
 	"KE": {"s": "Kenya", "lon": 37.906193, "lat": -0.023559, "c": "KE"},
 	"KI": {"s": "Kiribati", "lon": -168.734039, "lat": -3.370417, "c": "KI"},
 	"XK": {
-		"s": "Kosovo",
+		"s": "<span title=\"This designation is without prejudice to positions on status, and is in line with UNSCR 1244/1999 and the ICJ Opinion on the Kosovo declaration of independence.\">Kosovo</span>",
 		"lon": 21.0072222222,
 		"lat": 42.5269444444,
 		"c": "XK",
@@ -377,7 +377,7 @@ var filter_countries = {
 	"KZ": "Kazakhstan",
 	"KE": "Kenya",
 	"KI": "Kiribati",
-	"XK": "Kosovo",
+	"XK": "<span title=\"This designation is without prejudice to positions on status, and is in line with UNSCR 1244/1999 and the ICJ Opinion on the Kosovo declaration of independence.\">Kosovo</span>",
 	"KP": "Korea, Democratic People's Republic of",
 	"KR": "Korea, Republic of",
 	"KW": "Kuwait",

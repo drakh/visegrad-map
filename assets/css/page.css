@@ -297,9 +297,10 @@ ul.years li div.year-container div
 	height: 300px;
 }
 
-#e-graphs.page-section
+#e-graphs.page-section, #e-table.page-section
 {
-	margin-top: 4em;
+	padding-top: 12em;
+	padding-bottom: 4em;
 }
 
 .page-scroller
