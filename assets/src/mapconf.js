@@ -5,7 +5,7 @@ var mapconf = {
 	filter_labels: [
 		{countries: "Country:", g: "Grant program:", c: "Fields of activity:"},
 		{countries: "Host countries:", g: "Scholars from:"},
-		{countries: "Host country:", g: "Artist from:", c: "Discipline"},
+		{countries: "Artist from:", g: "Host country:", c: "Discipline"},
 	],
 	graph_names: ["Grant programs", "Activity fields", "Countries"],
 	visegrad: ["CZ", "HU", "PL", "SK"],

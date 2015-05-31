@@ -875,7 +875,7 @@ main.main-content
 	padding: 0;
 }
 
-#filter_pane section div header
+#filter_pane header.ys
 {
 	padding-left: 1em;
 }

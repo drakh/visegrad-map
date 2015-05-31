@@ -279,22 +279,22 @@ var DataUtil = {
 							var o = {
 								pt_id: pid,
 								city: dx.s,
-								country: dx.c,
+								country: String.from(fd.ci),
 								year: String.from(pt_year),
 								a: fd.h,
 								c: f_tp,
-								g: String.from(fd.ci),
+								g: dx.c,
 								amount: 1,
 								name: fd.n
 							};
 							d.include(o);
-							if (!countries[dx.c])
+							if (!countries[fd.ci])
 							{
-								countries[dx.c] = true;
+								countries[fd.ci] = true;
 							}
-							if(!g_countries[fd.ci])
+							if (!g_countries[dx.c])
 							{
-								g_countries[fd.ci]=true;
+								g_countries[dx.c] = true;
 							}
 						}
 					}
