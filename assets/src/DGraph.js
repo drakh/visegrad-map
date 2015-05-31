@@ -5,6 +5,7 @@ var DGraph = new Class({
 	],
 	initialize: function (el, options)
 	{
+		this.dtype = 0;
 		this.setOptions(options);
 		this.g = [];
 		this.btns = ['<i class="el el-tasks"></i>', '<i class="el el-eur"></i>'];
@@ -14,6 +15,10 @@ var DGraph = new Class({
 
 		var w = new Element('div').inject(el);
 		this.el = w;
+	},
+	set_dtype: function (i)
+	{
+		this.dtype = i;
 	},
 	build_switch: function (el)
 	{
@@ -108,7 +113,7 @@ var DGraph = new Class({
 				graph_data: data,
 				graph_descs: f.g,
 				graph_group: 'g',
-				unit:this.unit
+				unit: this.unit
 			};
 
 
@@ -122,7 +127,7 @@ var DGraph = new Class({
 				y_d: DataUtil.group_by_year(data),
 				g_d: f.g,
 				g_g: 'g',
-				unit:this.unit
+				unit: this.unit
 			});
 			this.g.include(b);
 		}
@@ -139,7 +144,7 @@ var DGraph = new Class({
 				graph_data: data,
 				graph_descs: f.c,
 				graph_group: 'c',
-				unit:this.unit
+				unit: this.unit
 			};
 
 
@@ -154,7 +159,7 @@ var DGraph = new Class({
 				y_d: DataUtil.group_by_year(data),
 				g_d: f.c,
 				g_g: 'c',
-				unit:this.unit
+				unit: this.unit
 			});
 			this.g.include(b);
 		}
@@ -168,7 +173,7 @@ var DGraph = new Class({
 			graph_data: data,
 			graph_descs: countries_geo,
 			graph_group: 'country',
-			unit:this.unit
+			unit: this.unit
 		};
 
 
@@ -183,7 +188,7 @@ var DGraph = new Class({
 			y_d: DataUtil.group_by_year(data),
 			g_d: countries_geo,
 			g_g: 'country',
-			unit:this.unit
+			unit: this.unit
 		});
 		this.g.include(b);
 	}

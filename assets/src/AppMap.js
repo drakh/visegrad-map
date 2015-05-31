@@ -2,6 +2,7 @@ var AppMap = new Class({
 	Implements: [Events, Options],
 	initialize: function (el, c, conf, options)
 	{
+		this.dtype = 0;
 		this.setOptions(options);
 		this.conf = conf;
 		this.markers = [];
@@ -32,6 +33,10 @@ var AppMap = new Class({
 
 		this.map = a_map;
 		this.zoom_to_v4();
+	},
+	set_dtype: function (i)
+	{
+		this.dtype = i;
 	},
 	cc_switches_bind: function ()
 	{

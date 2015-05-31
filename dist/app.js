@@ -27732,6 +27732,7 @@ var AppMap = new Class({
 	Implements: [Events, Options],
 	initialize: function (el, c, conf, options)
 	{
+		this.dtype = 0;
 		this.setOptions(options);
 		this.conf = conf;
 		this.markers = [];
@@ -27762,6 +27763,10 @@ var AppMap = new Class({
 
 		this.map = a_map;
 		this.zoom_to_v4();
+	},
+	set_dtype: function (i)
+	{
+		this.dtype = i;
 	},
 	cc_switches_bind: function ()
 	{
@@ -28173,6 +28178,7 @@ var DGraph = new Class({
 	],
 	initialize: function (el, options)
 	{
+		this.dtype = 0;
 		this.setOptions(options);
 		this.g = [];
 		this.btns = ['<i class="el el-tasks"></i>', '<i class="el el-eur"></i>'];
@@ -28182,6 +28188,10 @@ var DGraph = new Class({
 
 		var w = new Element('div').inject(el);
 		this.el = w;
+	},
+	set_dtype: function (i)
+	{
+		this.dtype = i;
 	},
 	build_switch: function (el)
 	{
@@ -28276,7 +28286,7 @@ var DGraph = new Class({
 				graph_data: data,
 				graph_descs: f.g,
 				graph_group: 'g',
-				unit:this.unit
+				unit: this.unit
 			};
 
 
@@ -28290,7 +28300,7 @@ var DGraph = new Class({
 				y_d: DataUtil.group_by_year(data),
 				g_d: f.g,
 				g_g: 'g',
-				unit:this.unit
+				unit: this.unit
 			});
 			this.g.include(b);
 		}
@@ -28307,7 +28317,7 @@ var DGraph = new Class({
 				graph_data: data,
 				graph_descs: f.c,
 				graph_group: 'c',
-				unit:this.unit
+				unit: this.unit
 			};
 
 
@@ -28322,7 +28332,7 @@ var DGraph = new Class({
 				y_d: DataUtil.group_by_year(data),
 				g_d: f.c,
 				g_g: 'c',
-				unit:this.unit
+				unit: this.unit
 			});
 			this.g.include(b);
 		}
@@ -28336,7 +28346,7 @@ var DGraph = new Class({
 			graph_data: data,
 			graph_descs: countries_geo,
 			graph_group: 'country',
-			unit:this.unit
+			unit: this.unit
 		};
 
 
@@ -28351,7 +28361,7 @@ var DGraph = new Class({
 			y_d: DataUtil.group_by_year(data),
 			g_d: countries_geo,
 			g_g: 'country',
-			unit:this.unit
+			unit: this.unit
 		});
 		this.g.include(b);
 	}
@@ -28508,6 +28518,11 @@ var DTable = new Class({
 				name: 'Project title',
 				pid: 'name',
 				type: 's'
+			},
+			{
+				name: 'Money',
+				pid: 'amount',
+				type: 'n'
 			}
 		],
 		sort_els: {
@@ -28517,6 +28532,7 @@ var DTable = new Class({
 	},
 	initialize: function (el, options)
 	{
+		this.dtype = 0;
 		this.setOptions(options);
 		this.pagination = {
 			limit: 50,
@@ -28524,11 +28540,31 @@ var DTable = new Class({
 			count: 0
 		};
 
-
+		this.wp = el;
 		var t = new Element('table', {class: 'pure-table pure-table-bordered pure-table-striped'}).inject(el);
-		this.build_head(t);
+		this.tbl = t;
+		this.bld_t();
 		this.pager = new DPager(el, {onPagechanged: this.change_page.bind(this)});
+	},
+	bld_t: function ()
+	{
+		var t = this.tbl;
+		t.empty();
+		this.build_head(t);
 		this.el = new Element('tbody').inject(t);
+	},
+	set_dtype: function (i)
+	{
+		this.dtype = i;
+		if (i == 1)
+		{
+			this.wp.setStyles({display: 'none'});
+		}
+		else
+		{
+			this.wp.setStyles({display: 'block'});
+		}
+		this.bld_t();
 	},
 	build_head: function (t)
 	{
@@ -28537,7 +28573,12 @@ var DTable = new Class({
 		var o = this.options;
 		var ho = o.table_headers;
 		var se = o.sort_els;
-		for (var i = 0; i < ho.length; i++)
+		var hal = 0;
+		if (this.dtype != 0)
+		{
+			hal = 1;
+		}
+		for (var i = 0; i < (ho.length - hal); i++)
 		{
 			var th = new Element('th').inject(r);
 			var e = new Element('div', {
@@ -28602,6 +28643,12 @@ var DTable = new Class({
 		var d = this.table_data;
 		var min = pg.page * pg.limit;
 		var max = min + pg.limit;
+		var hal = 0;
+		if (this.dtype != 0)
+		{
+			hal = 1;
+		}
+		console.log(hal);
 		var ho = this.options.table_headers;
 		if (max > d.length)
 		{
@@ -28610,7 +28657,8 @@ var DTable = new Class({
 		for (var i = min; i < max; i++)
 		{
 			var r = new Element('tr');
-			for (var j = 0; j < ho.length; j++)
+
+			for (var j = 0; j < (ho.length - hal); j++)
 			{
 				var pid = ho[j].pid;
 				new Element('td', {text: d[i][pid]}).inject(r);
@@ -28902,11 +28950,11 @@ var DataUtil = {
 								city: dx.s,
 								country: String.from(fd.ci),
 								year: String.from(pt_year),
-								a: fd.h,
+								a: fd.n,
 								c: f_tp,
 								g: dx.c,
 								amount: 1,
-								name: fd.n
+								name: fd.h
 							};
 							d.include(o);
 							if (!countries[fd.ci])
@@ -29827,13 +29875,15 @@ var VisegradApp = {
 
 			this.filter = new PlaceFilter(dt, filters, {
 				onFilterchanged: this.draw.bind(this),
-				onDatachanged:this.data_changed(this)
+				onDatachanged: this.data_changed.bind(this)
 			});
 		}
 	},
-	data_changed:function(i)
+	data_changed: function (i)
 	{
-
+		this.graph.set_dtype(i);
+		this.table.set_dtype(i);
+		this.map.set_dtype(i);
 	},
 	draw: function (d)
 	{

@@ -281,11 +281,11 @@ var DataUtil = {
 								city: dx.s,
 								country: String.from(fd.ci),
 								year: String.from(pt_year),
-								a: fd.h,
+								a: fd.n,
 								c: f_tp,
 								g: dx.c,
 								amount: 1,
-								name: fd.n
+								name: fd.h
 							};
 							d.include(o);
 							if (!countries[fd.ci])

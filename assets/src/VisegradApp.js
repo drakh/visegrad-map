@@ -28,13 +28,15 @@ var VisegradApp = {
 
 			this.filter = new PlaceFilter(dt, filters, {
 				onFilterchanged: this.draw.bind(this),
-				onDatachanged:this.data_changed(this)
+				onDatachanged: this.data_changed.bind(this)
 			});
 		}
 	},
-	data_changed:function(i)
+	data_changed: function (i)
 	{
-
+		this.graph.set_dtype(i);
+		this.table.set_dtype(i);
+		this.map.set_dtype(i);
 	},
 	draw: function (d)
 	{
