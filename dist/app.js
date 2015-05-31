@@ -28192,6 +28192,15 @@ var DGraph = new Class({
 	set_dtype: function (i)
 	{
 		this.dtype = i;
+		this.switch_units(0);
+		if (i == 0)
+		{
+			this.switch_el.setStyles({display: 'block'});
+		}
+		else
+		{
+			this.switch_el.setStyles({display: 'none'});
+		}
 	},
 	build_switch: function (el)
 	{
@@ -28213,7 +28222,7 @@ var DGraph = new Class({
 			this.switches.include(a);
 		}
 		this.switch_units(0);
-
+		this.switch_el = w;
 	},
 	switch_units: function (i, e)
 	{
@@ -28270,15 +28279,29 @@ var DGraph = new Class({
 	build_graphs: function ()
 	{
 		this.destroy();
-		this.build_topic_graph();
-		this.build_tag_graph();
-		this.build_country_graph();
+		var dt = this.dtype;
+		switch (dt)
+		{
+			case 0:
+				this.build_topic_graph();
+				this.build_tag_graph();
+				this.build_country_graph();
+				break;
+			case 1:
+				this.build_topic_graph();
+				break;
+			case 2:
+				this.build_tag_graph();
+				this.build_topic_graph();
+				break;
+		}
 	},
 	build_topic_graph: function ()
 	{
+		var dt = this.dtype;
 		if (this.f)
 		{
-			var re = this.build_graph_head(mapconf.graph_names[0] + ':');
+			var re = this.build_graph_head(mapconf.graph_names[dt][0]);
 			var data = this.data;
 			var f = this.f;
 
@@ -28307,9 +28330,10 @@ var DGraph = new Class({
 	},
 	build_tag_graph: function ()
 	{
+		var dt = this.dtype;
 		if (this.f)
 		{
-			var re = this.build_graph_head(mapconf.graph_names[1] + ':');
+			var re = this.build_graph_head(mapconf.graph_names[dt][1]);
 			var data = this.data;
 			var f = this.f;
 
@@ -28339,7 +28363,8 @@ var DGraph = new Class({
 	},
 	build_country_graph: function ()
 	{
-		var re = this.build_graph_head(mapconf.graph_names[2] + ':');
+		var dt = this.dtype;
+		var re = this.build_graph_head(mapconf.graph_names[dt][2]);
 		var data = this.data;
 
 		var g_d = {
@@ -30220,7 +30245,11 @@ var mapconf = {
 		{countries: "Host countries:", g: "Scholars from:"},
 		{countries: "Artist from:", g: "Host country:", c: "Discipline"},
 	],
-	graph_names: ["Grant programs", "Activity fields", "Countries"],
+	graph_names: [
+		["Grant programs:", "Activity fields:", "Countries:"],
+		["Participant countries:", "", ""],
+		["Countries:", "Disciplines:", ""]
+	],
 	visegrad: ["CZ", "HU", "PL", "SK"],
 	subdomains: 'a.b.c.d'.split('.'),
 	map_id: 'toner',

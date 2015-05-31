@@ -7,7 +7,11 @@ var mapconf = {
 		{countries: "Host countries:", g: "Scholars from:"},
 		{countries: "Artist from:", g: "Host country:", c: "Discipline"},
 	],
-	graph_names: ["Grant programs", "Activity fields", "Countries"],
+	graph_names: [
+		["Grant programs:", "Activity fields:", "Countries:"],
+		["Participant countries:", "", ""],
+		["Countries:", "Disciplines:", ""]
+	],
 	visegrad: ["CZ", "HU", "PL", "SK"],
 	subdomains: 'a.b.c.d'.split('.'),
 	map_id: 'toner',
