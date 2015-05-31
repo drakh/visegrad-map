@@ -162,9 +162,9 @@ var AppMap = new Class({
 				z = conf.min_z;
 			}
 
-			map.setMaxBounds(bounds);
+			//map.setMaxBounds(bounds);
 			map.options.minZoom = z;
-			this.zoom_to_bounds();
+			this.zoom_to_v4();
 		}
 	},
 	draw_points: function (data_in, points, f)
