@@ -119,7 +119,13 @@ var countries_geo =
 	"KZ": {"s": "Kazakhstan", "lon": 66.923684, "lat": 48.019573, "c": "KZ"},
 	"KE": {"s": "Kenya", "lon": 37.906193, "lat": -0.023559, "c": "KE"},
 	"KI": {"s": "Kiribati", "lon": -168.734039, "lat": -3.370417, "c": "KI"},
-	"XK": {"s": "Kosovo", "lon": 21.0072222222, "lat": 42.5269444444, "c": "XK"},
+	"XK": {
+		"s": "Kosovo",
+		"lon": 21.0072222222,
+		"lat": 42.5269444444,
+		"c": "XK",
+		"st": "This designation is without prejudice to positions on status, and is in line with UNSCR 1244/1999 and the ICJ Opinion on the Kosovo declaration of independence."
+	},
 	"KP": {"s": "Korea, Democratic People's Republic of", "lon": 127.510093, "lat": 40.339852, "c": "KP"},
 	"KR": {"s": "Korea, Republic of", "lon": 127.766922, "lat": 35.907757, "c": "KR"},
 	"KW": {"s": "Kuwait", "lon": 47.481766, "lat": 29.31166, "c": "KW"},
