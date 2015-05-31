@@ -162,9 +162,9 @@ var AppMap = new Class({
 				z = conf.min_z;
 			}
 
-			map.setMaxBounds(bounds);
+			//map.setMaxBounds(bounds);
 			map.options.minZoom = z;
-			this.zoom_to_bounds();
+			this.zoom_to_v4();
 		}
 	},
 	draw_points: function (data_in, points, f)
@@ -309,7 +309,6 @@ var BarGraph = new Class({
 		var unit = this.unit;
 		var s = el.getElements('.ct-series');
 		var lns = [];
-		console.log(r);
 		for (var i = 0; i < s.length; i++)
 		{
 			var cid = d.ord[i];
@@ -1370,7 +1369,115 @@ var FilterWin = new Class({
 		this.el.removeClass('visible');
 	}
 });
+var GraphMarker = new Class({
+	Implements: [
+		Events,
+		Options
+	],
+	options: {
+		pane: null
+	},
+	initialize: function (pt, map, graph_f, options)
+	{
+		this.setOptions(options);
+		this.pt = pt;
+		this.graph_f = graph_f;
+		var o = this.options;
+		this.tooltip_visible = false;
+		var el = new Element('div', {
+			styles: {
+				title: pt.s,
+				position: 'absolute',
+				'z-index': 998
+			},
+			events: {
+				mouseenter: this.to_front.bind(this),
+				mouseleave: this.to_back.bind(this)
+			}
+		}).inject(o.pane);
 
+		var g_el = new Element('div', {
+			styles: {
+				position: 'absolute',
+				width: 200,
+				height: 200,
+				left: -100,
+				top: -100,
+				background: '#fff',
+				'border-radius': '50%'
+			},
+			class: 'ct-chart'
+		}).inject(el);
+
+		var g_d = {
+			graph_data: pt.data,
+			graph_descs: graph_f.c,
+			graph_group: 'c',
+			unit: 0
+		};
+
+		this.g = new PieGraph(g_el, g_d);
+
+		new Element('div',
+			{
+				html: '<div><header>' + pt.pt.s + '</header></div><div>' + pt.data.length + '</div>',
+				class: 'graph-inner',
+				events: {
+					click: this.destroy.bind(this, map)
+				}
+			}).inject(el);
+
+
+		this.el = el;
+		this.reposition(map);
+
+		map.on('zoomstart', this.before_zoom.bind(this));
+		map.on('zoomend', this.reposition.bind(this, map));
+		this.fireEvent('create', pt);
+	},
+	before_zoom: function ()
+	{
+		this.el.setStyles({
+			display: 'none'
+		});
+	},
+	reposition: function (map)
+	{
+		var pt = this.pt;
+		var ps = map.latLngToLayerPoint([
+			pt.pt.lat,
+			pt.pt.lon
+		]);
+
+		this.el.setStyles({
+			display: 'block',
+			transform: 'translate3d(' + ps.x + 'px, ' + ps.y + 'px, 0px)'
+		});
+
+	},
+	destroy: function (map)
+	{
+		this.g.destroy();
+		this.el.destroy();
+		map.off('zoomstart', this.before_zoom.bind(this));
+		map.off('zoomend', this.reposition.bind.bind(this, map));
+
+		this.fireEvent('destroy');
+		this.removeEvents();
+	},
+	to_front: function ()
+	{
+		this.el.setStyles({
+			'z-index': 999
+		});
+	},
+	to_back: function ()
+	{
+		this.el.setStyles({
+			'z-index': 998
+		});
+	}
+});
 var MessageWin = new Class({
 	initialize: function (el)
 	{
@@ -1642,7 +1749,6 @@ var PlaceFilter = new Class({
 	{
 		var m = 'Showing ';
 		var msgs = this.msg;
-		console.log(msgs);
 		var m_a = [];
 		for (var pid in msgs)
 		{
@@ -1678,7 +1784,7 @@ var PlaceFilter = new Class({
 					}
 					else
 					{
-						m_a[2] = 'in the field(s) ' + msgs[pid].m1;
+						m_a[2] = 'in the field(s) <i>' + msgs[pid].m1 + '</i>';
 					}
 					break;
 			}
@@ -1724,6 +1830,7 @@ var PlaceFilter = new Class({
 				this.filt_arr = {countries: [], types: []};
 				break;
 		}
+		this.year_sel.set_header(mapconf.year_labels[i]);
 		this.fireEvent('datachanged', i);
 		this.sel_filter = i;
 
@@ -2094,12 +2201,17 @@ var YearSel = new Class({
 			data: {},
 			max: 0
 		};
+		this.head_el = el.getParent().getElement('header');
 		this.bounds = bounds;
 		this.build_elements(bounds, el);
 		this.data = [];
 		this.drag = new YearDrag(el, this.vals.length, {
 			onChanged: this.change_vals.bind(this)
 		});
+	},
+	set_header: function (t)
+	{
+		this.head_el.set('html', t);
 	},
 	get_message: function ()
 	{
@@ -2315,6 +2427,7 @@ var YearSlider = new Class({
 var mapconf = {
 	url: 'http://{s}.tile.stamen.com/{id}/{z}/{x}/{y}.png',
 	attr: 'one',
+	year_labels: ["Total number of grants:", "Total number of semesters:", "Total number of residencies:"],
 	filter_labels: [
 		{countries: "Country:", g: "Grant program:", c: "Fields of activity:"},
 		{countries: "Host countries:", g: "Scholars from:"},

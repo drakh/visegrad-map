@@ -1,6 +1,7 @@
 var mapconf = {
 	url: 'http://{s}.tile.stamen.com/{id}/{z}/{x}/{y}.png',
 	attr: 'one',
+	year_labels: ["Total number of grants:", "Total number of semesters:", "Total number of residencies:"],
 	filter_labels: [
 		{countries: "Country:", g: "Grant program:", c: "Fields of activity:"},
 		{countries: "Host countries:", g: "Scholars from:"},

@@ -57,7 +57,6 @@ var PlaceFilter = new Class({
 	{
 		var m = 'Showing ';
 		var msgs = this.msg;
-		console.log(msgs);
 		var m_a = [];
 		for (var pid in msgs)
 		{
@@ -93,7 +92,7 @@ var PlaceFilter = new Class({
 					}
 					else
 					{
-						m_a[2] = 'in the field(s) ' + msgs[pid].m1;
+						m_a[2] = 'in the field(s) <i>' + msgs[pid].m1 + '</i>';
 					}
 					break;
 			}
@@ -139,6 +138,7 @@ var PlaceFilter = new Class({
 				this.filt_arr = {countries: [], types: []};
 				break;
 		}
+		this.year_sel.set_header(mapconf.year_labels[i]);
 		this.fireEvent('datachanged', i);
 		this.sel_filter = i;
 

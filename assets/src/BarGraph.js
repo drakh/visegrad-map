@@ -79,7 +79,6 @@ var BarGraph = new Class({
 		var unit = this.unit;
 		var s = el.getElements('.ct-series');
 		var lns = [];
-		console.log(r);
 		for (var i = 0; i < s.length; i++)
 		{
 			var cid = d.ord[i];

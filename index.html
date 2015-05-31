@@ -10,35 +10,37 @@
 <body>
 <header class="black-bg main-header">
     <section class="logo black-bg">
-        <span><img src="http://visegradfund.org/wordpress/wp-content/uploads/logo/visegrad_fund_logo_inverse_150.jpg"
-                   alt="Visegrad Funds Map" title="Visegrad Funds Map" width="150" height="62"></span>
+        <span class="main-logo"><a href="./"><img
+                src="http://visegradfund.org/wordpress/wp-content/uploads/logo/visegrad_fund_logo_inverse_150.jpg"
+                alt="Visegrad Funds Map" title="Visegrad Funds Map" width="150" height="62"></a></span>
         <span id="filter-message"></span>
     </section>
     <dialog class="filters light-bg" id="filter_pane">
         <form class="pure-form">
             <section class="pure-g filter-tab">
                 <div class="pure-u-1 pure-u-lg-1-2 pure-u-xl-1-2">
+                    <header>Total number of grants:</header>
                     <ul class="years"></ul>
                 </div>
                 <div class="pure-u-1-3 pure-u-sm-1-4 pure-u-lg-1-6 pure-u-xl-1-8">
                     <section class="select">
                         <header>Country:</header>
                         <div>select: <a href="#" class="s-all">all</a> <a href="#" class="s-none">none</a></div>
-                        <select multiple size="5"></select>
+                        <select multiple size="8"></select>
                     </section>
                 </div>
                 <div class="pure-u-1-3 pure-u-sm-1-4 pure-u-lg-1-6 pure-u-xl-1-8">
                     <section class="select">
                         <header>Grant program:</header>
                         <div>select: <a href="#" class="s-all">all</a> <a href="#" class="s-none">none</a></div>
-                        <select multiple size="5"></select>
+                        <select multiple size="8"></select>
                     </section>
                 </div>
                 <div class="pure-u-1-3 pure-u-sm-1-2 pure-u-lg-1-6 pure-u-xl-1-4">
                     <section class="select">
                         <header>Fields of activity:</header>
                         <div>select: <a href="#" class="s-all">all</a> <a href="#" class="s-none">none</a></div>
-                        <select multiple size="5"></select>
+                        <select multiple size="8"></select>
                     </section>
                 </div>
             </section>
@@ -56,15 +58,15 @@
     </dialog>
 </header>
 <main class="main-content">
-    <section class="page-section" title="map">
+    <section class="page-section">
         <main class="map">
             <section class="map">
                 <div id="map-main" class="map"></div>
             </section>
             <section class="map-control" id="map-controls">
                 <nav class="pure-g">
-                <span class="pure-u-1-2"><a class="pure-button dark-bg">fit</a><a
-                        class="pure-button dark-bg">v4</a></span>
+                <span class="pure-u-1-2"><a class="pure-button dark-bg" title="Fit to see all">fit</a><a
+                        class="pure-button dark-bg" title="Fit to V4 region">v4</a></span>
                 <span class="pure-u-1-2"><a class="pure-button dark-bg"><i class="el el-plus"></i></a><a
                         class="pure-button dark-bg"><i class="el el-minus"></i></a></span>
                 </nav>
@@ -84,5 +86,6 @@
 
     </section>
 </main>
+<footer class="black-bg">© 2014 – 2015 International Visegrad Fund</footer>
 </body>
 </html>

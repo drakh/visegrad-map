@@ -11,12 +11,17 @@ var YearSel = new Class({
 			data: {},
 			max: 0
 		};
+		this.head_el = el.getParent().getElement('header');
 		this.bounds = bounds;
 		this.build_elements(bounds, el);
 		this.data = [];
 		this.drag = new YearDrag(el, this.vals.length, {
 			onChanged: this.change_vals.bind(this)
 		});
+	},
+	set_header: function (t)
+	{
+		this.head_el.set('html', t);
 	},
 	get_message: function ()
 	{
