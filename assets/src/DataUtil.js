@@ -223,7 +223,7 @@ var DataUtil = {
 									country: dx.c,
 									year: String.from(pt_year),
 									a: '',
-									c: f_tp,
+									c: [String.from(cpid)],
 									g: String.from(cpid),
 									amount: fd[cpid],
 									name: ''
