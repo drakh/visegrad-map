@@ -2071,6 +2071,18 @@ var PlaceFilter = new Class({
 		this.fireEvent('filterchanged', r);
 	}
 });
+var SearchBox = new Class({
+	Implements: [Events, Options],
+	initialize: function (points, options)
+	{
+		this.setOptions(options);
+	},
+	searched:function()
+	{
+		this.fireEvent('found');
+	}
+})
+
 var SelectFilter = new Class({
 	Implements: [
 		Events,
