@@ -29466,7 +29466,6 @@ var PieGraph = new Class({
 	graph_bind_events: function (el)
 	{
 		var d = this.data.graph_descs;
-		console.log(d);
 		var gr = this.gr;
 		var p = this.g_data.g;
 		var map = this.g_data.d;
@@ -29771,7 +29770,24 @@ var PlaceFilter = new Class({
 	{
 		var f = this.filt_arr;
 		var data = this.f_data;
-		return data.filterOn(f);
+		var rd = data.filterOn(f);
+		if (f['tags'] && f['tags'].length > 0)
+		{
+			for (var i = 0; i < rd.length; i++)
+			{
+				var c = [];
+				for (var j = 0; j < rd[i].c.length; j++)
+				{
+					var cc = rd[i].c[j];
+					if (f['tags'].contains(cc))
+					{
+						c.include(cc);
+					}
+				}
+				rd[i].c = c;
+			}
+		}
+		return rd;
 	},
 	filter: function (data)
 	{
