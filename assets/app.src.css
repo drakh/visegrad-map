@@ -444,7 +444,7 @@ main.main-content
 	background-color: #ca7e7d;
 }
 
-.map-control, .map-control-city
+.map-control, .map-control-city, .map-control-search
 {
 	position: absolute;
 	width: 5.4em;
@@ -457,7 +457,12 @@ main.main-content
 {
 	left: 7.4em;
 }
-
+.map-control-search
+{
+	left: 10.4em;
+	bottom: 4.5em;
+	width: 15em;
+}
 .map-control span a, .map-control-city span a
 {
 	margin: 0.2em;
