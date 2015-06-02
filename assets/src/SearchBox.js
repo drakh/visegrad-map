@@ -4,8 +4,8 @@ var SearchBox = new Class({
 	{
 		this.setOptions(options);
 	},
-	searched:function()
+	searched:function(p)
 	{
-		this.fireEvent('found');
+		this.fireEvent('found', p);
 	}
 })

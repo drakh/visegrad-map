@@ -10,7 +10,7 @@ module.exports = function (grunt)
 					dest: 'assets/js/app.src.js'
 				},
 				app_css: {
-					src: ['assets/css/fonts.css', 'assets/css/colors.css', 'assets/css/page.css'],
+					src: ['assets/css/MooComplete.css','assets/css/fonts.css', 'assets/css/colors.css', 'assets/css/page.css'],
 					dest: 'assets/app.src.css'
 				},
 				dist_js: {
