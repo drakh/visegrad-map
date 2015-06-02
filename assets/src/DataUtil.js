@@ -137,7 +137,7 @@ var DataUtil = {
 		}
 		return r;
 	},
-	flatten_data: function (data, filters, w)
+	flatten_data: function (data, filters, w, u_cities)
 	{
 		var v_c = mapconf.visegrad;
 		var f_c = filter_countries;
@@ -155,6 +155,10 @@ var DataUtil = {
 					{
 						p[pid] = {s: dx.s, lat: dx.lat, lon: dx.lon, c: dx.c};
 					}
+					if(!u_cities[pid])
+					{
+						u_cities[pid] = {s: dx.s, lat: dx.lat, lon: dx.lon, c: dx.c};
+					}
 					var dt = dx.data;
 					for (var pt_year in dt)
 					{
@@ -169,6 +173,10 @@ var DataUtil = {
 								{
 									f_tp[k] = String.from(fd.c[k]);
 								}
+							}
+							if(!u_cities[countries_geo[dx.c].s])
+							{
+								u_cities[countries_geo[dx.c].s] = countries_geo[dx.c];
 							}
 							var o = {
 								pt_id: pid,
@@ -200,6 +208,10 @@ var DataUtil = {
 					{
 						p[pid] = {s: dx.s, lat: dx.lat, lon: dx.lon, c: dx.c};
 					}
+					if(!u_cities[pid])
+					{
+						u_cities[pid] = {s: dx.s, lat: dx.lat, lon: dx.lon, c: dx.c};
+					}
 					var dt = dx.data;
 					for (var pt_year in dt)
 					{
@@ -217,6 +229,10 @@ var DataUtil = {
 							}
 							for (var cpid in fd)
 							{
+								if(!u_cities[countries_geo[dx.c].s])
+								{
+									u_cities[countries_geo[dx.c].s] = countries_geo[dx.c];
+								}
 								var o = {
 									pt_id: pid,
 									city: dx.s,
@@ -264,6 +280,10 @@ var DataUtil = {
 					{
 						p[pid] = {s: dx.s, lat: dx.lat, lon: dx.lon, c: dx.c};
 					}
+					if(!u_cities[pid])
+					{
+						u_cities[pid] = {s: dx.s, lat: dx.lat, lon: dx.lon, c: dx.c};
+					}
 					var dt = dx.data;
 					for (var pt_year in dt)
 					{
@@ -278,6 +298,10 @@ var DataUtil = {
 								{
 									f_tp[k] = String.from(fd.c[k]);
 								}
+							}
+							if(!u_cities[countries_geo[String.from(fd.ci)].s])
+							{
+								u_cities[countries_geo[String.from(fd.ci)].s] = countries_geo[String.from(fd.ci)];
 							}
 							var o = {
 								pt_id: pid,

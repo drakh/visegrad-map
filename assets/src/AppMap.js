@@ -34,6 +34,10 @@ var AppMap = new Class({
 		this.map = a_map;
 		this.zoom_to_v4();
 	},
+	move_map:function(p)
+	{
+		this.map.panTo([p.lat, p.lon]);
+	},
 	set_dtype: function (i)
 	{
 		this.dtype = i;
@@ -191,6 +195,7 @@ var AppMap = new Class({
 	},
 	show_graph: function (data)
 	{
+		this.move_map(data.pt);
 		var map = this.map;
 		var pane = this.pane;
 		var graph_f = this.graph_f;

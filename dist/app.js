@@ -27764,6 +27764,10 @@ var AppMap = new Class({
 		this.map = a_map;
 		this.zoom_to_v4();
 	},
+	move_map:function(p)
+	{
+		this.map.panTo([p.lat, p.lon]);
+	},
 	set_dtype: function (i)
 	{
 		this.dtype = i;
@@ -27921,6 +27925,7 @@ var AppMap = new Class({
 	},
 	show_graph: function (data)
 	{
+		this.move_map(data.pt);
 		var map = this.map;
 		var pane = this.pane;
 		var graph_f = this.graph_f;
@@ -28673,7 +28678,6 @@ var DTable = new Class({
 		{
 			hal = 1;
 		}
-		console.log(hal);
 		var ho = this.options.table_headers;
 		if (max > d.length)
 		{
@@ -28831,7 +28835,7 @@ var DataUtil = {
 		}
 		return r;
 	},
-	flatten_data: function (data, filters, w)
+	flatten_data: function (data, filters, w, u_cities)
 	{
 		var v_c = mapconf.visegrad;
 		var f_c = filter_countries;
@@ -28849,6 +28853,10 @@ var DataUtil = {
 					{
 						p[pid] = {s: dx.s, lat: dx.lat, lon: dx.lon, c: dx.c};
 					}
+					if(!u_cities[pid])
+					{
+						u_cities[pid] = {s: dx.s, lat: dx.lat, lon: dx.lon, c: dx.c};
+					}
 					var dt = dx.data;
 					for (var pt_year in dt)
 					{
@@ -28863,6 +28871,10 @@ var DataUtil = {
 								{
 									f_tp[k] = String.from(fd.c[k]);
 								}
+							}
+							if(!u_cities[countries_geo[dx.c].s])
+							{
+								u_cities[countries_geo[dx.c].s] = countries_geo[dx.c];
 							}
 							var o = {
 								pt_id: pid,
@@ -28894,6 +28906,10 @@ var DataUtil = {
 					{
 						p[pid] = {s: dx.s, lat: dx.lat, lon: dx.lon, c: dx.c};
 					}
+					if(!u_cities[pid])
+					{
+						u_cities[pid] = {s: dx.s, lat: dx.lat, lon: dx.lon, c: dx.c};
+					}
 					var dt = dx.data;
 					for (var pt_year in dt)
 					{
@@ -28911,6 +28927,10 @@ var DataUtil = {
 							}
 							for (var cpid in fd)
 							{
+								if(!u_cities[countries_geo[dx.c].s])
+								{
+									u_cities[countries_geo[dx.c].s] = countries_geo[dx.c];
+								}
 								var o = {
 									pt_id: pid,
 									city: dx.s,
@@ -28958,6 +28978,10 @@ var DataUtil = {
 					{
 						p[pid] = {s: dx.s, lat: dx.lat, lon: dx.lon, c: dx.c};
 					}
+					if(!u_cities[pid])
+					{
+						u_cities[pid] = {s: dx.s, lat: dx.lat, lon: dx.lon, c: dx.c};
+					}
 					var dt = dx.data;
 					for (var pt_year in dt)
 					{
@@ -28972,6 +28996,10 @@ var DataUtil = {
 								{
 									f_tp[k] = String.from(fd.c[k]);
 								}
+							}
+							if(!u_cities[countries_geo[String.from(fd.ci)].s])
+							{
+								u_cities[countries_geo[String.from(fd.ci)].s] = countries_geo[String.from(fd.ci)];
 							}
 							var o = {
 								pt_id: pid,
@@ -30068,7 +30096,30 @@ var SearchBox = new Class({
 	Implements: [Events, Options],
 	initialize: function (points, options)
 	{
+		$('searchform').addEvent('submit',this.fnd.bind(this));
+		this.pts=points;
+		var list=[];
+		for(var pid in points)
+		{
+			list.include(pid);
+		}
 		this.setOptions(options);
+		new MooComplete('s-place', {
+			list: list,
+			size: 3,
+			set:function(v)
+			{
+				this.searched(points[v])
+				return v;
+			}.bind(this)
+		});
+	},
+	fnd:function(e)
+	{
+		if(e)
+		{
+			e.stop();
+		}
 	},
 	searched:function(p)
 	{
@@ -30254,12 +30305,14 @@ var VisegradApp = {
 			this.initiated = true;
 			var dt = [];
 			var cities = [];
+			var u_cities = [];
 			for (var i = 0; i < mapdata.length; i++)
 			{
-				dt[i] = DataUtil.flatten_data(mapdata[i], filters[i], i);
+				dt[i] = DataUtil.flatten_data(mapdata[i], filters[i], i, u_cities);
 				cities[i] = dt[i].points;
 				filters[i] = dt[i].filters;
 			}
+
 
 			this.msg_win = new MessageWin($('filter-message'));
 			this.map = new AppMap($(mapid), $('map-controls'), mapconf, {
@@ -30273,7 +30326,14 @@ var VisegradApp = {
 				onFilterchanged: this.draw.bind(this),
 				onDatachanged: this.data_changed.bind(this)
 			});
+			this.sb = new SearchBox(u_cities,{
+				onFound:this.move_map.bind(this)
+			});
 		}
+	},
+	move_map:function(p)
+	{
+		this.map.move_map(p);
 	},
 	data_changed: function (i)
 	{

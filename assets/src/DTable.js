@@ -154,7 +154,6 @@ var DTable = new Class({
 		{
 			hal = 1;
 		}
-		console.log(hal);
 		var ho = this.options.table_headers;
 		if (max > d.length)
 		{

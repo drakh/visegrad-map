@@ -11,12 +11,14 @@ var VisegradApp = {
 			this.initiated = true;
 			var dt = [];
 			var cities = [];
+			var u_cities = [];
 			for (var i = 0; i < mapdata.length; i++)
 			{
-				dt[i] = DataUtil.flatten_data(mapdata[i], filters[i], i);
+				dt[i] = DataUtil.flatten_data(mapdata[i], filters[i], i, u_cities);
 				cities[i] = dt[i].points;
 				filters[i] = dt[i].filters;
 			}
+
 
 			this.msg_win = new MessageWin($('filter-message'));
 			this.map = new AppMap($(mapid), $('map-controls'), mapconf, {
@@ -30,7 +32,14 @@ var VisegradApp = {
 				onFilterchanged: this.draw.bind(this),
 				onDatachanged: this.data_changed.bind(this)
 			});
+			this.sb = new SearchBox(u_cities,{
+				onFound:this.move_map.bind(this)
+			});
 		}
+	},
+	move_map:function(p)
+	{
+		this.map.move_map(p);
 	},
 	data_changed: function (i)
 	{
