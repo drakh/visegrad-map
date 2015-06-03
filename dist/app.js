@@ -27982,11 +27982,15 @@ var BarGraph = new Class({
 		var l = [];
 		var r = [];
 		var r_p = [];
+
+		var totals=[];
+
 		for (var yr in y_d)
 		{
 			l.include(yr);
 		}
-		var y_d_c = DataUtil.count_arr_o(y_d, unit);
+
+		var y_d_c = DataUtil.count_arr_o(y_d, unit);;
 		for (var c = 0; c < ord.length; c++)
 		{
 			var grd = {data: [], className: 'graph-' + (c % 17)};
@@ -28007,6 +28011,9 @@ var BarGraph = new Class({
 				{
 					var c_year = l[i];
 					var t = y_d_c[c_year];
+
+					totals[i]= t.count;
+
 					var al = c_y_d[l[i]].length;
 					var am = 0;
 					switch (unit)
@@ -28032,8 +28039,10 @@ var BarGraph = new Class({
 			r_p[c] = p_grd;
 			r[c] = grd;
 		}
+		this.totals=totals;
 		this.r_p = r_p;
 		this.unit = unit;
+
 		var g = new Chartist.Bar(el, {
 			labels: l,
 			series: r
@@ -28056,7 +28065,7 @@ var BarGraph = new Class({
 			var l = s[i].getElements('.ct-bar');
 			for (var j = 0; j < l.length; j++)
 			{
-				var ad = ': ' + ((r[i][j]).round(2)) + '% (of total ' + (unit === 0 ? 'projects' : 'money') + ')';
+				var ad = ': '+(r[i][j]*(this.totals[j]/100)).round(0)+ (unit === 0 ? ' projects' : ' eur') +' (' + ((r[i][j]).round(2)) + '%)';
 				switch (sw)
 				{
 					case 'country':
@@ -28316,7 +28325,6 @@ var DGraph = new Class({
 				graph_group: 'g',
 				unit: this.unit
 			};
-
 
 			var g = new PieGraph(re.pie, g_d);
 			this.g.include(g);
@@ -28704,7 +28712,8 @@ Number.prototype.map = function (in_min, in_max, out_min, out_max)
 var DataUtil = {
 	count_arr_o: function (data, w)
 	{
-		var d = this.count_arr(data, w);
+		var rt = this.count_arr(data, w);
+		var d = rt.r;
 		var r = {};
 		for (var i = 0; i < d.length; i++)
 		{
@@ -28746,7 +28755,8 @@ var DataUtil = {
 		{
 			r[i]['p'] = r[i]['count'] / (total / 100);
 		}
-		return r;
+		var ret = {total: total, r: r};
+		return ret;
 	},
 	get_max_len: function (data)
 	{
@@ -28853,7 +28863,7 @@ var DataUtil = {
 					{
 						p[pid] = {s: dx.s, lat: dx.lat, lon: dx.lon, c: dx.c};
 					}
-					if(!u_cities[pid])
+					if (!u_cities[pid])
 					{
 						u_cities[pid] = {s: dx.s, lat: dx.lat, lon: dx.lon, c: dx.c};
 					}
@@ -28872,7 +28882,7 @@ var DataUtil = {
 									f_tp[k] = String.from(fd.c[k]);
 								}
 							}
-							if(!u_cities[countries_geo[dx.c].s])
+							if (!u_cities[countries_geo[dx.c].s])
 							{
 								u_cities[countries_geo[dx.c].s] = countries_geo[dx.c];
 							}
@@ -28906,7 +28916,7 @@ var DataUtil = {
 					{
 						p[pid] = {s: dx.s, lat: dx.lat, lon: dx.lon, c: dx.c};
 					}
-					if(!u_cities[pid])
+					if (!u_cities[pid])
 					{
 						u_cities[pid] = {s: dx.s, lat: dx.lat, lon: dx.lon, c: dx.c};
 					}
@@ -28927,7 +28937,7 @@ var DataUtil = {
 							}
 							for (var cpid in fd)
 							{
-								if(!u_cities[countries_geo[dx.c].s])
+								if (!u_cities[countries_geo[dx.c].s])
 								{
 									u_cities[countries_geo[dx.c].s] = countries_geo[dx.c];
 								}
@@ -28978,7 +28988,7 @@ var DataUtil = {
 					{
 						p[pid] = {s: dx.s, lat: dx.lat, lon: dx.lon, c: dx.c};
 					}
-					if(!u_cities[pid])
+					if (!u_cities[pid])
 					{
 						u_cities[pid] = {s: dx.s, lat: dx.lat, lon: dx.lon, c: dx.c};
 					}
@@ -28997,7 +29007,7 @@ var DataUtil = {
 									f_tp[k] = String.from(fd.c[k]);
 								}
 							}
-							if(!u_cities[countries_geo[String.from(fd.ci)].s])
+							if (!u_cities[countries_geo[String.from(fd.ci)].s])
 							{
 								u_cities[countries_geo[String.from(fd.ci)].s] = countries_geo[String.from(fd.ci)];
 							}
@@ -29740,8 +29750,9 @@ var PieGraph = new Class({
 				c_d = DataUtil.group_by_country(data.graph_data);
 				break;
 		}
-
-		var s = DataUtil.count_arr(c_d, unit);
+		var gga = DataUtil.count_arr(c_d, unit);
+		var s = gga.r;
+		this.total = gga.total;
 
 		s.sortOn("count", Array.DESC_NUMERIC);
 
@@ -29759,6 +29770,8 @@ var PieGraph = new Class({
 		var d = this.data.graph_descs;
 		var gr = this.gr;
 		var p = this.g_data.g;
+
+		var t = this.total;
 		var map = this.g_data.d;
 		var u = this.g_data.u;
 		var s = el.getElements('.ct-series');
@@ -29767,7 +29780,7 @@ var PieGraph = new Class({
 		for (var i = 0; i < l; i++)
 		{
 			var j = (l1 - i);
-			var ad = ': ' + (p[j].data).round(2) + '% (' + (u === 0 ? 'of total projects' : 'of total money') + ')';
+			var ad = ': ' + (p[j].data * (t / 100)).round(0) + (u === 0 ? ' projects' : 'eur') + ' (' + (p[j].data).round(2) + '%)';
 			switch (gr)
 			{
 				case 'c':

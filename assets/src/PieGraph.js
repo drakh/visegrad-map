@@ -41,8 +41,9 @@ var PieGraph = new Class({
 				c_d = DataUtil.group_by_country(data.graph_data);
 				break;
 		}
-
-		var s = DataUtil.count_arr(c_d, unit);
+		var gga = DataUtil.count_arr(c_d, unit);
+		var s = gga.r;
+		this.total = gga.total;
 
 		s.sortOn("count", Array.DESC_NUMERIC);
 
@@ -60,6 +61,8 @@ var PieGraph = new Class({
 		var d = this.data.graph_descs;
 		var gr = this.gr;
 		var p = this.g_data.g;
+
+		var t = this.total;
 		var map = this.g_data.d;
 		var u = this.g_data.u;
 		var s = el.getElements('.ct-series');
@@ -68,7 +71,7 @@ var PieGraph = new Class({
 		for (var i = 0; i < l; i++)
 		{
 			var j = (l1 - i);
-			var ad = ': ' + (p[j].data).round(2) + '% (' + (u === 0 ? 'of total projects' : 'of total money') + ')';
+			var ad = ': ' + (p[j].data * (t / 100)).round(0) + (u === 0 ? ' projects' : 'eur') + ' (' + (p[j].data).round(2) + '%)';
 			switch (gr)
 			{
 				case 'c':

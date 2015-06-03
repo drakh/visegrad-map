@@ -139,7 +139,6 @@ var DGraph = new Class({
 				unit: this.unit
 			};
 
-
 			var g = new PieGraph(re.pie, g_d);
 			this.g.include(g);
 

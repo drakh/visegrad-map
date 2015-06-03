@@ -6,7 +6,8 @@ Number.prototype.map = function (in_min, in_max, out_min, out_max)
 var DataUtil = {
 	count_arr_o: function (data, w)
 	{
-		var d = this.count_arr(data, w);
+		var rt = this.count_arr(data, w);
+		var d = rt.r;
 		var r = {};
 		for (var i = 0; i < d.length; i++)
 		{
@@ -48,7 +49,8 @@ var DataUtil = {
 		{
 			r[i]['p'] = r[i]['count'] / (total / 100);
 		}
-		return r;
+		var ret = {total: total, r: r};
+		return ret;
 	},
 	get_max_len: function (data)
 	{
@@ -155,7 +157,7 @@ var DataUtil = {
 					{
 						p[pid] = {s: dx.s, lat: dx.lat, lon: dx.lon, c: dx.c};
 					}
-					if(!u_cities[pid])
+					if (!u_cities[pid])
 					{
 						u_cities[pid] = {s: dx.s, lat: dx.lat, lon: dx.lon, c: dx.c};
 					}
@@ -174,7 +176,7 @@ var DataUtil = {
 									f_tp[k] = String.from(fd.c[k]);
 								}
 							}
-							if(!u_cities[countries_geo[dx.c].s])
+							if (!u_cities[countries_geo[dx.c].s])
 							{
 								u_cities[countries_geo[dx.c].s] = countries_geo[dx.c];
 							}
@@ -208,7 +210,7 @@ var DataUtil = {
 					{
 						p[pid] = {s: dx.s, lat: dx.lat, lon: dx.lon, c: dx.c};
 					}
-					if(!u_cities[pid])
+					if (!u_cities[pid])
 					{
 						u_cities[pid] = {s: dx.s, lat: dx.lat, lon: dx.lon, c: dx.c};
 					}
@@ -229,7 +231,7 @@ var DataUtil = {
 							}
 							for (var cpid in fd)
 							{
-								if(!u_cities[countries_geo[dx.c].s])
+								if (!u_cities[countries_geo[dx.c].s])
 								{
 									u_cities[countries_geo[dx.c].s] = countries_geo[dx.c];
 								}
@@ -280,7 +282,7 @@ var DataUtil = {
 					{
 						p[pid] = {s: dx.s, lat: dx.lat, lon: dx.lon, c: dx.c};
 					}
-					if(!u_cities[pid])
+					if (!u_cities[pid])
 					{
 						u_cities[pid] = {s: dx.s, lat: dx.lat, lon: dx.lon, c: dx.c};
 					}
@@ -299,7 +301,7 @@ var DataUtil = {
 									f_tp[k] = String.from(fd.c[k]);
 								}
 							}
-							if(!u_cities[countries_geo[String.from(fd.ci)].s])
+							if (!u_cities[countries_geo[String.from(fd.ci)].s])
 							{
 								u_cities[countries_geo[String.from(fd.ci)].s] = countries_geo[String.from(fd.ci)];
 							}
