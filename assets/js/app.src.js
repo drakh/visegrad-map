@@ -34,9 +34,16 @@ var AppMap = new Class({
 		this.map = a_map;
 		this.zoom_to_v4();
 	},
-	move_map:function(p)
+	move_map:function(p,z)
 	{
-		this.map.panTo([p.lat, p.lon]);
+		if(z)
+		{
+			this.map.setView([p.lat, p.lon],this.map.getMaxZoom())
+		}
+		else
+		{
+			this.map.panTo([p.lat, p.lon]);
+		}
 	},
 	set_dtype: function (i)
 	{
@@ -2609,14 +2616,14 @@ var VisegradApp = {
 				onFilterchanged: this.draw.bind(this),
 				onDatachanged: this.data_changed.bind(this)
 			});
-			this.sb = new SearchBox(u_cities,{
-				onFound:this.move_map.bind(this)
+			this.sb = new SearchBox(u_cities, {
+				onFound: this.move_map.bind(this)
 			});
 		}
 	},
-	move_map:function(p)
+	move_map: function (p)
 	{
-		this.map.move_map(p);
+		this.map.move_map(p, true);
 	},
 	data_changed: function (i)
 	{

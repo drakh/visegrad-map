@@ -34,9 +34,16 @@ var AppMap = new Class({
 		this.map = a_map;
 		this.zoom_to_v4();
 	},
-	move_map:function(p)
+	move_map:function(p,z)
 	{
-		this.map.panTo([p.lat, p.lon]);
+		if(z)
+		{
+			this.map.setView([p.lat, p.lon],this.map.getMaxZoom())
+		}
+		else
+		{
+			this.map.panTo([p.lat, p.lon]);
+		}
 	},
 	set_dtype: function (i)
 	{

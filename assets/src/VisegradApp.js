@@ -32,14 +32,14 @@ var VisegradApp = {
 				onFilterchanged: this.draw.bind(this),
 				onDatachanged: this.data_changed.bind(this)
 			});
-			this.sb = new SearchBox(u_cities,{
-				onFound:this.move_map.bind(this)
+			this.sb = new SearchBox(u_cities, {
+				onFound: this.move_map.bind(this)
 			});
 		}
 	},
-	move_map:function(p)
+	move_map: function (p)
 	{
-		this.map.move_map(p);
+		this.map.move_map(p, true);
 	},
 	data_changed: function (i)
 	{
