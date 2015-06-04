@@ -10,7 +10,7 @@ var mapconf = {
 	graph_names: [
 		["Grant programs:", "Activity fields:", "Countries:"],
 		["Participant countries:", "", ""],
-		["Countries:", "Disciplines:", ""]
+		["Host countries:", "Disciplines:", "Artist from:"]
 	],
 	visegrad: ["CZ", "HU", "PL", "SK"],
 	subdomains: 'a.b.c.d'.split('.'),

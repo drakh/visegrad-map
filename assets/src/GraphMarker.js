@@ -37,7 +37,10 @@ var GraphMarker = new Class({
 			},
 			class: 'ct-chart'
 		}).inject(el);
+
+
 		var g_f = graph_f['c'];
+
 		if (graph_f['gc'])
 		{
 			g_f = graph_f['gc'];
@@ -49,6 +52,12 @@ var GraphMarker = new Class({
 			graph_group: 'c',
 			unit: 0
 		};
+
+		if (this.options.dtype && this.options.dtype == 2)
+		{
+			g_d.graph_group = 'country';
+			g_d.graph_descs = countries_geo;
+		}
 
 		this.g = new PieGraph(g_el, g_d, {dtype: this.options.dtype});
 

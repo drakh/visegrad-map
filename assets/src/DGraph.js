@@ -123,8 +123,9 @@ var DGraph = new Class({
 				this.build_topic_graph();
 				break;
 			case 2:
-				this.build_tag_graph();
+				this.build_country_graph();
 				this.build_topic_graph();
+				this.build_tag_graph();
 				break;
 		}
 	},

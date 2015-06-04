@@ -101,6 +101,7 @@ var BarGraph = new Class({
 					strng = 'semesters';
 					break;
 				case 2:
+					strng = 'artists';
 					break;
 			}
 		}

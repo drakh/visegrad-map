@@ -56,7 +56,7 @@ var PieGraph = new Class({
 		}
 		return {g: c, d: d, u: unit};
 	},
-	get_total:function()
+	get_total: function ()
 	{
 		return this.total;
 	},
@@ -72,25 +72,26 @@ var PieGraph = new Class({
 		var s = el.getElements('.ct-series');
 		var l = s.length;
 		var l1 = l - 1;
-		var st='projects';
-		if(this.options.dtype)
+		var st = 'projects';
+		if (this.options.dtype)
 		{
-			switch(this.options.dtype)
+			switch (this.options.dtype)
 			{
 				case 0:
-					st='projects';
+					st = 'projects';
 					break;
 				case 1:
-					st='semesters';
+					st = 'semesters';
 					break;
 				case 2:
+					st = 'artists';
 					break;
 			}
 		}
 		for (var i = 0; i < l; i++)
 		{
 			var j = (l1 - i);
-			var ad = ': ' + (p[j].data * (t / 100)).round(0) + (u === 0 ? ' '+st : 'eur') + ' (' + (p[j].data).round(2) + '%)';
+			var ad = ': ' + (p[j].data * (t / 100)).round(0) + (u === 0 ? ' ' + st : 'eur') + ' (' + (p[j].data).round(2) + '%)';
 			switch (gr)
 			{
 				case 'c':

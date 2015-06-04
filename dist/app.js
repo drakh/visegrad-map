@@ -28078,6 +28078,7 @@ var BarGraph = new Class({
 					strng = 'semesters';
 					break;
 				case 2:
+					strng = 'artists';
 					break;
 			}
 		}
@@ -28333,8 +28334,9 @@ var DGraph = new Class({
 				this.build_topic_graph();
 				break;
 			case 2:
-				this.build_tag_graph();
+				this.build_country_graph();
 				this.build_topic_graph();
+				this.build_tag_graph();
 				break;
 		}
 	},
@@ -29322,7 +29324,10 @@ var GraphMarker = new Class({
 			},
 			class: 'ct-chart'
 		}).inject(el);
+
+
 		var g_f = graph_f['c'];
+
 		if (graph_f['gc'])
 		{
 			g_f = graph_f['gc'];
@@ -29334,6 +29339,12 @@ var GraphMarker = new Class({
 			graph_group: 'c',
 			unit: 0
 		};
+
+		if (this.options.dtype && this.options.dtype == 2)
+		{
+			g_d.graph_group = 'country';
+			g_d.graph_descs = countries_geo;
+		}
 
 		this.g = new PieGraph(g_el, g_d, {dtype: this.options.dtype});
 
@@ -29835,7 +29846,7 @@ var PieGraph = new Class({
 		}
 		return {g: c, d: d, u: unit};
 	},
-	get_total:function()
+	get_total: function ()
 	{
 		return this.total;
 	},
@@ -29851,25 +29862,26 @@ var PieGraph = new Class({
 		var s = el.getElements('.ct-series');
 		var l = s.length;
 		var l1 = l - 1;
-		var st='projects';
-		if(this.options.dtype)
+		var st = 'projects';
+		if (this.options.dtype)
 		{
-			switch(this.options.dtype)
+			switch (this.options.dtype)
 			{
 				case 0:
-					st='projects';
+					st = 'projects';
 					break;
 				case 1:
-					st='semesters';
+					st = 'semesters';
 					break;
 				case 2:
+					st = 'artists';
 					break;
 			}
 		}
 		for (var i = 0; i < l; i++)
 		{
 			var j = (l1 - i);
-			var ad = ': ' + (p[j].data * (t / 100)).round(0) + (u === 0 ? ' '+st : 'eur') + ' (' + (p[j].data).round(2) + '%)';
+			var ad = ': ' + (p[j].data * (t / 100)).round(0) + (u === 0 ? ' ' + st : 'eur') + ' (' + (p[j].data).round(2) + '%)';
 			switch (gr)
 			{
 				case 'c':
@@ -30786,7 +30798,7 @@ var mapconf = {
 	graph_names: [
 		["Grant programs:", "Activity fields:", "Countries:"],
 		["Participant countries:", "", ""],
-		["Countries:", "Disciplines:", ""]
+		["Host countries:", "Disciplines:", "Artist from:"]
 	],
 	visegrad: ["CZ", "HU", "PL", "SK"],
 	subdomains: 'a.b.c.d'.split('.'),
