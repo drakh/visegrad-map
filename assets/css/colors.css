@@ -1,234 +1,324 @@
 .white-bg
 {
-	background-color : #fff;
-	color            : #000;
+	background-color: #fff;
+	color: #000;
 }
 
 .black-bg
 {
-	background-color : #000;
-	color            : #fff;
+	background-color: #000;
+	color: #fff;
 }
 
 .dark-bg
 {
-	background-color : #464646;
-	color            : #d1d1d1;
+	background-color: #464646;
+	color: #d1d1d1;
 }
 
 .light-bg
 {
-	background-color : #d1d1d1;
-	color            : #464646;
+	background-color: #d1d1d1;
+	color: #464646;
 }
 
 .grey-1
 {
-	color : #666;
+	color: #666;
 }
 
 .grey-1-bg
 {
-	background-color : #666;
+	background-color: #666;
 }
 
 .grey-2
 {
-	color : #949494;
+	color: #949494;
 }
 
 .grey-2-bg
 {
-	background-color : #949494;
+	background-color: #949494;
 }
 
 .grey-3
 {
-	color : #b4b4b4;
+	color: #b4b4b4;
 }
 
 .grey-3-bg
 {
-	background-color : #b4b4b4;
+	background-color: #b4b4b4;
 }
 
 .green
 {
-	color : #02d349;
+	color: #02d349;
 }
 
 .green-bg
 {
-	background-color : #02d349;
+	background-color: #02d349;
 }
 
 .yellow
 {
-	color : #fcac00;
+	color: #fcac00;
 }
 
 .yellow-bg
 {
-	background-color : #fcac00;
+	background-color: #fcac00;
 }
 
 .blue
 {
-	color : #00d6e0;
+	color: #00d6e0;
 }
 
 .blue-bg
 {
-	background-color : #00d6e0;
+	background-color: #00d6e0;
 }
 
 .red
 {
-	color : #fa4c03;
+	color: #fa4c03;
 }
 
 .red-bg
 {
-	background-color : #fa4c03;
+	background-color: #fa4c03;
 }
 
 /*graph*/
 .graph-0
 {
-	color  : #3c6494;
-	fill   : #3c6494;
-	stroke : #3c6494;
+	color: #3c6494;
+	fill: #3c6494;
+	stroke: #3c6494;
+}
+
+span.graph-0
+{
+	background-color: #3c6494;
 }
 
 .graph-1
 {
-	color  : #963d3b;
-	fill   : #963d3b;
-	stroke : #963d3b;
+	color: #963d3b;
+	fill: #963d3b;
+	stroke: #963d3b;
+}
+
+span.graph-1
+{
+	background-color: #963d3b;
 }
 
 .graph-2
 {
-	color  : #799244;
-	fill   : #799244;
-	stroke : #799244;
+	color: #799244;
+	fill: #799244;
+	stroke: #799244;
+}
+
+span.graph-2
+{
+	background-color: #799244;
 }
 
 .graph-3
 {
-	color  : #634d7e;
-	fill   : #634d7e;
-	stroke : #634d7e;
+	color: #634d7e;
+	fill: #634d7e;
+	stroke: #634d7e;
+}
+
+span.graph-3
+{
+	background-color: #634d7e;
 }
 
 .graph-4
 {
-	color  : #39869b;
-	fill   : #39869b;
-	stroke : #39869b;
+	color: #39869b;
+	fill: #39869b;
+	stroke: #39869b;
+}
+
+span.graph-4
+{
+	background-color: #39869b;
 }
 
 .graph-5
 {
-	color  : #c27535;
-	fill   : #c27535;
-	stroke : #c27535;
+	color: #c27535;
+	fill: #c27535;
+	stroke: #c27535;
+}
+
+span.graph-5
+{
+	background-color: #c27535;
 }
 
 .graph-6
 {
-	color  : #4978b1;
-	fill   : #4978b1;
-	stroke : #4978b1;
+	color: #4978b1;
+	fill: #4978b1;
+	stroke: #4978b1;
+}
+
+span.graph-6
+{
+	background-color: #4978b1;
 }
 
 .graph-7
 {
-	color  : #b34a47;
-	fill   : #b34a47;
-	stroke : #b34a47;
+	color: #b34a47;
+	fill: #b34a47;
+	stroke: #b34a47;
+}
+
+span.graph-7
+{
+	background-color: #b34a47;
 }
 
 .graph-8
 {
-	color  : #91af53;
-	fill   : #91af53;
-	stroke : #91af53;
+	color: #91af53;
+	fill: #91af53;
+	stroke: #91af53;
+}
+
+span.graph-8
+{
+	background-color: #91af53;
 }
 
 .graph-9
 {
-	color  : #775d97;
-	fill   : #775d97;
-	stroke : #775d97;
+	color: #775d97;
+	fill: #775d97;
+	stroke: #775d97;
+}
+
+span.graph-9
+{
+	background-color: #775d97;
 }
 
 .graph-10
 {
-	color  : #46a1b9;
-	fill   : #46a1b9;
-	stroke : #46a1b9;
+	color: #46a1b9;
+	fill: #46a1b9;
+	stroke: #46a1b9;
+}
+
+span.graph-10
+{
+	background-color: #46a1b9;
 }
 
 .graph-11
 {
-	color  : #e78c41;
-	fill   : #e78c41;
-	stroke : #e78c41;
+	color: #e78c41;
+	fill: #e78c41;
+	stroke: #e78c41;
+}
+
+span.graph-11
+{
+	background-color: #e78c41;
 }
 
 .graph-12
 {
-	color  : #7e9bc8;
-	fill   : #7e9bc8;
-	stroke : #7e9bc8;
+	color: #7e9bc8;
+	fill: #7e9bc8;
+	stroke: #7e9bc8;
+}
+
+span.graph-12
+{
+	background-color: #7e9bc8;
 }
 
 .graph-13
 {
-	color  : #ca7e7d;
-	fill   : #ca7e7d;
-	stroke : #ca7e7d;
+	color: #ca7e7d;
+	fill: #ca7e7d;
+	stroke: #ca7e7d;
+}
+
+span.graph-13
+{
+	background-color: #ca7e7d;
 }
 
 .graph-14
 {
-	color  : #aec683;
-	fill   : #aec683;
-	stroke : #aec683;
+	color: #aec683;
+	fill: #aec683;
+	stroke: #aec683;
+}
+
+span.graph-14
+{
+	background-color: #aec683;
 }
 
 .graph-15
 {
-	color  : #9b89b3;
-	fill   : #9b89b3;
-	stroke : #9b89b3;
+	color: #9b89b3;
+	fill: #9b89b3;
+	stroke: #9b89b3;
+}
+
+span.graph-15
+{
+	background-color: #9b89b3;
 }
 
 .graph-16
 {
-	color  : #7cbbcf;
-	fill   : #7cbbcf;
-	stroke : #7cbbcf;
+	color: #7cbbcf;
+	fill: #7cbbcf;
+	stroke: #7cbbcf;
+}
+
+span.graph-16
+{
+	background-color: #7cbbcf;
 }
 
 .graph-17
 {
-	color  : #f8aa79;
-	fill   : #f8aa79;
-	stroke : #f8aa79;
+	color: #f8aa79;
+	fill: #f8aa79;
+	stroke: #f8aa79;
+}
+
+span.graph-17
+{
+	background-color: #f8aa79;
 }
 
 /*marker*/
 .marker-circle
 {
-	stroke           : #000;
-	stroke-width     : 1px;
-	stroke-opacity   : 0.3;
-	fill             : #ca7e7d;
-	fill-opacity     : 0.3;
-	background-color : #ca7e7d;
-	opacity          : 0.3;
-	border           : 1px solid #000;
-	border-radius    : 50%;
+	stroke: #000;
+	stroke-width: 1px;
+	stroke-opacity: 0.3;
+	fill: #ca7e7d;
+	fill-opacity: 0.3;
+	background-color: #ca7e7d;
+	opacity: 0.3;
+	border: 1px solid #000;
+	border-radius: 50%;
 }

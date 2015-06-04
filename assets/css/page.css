@@ -281,7 +281,27 @@ ul.years li div.year-container div
 	margin: 0px;
 	padding-top: 1em;
 }
-
+.gp-labels .pure-menu
+{
+	position: relative;
+	height: 23em;
+	overflow: auto;
+	padding-left: 1em;
+}
+.gp-labels .pure-menu .pure-menu-list
+{
+	position: absolute;
+}
+.gp-labels .pure-menu .pure-menu-list li
+{
+	margin-bottom: 1em;
+}
+.gp-labels .pure-menu .pure-menu-list li span
+{
+	width: 2em;
+	margin-right: 1em;
+	display: inline-block;
+}
 .tip-wrap
 {
 	background-color: #fff;

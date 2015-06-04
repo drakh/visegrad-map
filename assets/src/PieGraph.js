@@ -56,6 +56,10 @@ var PieGraph = new Class({
 		}
 		return {g: c, d: d, u: unit};
 	},
+	get_total:function()
+	{
+		return this.total;
+	},
 	graph_bind_events: function (el)
 	{
 		var d = this.data.graph_descs;

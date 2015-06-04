@@ -568,7 +568,7 @@ var DGraph = new Class({
 		var g = this.g;
 		for (var i = 0; i < g.length; i++)
 		{
-			if(g[i])
+			if (g[i])
 			{
 				g[i].destroy();
 			}
@@ -583,9 +583,10 @@ var DGraph = new Class({
 		var s = new Element('section', {class: 'graph-section'}).inject(w);
 		new Element('header', {html: n}).inject(s);
 		var grid = new Element('div', {class: 'pure-g'}).inject(s);
-		var pie = new Element('div', {class: 'pure-u-1 pure-u-md-1-3 ct-chart'}).inject(grid);
+		var pie = new Element('div', {class: 'pure-u-1-2 pure-u-md-1-6 ct-chart'}).inject(grid);
+		var labels = new Element('div', {class: 'pure-u-1-2 pure-u-md-1-6 gp-labels'}).inject(grid);
 		var bar = new Element('div', {class: 'pure-u-1 pure-u-md-2-3 ct-chart'}).inject(grid);
-		return {pie: pie, bar: bar};
+		return {pie: pie, bar: bar, labels: labels};
 	},
 	build_graphs: function ()
 	{
@@ -627,7 +628,8 @@ var DGraph = new Class({
 			this.g.include(g);
 
 			var s_d = g.get_g_data();
-			this.g.include(b);
+
+			this.build_labels(s_d, f.g, g.get_total(), re.labels);
 			var b = new BarGraph(re.bar, {
 				ord: s_d.d,
 				c_d: DataUtil.group_by_g(data),
@@ -637,7 +639,43 @@ var DGraph = new Class({
 				unit: this.unit,
 				dtype: this.dtype
 			});
+			this.g.include(b);
 		}
+	},
+	build_labels: function (data, descs, total, el)
+	{
+		var w = new Element('div', {class: 'pure-menu'}).inject(el);
+		var ul = new Element('ul', {
+			class: 'pure-menu-list'
+		}).inject(w);
+
+		var gd = data.g;
+		var dd = data.d;
+		for (var i = 0; i < gd.length; i++)
+		{
+			var n = gd[i];
+			var d = dd[i];
+			var nx = descs[d];
+			var nm = descs[d];
+			if (nm['s'])
+			{
+				nx = nm['s'];
+			}
+			else if (nm['n'])
+			{
+				nx = nm['n'];
+			}
+			else
+			{
+				nx = nm;
+			}
+			var li = new Element('li', {
+				class: 'pure-menu-item',
+				html: '<span class="' + n.className + '">&nbsp;</span>' + (nx) + ': ' + (n.data * (total / 100)).round(0) + ' (' + n.data.round(2) + '%)'
+			}).inject(ul);
+
+		}
+		console.log(data);
 	},
 	build_tag_graph: function ()
 	{
@@ -661,6 +699,7 @@ var DGraph = new Class({
 
 
 			var s_d = g.get_g_data();
+			this.build_labels(s_d, f.c, g.get_total(), re.labels);
 			var b = new BarGraph(re.bar, {
 				ord: s_d.d,
 				c_d: DataUtil.group_by_c(data),
@@ -692,6 +731,7 @@ var DGraph = new Class({
 
 
 		var s_d = g.get_g_data();
+		this.build_labels(s_d, countries_geo, g.get_total(), re.labels);
 		var b = new BarGraph(re.bar, {
 			ord: s_d.d,
 			c_d: DataUtil.group_by_country(data),
@@ -2064,6 +2104,10 @@ var PieGraph = new Class({
 			d.include(s[i].pid);
 		}
 		return {g: c, d: d, u: unit};
+	},
+	get_total:function()
+	{
+		return this.total;
 	},
 	graph_bind_events: function (el)
 	{
