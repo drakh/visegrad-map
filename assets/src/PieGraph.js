@@ -68,10 +68,25 @@ var PieGraph = new Class({
 		var s = el.getElements('.ct-series');
 		var l = s.length;
 		var l1 = l - 1;
+		var st='projects';
+		if(this.options.dtype)
+		{
+			switch(this.options.dtype)
+			{
+				case 0:
+					st='projects';
+					break;
+				case 1:
+					st='semesters';
+					break;
+				case 2:
+					break;
+			}
+		}
 		for (var i = 0; i < l; i++)
 		{
 			var j = (l1 - i);
-			var ad = ': ' + (p[j].data * (t / 100)).round(0) + (u === 0 ? ' projects' : 'eur') + ' (' + (p[j].data).round(2) + '%)';
+			var ad = ': ' + (p[j].data * (t / 100)).round(0) + (u === 0 ? ' '+st : 'eur') + ' (' + (p[j].data).round(2) + '%)';
 			switch (gr)
 			{
 				case 'c':

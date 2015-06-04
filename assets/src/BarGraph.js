@@ -13,14 +13,15 @@ var BarGraph = new Class({
 		var r = [];
 		var r_p = [];
 
-		var totals=[];
+		var totals = [];
 
 		for (var yr in y_d)
 		{
 			l.include(yr);
 		}
 
-		var y_d_c = DataUtil.count_arr_o(y_d, unit);;
+		var y_d_c = DataUtil.count_arr_o(y_d, unit);
+		;
 		for (var c = 0; c < ord.length; c++)
 		{
 			var grd = {data: [], className: 'graph-' + (c % 17)};
@@ -42,7 +43,7 @@ var BarGraph = new Class({
 					var c_year = l[i];
 					var t = y_d_c[c_year];
 
-					totals[i]= t.count;
+					totals[i] = t.count;
 
 					var al = c_y_d[l[i]].length;
 					var am = 0;
@@ -69,7 +70,7 @@ var BarGraph = new Class({
 			r_p[c] = p_grd;
 			r[c] = grd;
 		}
-		this.totals=totals;
+		this.totals = totals;
 		this.r_p = r_p;
 		this.unit = unit;
 
@@ -88,6 +89,21 @@ var BarGraph = new Class({
 		var unit = this.unit;
 		var s = el.getElements('.ct-series');
 		var lns = [];
+		var strng = 'projects';
+		if (this.data.dtype)
+		{
+			switch (this.data.dtype)
+			{
+				case 0:
+					strng = 'projects';
+					break;
+				case 1:
+					strng = 'semesters';
+					break;
+				case 2:
+					break;
+			}
+		}
 		for (var i = 0; i < s.length; i++)
 		{
 			var cid = d.ord[i];
@@ -95,7 +111,7 @@ var BarGraph = new Class({
 			var l = s[i].getElements('.ct-bar');
 			for (var j = 0; j < l.length; j++)
 			{
-				var ad = ': '+(r[i][j]*(this.totals[j]/100)).round(0)+ (unit === 0 ? ' projects' : ' eur') +' (' + ((r[i][j]).round(2)) + '%)';
+				var ad = ': ' + (r[i][j] * (this.totals[j] / 100)).round(0) + (unit === 0 ? ' ' + strng : ' eur') + ' (' + ((r[i][j]).round(2)) + '%)';
 				switch (sw)
 				{
 					case 'country':

@@ -208,10 +208,10 @@ var AppMap = new Class({
 		var graph_f = this.graph_f;
 		this.destroy_graph(map);
 
-		console.log(data);
 
 		this.graph = new GraphMarker(data, map, graph_f, {
 			pane: pane,
+			dtype:this.dtype,
 			onDestroy: this.graph_destroyed.bind(this),
 			onCreate: this.graph_created.bind(this)
 		});
@@ -260,14 +260,15 @@ var BarGraph = new Class({
 		var r = [];
 		var r_p = [];
 
-		var totals=[];
+		var totals = [];
 
 		for (var yr in y_d)
 		{
 			l.include(yr);
 		}
 
-		var y_d_c = DataUtil.count_arr_o(y_d, unit);;
+		var y_d_c = DataUtil.count_arr_o(y_d, unit);
+		;
 		for (var c = 0; c < ord.length; c++)
 		{
 			var grd = {data: [], className: 'graph-' + (c % 17)};
@@ -289,7 +290,7 @@ var BarGraph = new Class({
 					var c_year = l[i];
 					var t = y_d_c[c_year];
 
-					totals[i]= t.count;
+					totals[i] = t.count;
 
 					var al = c_y_d[l[i]].length;
 					var am = 0;
@@ -316,7 +317,7 @@ var BarGraph = new Class({
 			r_p[c] = p_grd;
 			r[c] = grd;
 		}
-		this.totals=totals;
+		this.totals = totals;
 		this.r_p = r_p;
 		this.unit = unit;
 
@@ -335,6 +336,21 @@ var BarGraph = new Class({
 		var unit = this.unit;
 		var s = el.getElements('.ct-series');
 		var lns = [];
+		var strng = 'projects';
+		if (this.data.dtype)
+		{
+			switch (this.data.dtype)
+			{
+				case 0:
+					strng = 'projects';
+					break;
+				case 1:
+					strng = 'semesters';
+					break;
+				case 2:
+					break;
+			}
+		}
 		for (var i = 0; i < s.length; i++)
 		{
 			var cid = d.ord[i];
@@ -342,7 +358,7 @@ var BarGraph = new Class({
 			var l = s[i].getElements('.ct-bar');
 			for (var j = 0; j < l.length; j++)
 			{
-				var ad = ': '+(r[i][j]*(this.totals[j]/100)).round(0)+ (unit === 0 ? ' projects' : ' eur') +' (' + ((r[i][j]).round(2)) + '%)';
+				var ad = ': ' + (r[i][j] * (this.totals[j] / 100)).round(0) + (unit === 0 ? ' ' + strng : ' eur') + ' (' + ((r[i][j]).round(2)) + '%)';
 				switch (sw)
 				{
 					case 'country':
@@ -552,7 +568,11 @@ var DGraph = new Class({
 		var g = this.g;
 		for (var i = 0; i < g.length; i++)
 		{
-			g[i].destroy();
+			if(g[i])
+			{
+				g[i].destroy();
+			}
+
 		}
 		this.g = [];
 		this.el.empty();
@@ -603,19 +623,20 @@ var DGraph = new Class({
 				unit: this.unit
 			};
 
-			var g = new PieGraph(re.pie, g_d);
+			var g = new PieGraph(re.pie, g_d, {dtype: this.dtype});
 			this.g.include(g);
 
 			var s_d = g.get_g_data();
+			this.g.include(b);
 			var b = new BarGraph(re.bar, {
 				ord: s_d.d,
 				c_d: DataUtil.group_by_g(data),
 				y_d: DataUtil.group_by_year(data),
 				g_d: f.g,
 				g_g: 'g',
-				unit: this.unit
+				unit: this.unit,
+				dtype: this.dtype
 			});
-			this.g.include(b);
 		}
 	},
 	build_tag_graph: function ()
@@ -635,7 +656,7 @@ var DGraph = new Class({
 			};
 
 
-			var g = new PieGraph(re.pie, g_d);
+			var g = new PieGraph(re.pie, g_d, {dtype: this.dtype});
 			this.g.include(g);
 
 
@@ -646,7 +667,8 @@ var DGraph = new Class({
 				y_d: DataUtil.group_by_year(data),
 				g_d: f.c,
 				g_g: 'c',
-				unit: this.unit
+				unit: this.unit,
+				dtype: this.dtype
 			});
 			this.g.include(b);
 		}
@@ -665,7 +687,7 @@ var DGraph = new Class({
 		};
 
 
-		var g = new PieGraph(re.pie, g_d);
+		var g = new PieGraph(re.pie, g_d, {dtype: this.dtype});
 		this.g.include(g);
 
 
@@ -676,7 +698,8 @@ var DGraph = new Class({
 			y_d: DataUtil.group_by_year(data),
 			g_d: countries_geo,
 			g_g: 'country',
-			unit: this.unit
+			unit: this.unit,
+			dtype: this.dtype
 		});
 		this.g.include(b);
 	}
@@ -1542,7 +1565,7 @@ var GraphMarker = new Class({
 			unit: 0
 		};
 
-		this.g = new PieGraph(g_el, g_d);
+		this.g = new PieGraph(g_el, g_d, {dtype: this.options.dtype});
 
 		new Element('div',
 			{
@@ -2054,10 +2077,25 @@ var PieGraph = new Class({
 		var s = el.getElements('.ct-series');
 		var l = s.length;
 		var l1 = l - 1;
+		var st='projects';
+		if(this.options.dtype)
+		{
+			switch(this.options.dtype)
+			{
+				case 0:
+					st='projects';
+					break;
+				case 1:
+					st='semesters';
+					break;
+				case 2:
+					break;
+			}
+		}
 		for (var i = 0; i < l; i++)
 		{
 			var j = (l1 - i);
-			var ad = ': ' + (p[j].data * (t / 100)).round(0) + (u === 0 ? ' projects' : 'eur') + ' (' + (p[j].data).round(2) + '%)';
+			var ad = ': ' + (p[j].data * (t / 100)).round(0) + (u === 0 ? ' '+st : 'eur') + ' (' + (p[j].data).round(2) + '%)';
 			switch (gr)
 			{
 				case 'c':
@@ -2338,6 +2376,10 @@ var PlaceFilter = new Class({
 			s['tags'].hide();
 		}
 	},
+	get_data_type:function()
+	{
+		return this.sel_filter;
+	},
 	filter_years: function (y)
 	{
 		this.msg['years'] = y.msg;
@@ -2616,7 +2658,8 @@ var VisegradApp = {
 				onFilterchanged: this.draw.bind(this),
 				onDatachanged: this.data_changed.bind(this)
 			});
-			this.sb = new SearchBox(u_cities, {
+
+			new SearchBox(u_cities, {
 				onFound: this.move_map.bind(this)
 			});
 		}

@@ -50,7 +50,7 @@ var GraphMarker = new Class({
 			unit: 0
 		};
 
-		this.g = new PieGraph(g_el, g_d);
+		this.g = new PieGraph(g_el, g_d, {dtype: this.options.dtype});
 
 		new Element('div',
 			{

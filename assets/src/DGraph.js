@@ -88,7 +88,11 @@ var DGraph = new Class({
 		var g = this.g;
 		for (var i = 0; i < g.length; i++)
 		{
-			g[i].destroy();
+			if(g[i])
+			{
+				g[i].destroy();
+			}
+
 		}
 		this.g = [];
 		this.el.empty();
@@ -139,19 +143,20 @@ var DGraph = new Class({
 				unit: this.unit
 			};
 
-			var g = new PieGraph(re.pie, g_d);
+			var g = new PieGraph(re.pie, g_d, {dtype: this.dtype});
 			this.g.include(g);
 
 			var s_d = g.get_g_data();
+			this.g.include(b);
 			var b = new BarGraph(re.bar, {
 				ord: s_d.d,
 				c_d: DataUtil.group_by_g(data),
 				y_d: DataUtil.group_by_year(data),
 				g_d: f.g,
 				g_g: 'g',
-				unit: this.unit
+				unit: this.unit,
+				dtype: this.dtype
 			});
-			this.g.include(b);
 		}
 	},
 	build_tag_graph: function ()
@@ -171,7 +176,7 @@ var DGraph = new Class({
 			};
 
 
-			var g = new PieGraph(re.pie, g_d);
+			var g = new PieGraph(re.pie, g_d, {dtype: this.dtype});
 			this.g.include(g);
 
 
@@ -182,7 +187,8 @@ var DGraph = new Class({
 				y_d: DataUtil.group_by_year(data),
 				g_d: f.c,
 				g_g: 'c',
-				unit: this.unit
+				unit: this.unit,
+				dtype: this.dtype
 			});
 			this.g.include(b);
 		}
@@ -201,7 +207,7 @@ var DGraph = new Class({
 		};
 
 
-		var g = new PieGraph(re.pie, g_d);
+		var g = new PieGraph(re.pie, g_d, {dtype: this.dtype});
 		this.g.include(g);
 
 
@@ -212,7 +218,8 @@ var DGraph = new Class({
 			y_d: DataUtil.group_by_year(data),
 			g_d: countries_geo,
 			g_g: 'country',
-			unit: this.unit
+			unit: this.unit,
+			dtype: this.dtype
 		});
 		this.g.include(b);
 	}

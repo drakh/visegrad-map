@@ -254,6 +254,10 @@ var PlaceFilter = new Class({
 			s['tags'].hide();
 		}
 	},
+	get_data_type:function()
+	{
+		return this.sel_filter;
+	},
 	filter_years: function (y)
 	{
 		this.msg['years'] = y.msg;

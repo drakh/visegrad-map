@@ -32,7 +32,8 @@ var VisegradApp = {
 				onFilterchanged: this.draw.bind(this),
 				onDatachanged: this.data_changed.bind(this)
 			});
-			this.sb = new SearchBox(u_cities, {
+
+			new SearchBox(u_cities, {
 				onFound: this.move_map.bind(this)
 			});
 		}

@@ -208,10 +208,10 @@ var AppMap = new Class({
 		var graph_f = this.graph_f;
 		this.destroy_graph(map);
 
-		console.log(data);
 
 		this.graph = new GraphMarker(data, map, graph_f, {
 			pane: pane,
+			dtype:this.dtype,
 			onDestroy: this.graph_destroyed.bind(this),
 			onCreate: this.graph_created.bind(this)
 		});
