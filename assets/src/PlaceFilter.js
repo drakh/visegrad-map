@@ -104,7 +104,7 @@ var PlaceFilter = new Class({
 				}
 				break;
 			case 1:
-				m = 'Showing total number of semesters in'
+				m = 'Showing total number of semesters in';
 				for (var pid in msgs)
 				{
 					switch (pid)
@@ -115,18 +115,18 @@ var PlaceFilter = new Class({
 						case 'countries':
 							if (msgs[pid].m1 == 'all')
 							{
-								m_a[1] = 'in ' + msgs[pid].m1 + ' ' + pid;
+								m_a[1] = msgs[pid].m1 + ' ' + pid;
 							}
 							else
 							{
-								m_a[1] = 'in ' + msgs[pid].m2;
+								m_a[1] = msgs[pid].m2;
 							}
 							break;
 					}
 				}
 				break;
 			case 2:
-				m = 'Showing residencies in '
+				m = 'Showing residencies in ';
 				for (var pid in msgs)
 				{
 					switch (pid)
