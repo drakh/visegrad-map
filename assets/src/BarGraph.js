@@ -112,7 +112,7 @@ var BarGraph = new Class({
 			var l = s[i].getElements('.ct-bar');
 			for (var j = 0; j < l.length; j++)
 			{
-				var ad = ': ' + (r[i][j] * (this.totals[j] / 100)).round(0) + (unit === 0 ? ' ' + strng : ' eur') + ' (' + ((r[i][j]).round(2)) + '%)';
+				var ad = ': ' + (r[i][j] * (this.totals[j] / 100)).format({decimals: 0}) + (unit === 0 ? ' ' + strng : '€') + ' (' + ((r[i][j]).round(2)) + '%)';
 				switch (sw)
 				{
 					case 'country':

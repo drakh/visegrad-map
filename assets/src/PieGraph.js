@@ -91,7 +91,7 @@ var PieGraph = new Class({
 		for (var i = 0; i < l; i++)
 		{
 			var j = (l1 - i);
-			var ad = ': ' + (p[j].data * (t / 100)).round(0) + (u === 0 ? ' ' + st : 'eur') + ' (' + (p[j].data).round(2) + '%)';
+			var ad = ': ' + (p[j].data * (t / 100)).format({decimals:0}) + (u === 0 ? ' ' + st : '€') + ' (' + (p[j].data).round(2) + '%)';
 			switch (gr)
 			{
 				case 'c':

@@ -12,67 +12,83 @@ var filters = [
 		"c": {
 			"1": {
 				"n": "Architecture and urban development",
+				"q": "Architecture/urbanism",
 				"d": "Planning, design, cities and urban areas, urban renewal"
 			},
 			"2": {
 				"n": "Common identity",
+				"q": "Common identity",
 				"d": "Regional identity building, V4 branding, strengthening ties between V4 nations, fostering dialog on V4/Central Europe"
 			},
 			"3": {
 				"n": "Cross-border cooperation",
+				"q": "Cross-border coop.",
 				"d": "Initiatives in border areas, bi-/trilateral initiatives"
 			},
 			"4": {
 				"n": "Culture and arts",
+				"q": "Culture and arts",
 				"d": "Projects dealing with cultural cooperation, cultural heritage, cultural infrastructures and services, and all spheres of fine arts"
 			},
 			"5": {
 				"n": "Demographic change and migration",
+				"q": "Demographic",
 				"d": "Social and spatial segregation, brain drain, aging and other demographic challenges"
 			},
 			"6": {
 				"n": "Education, training and capacity building",
+				"q": "Education/trainings",
 				"d": "Life-long learning, knowledge transfer, know-how facilitation"
 			},
 			"7": {
 				"n": "Environment and climate change",
+				"q": "Environment",
 				"d": "Projects dealing with sustainability, natural risks, water, waste, air quality, biodiversity, energy, protection of natural heritage, challenges related to the climate change, etc."
 			},
 			"8": {
 				"n": "Institutional networking and partnerships",
+				"q": "Networking/partnerships",
 				"d": "Cooperation between public institutions, regional governments, universities and other higher-education institutions, schools, town-twinning projects, etc."
 			},
 			"9": {
 				"n": "Media, journalism, ICT",
+				"q": "Media/ICT",
 				"d": "Cooperation of media outlets, projects dealing with information and communication technologies and their development, digitization, projects dealing with free speech, media literacy, etc."
 			},
 			"10": {
 				"n": "Public policy",
+				"q": "Public policy",
 				"d": "Policies of public administrations – defense policy, energy policy, foreign policy, economic policy, security, infrastructure, public health, etc."
 			},
 			"11": {
 				"n": "Science and research",
+				"q": "Science and research",
 				"d": "Research activities, scientific development, scientific mobility and networking"
 			},
 			"12": {
 				"n": "SMEs and entrepreneurship",
+				"q": "SMEs/entrepreneurship",
 				"d": "Start-ups, business advisory services, jobs creation, clusters, business networks, market innovation"
 			},
 			"13": {
 				"n": "Social inclusion and equal opportunities",
+				"q": "Social inclusion",
 				"d": "Social projects dealing with disadvantaged peoples and excluded groups, namely minorities"
 			},
-			"14": {"n": "Sports", "d": "Sporting events, cooperation between sport institutions"},
+			"14": {"n": "Sports", "q": "Sports", "d": "Sporting events, cooperation between sport institutions"},
 			"15": {
 				"n": "Tourism",
+				"q": "Tourism",
 				"d": "Promotion of natural and cultural assets, tourist services and products"
 			},
 			"16": {
 				"n": "Transparency and fight against corruption",
+				"q": "Transparency/anti-corruption",
 				"d": "Anti-corruption mechanisms, open government initiatives, watchdog initiatives"
 			},
 			"17": {
 				"n": "Youth exchanges",
+				"q": "Youth exchanges",
 				"d": "Youth mobility, intercultural learning, contacts among schools"
 			}
 		}

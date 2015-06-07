@@ -1,5 +1,5 @@
 var mapconf = {
-	url: 'http://{s}.tile.stamen.com/{id}/{z}/{x}/{y}.png',
+	url: 'http://wind101.net/{id}/{z}/{x}/{y}.png',
 	attr: 'one',
 	year_labels: ["Total number of grants:", "Total number of semesters:", "Total number of residencies:"],
 	filter_labels: [
@@ -13,9 +13,9 @@ var mapconf = {
 		["Host countries:", "Disciplines:", "Artist from:"]
 	],
 	visegrad: ["CZ", "HU", "PL", "SK"],
-	subdomains: 'a.b.c.d'.split('.'),
+	subdomains: ''.split('.'),
 	map_id: 'toner',
-	min_z: 5,
+	min_z: 3,
 	max_z: 10,
 	min_radius: 10,
 	max_radius: 60,

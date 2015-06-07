@@ -172,15 +172,23 @@ var DGraph = new Class({
 
 		var gd = data.g;
 		var dd = data.d;
+		var unit = this.unit;
 		for (var i = 0; i < gd.length; i++)
 		{
 			var n = gd[i];
 			var d = dd[i];
 			var nx = descs[d];
 			var nm = descs[d];
+			var title = null;
 			if (nm['s'])
 			{
 				nx = nm['s'];
+			}
+			else if (nm['q'])
+			{
+				// if q is defined, also n must be defined
+				nx = nm['q'];
+				title = nm['n'];
 			}
 			else if (nm['n'])
 			{
@@ -192,11 +200,12 @@ var DGraph = new Class({
 			}
 			var li = new Element('li', {
 				class: 'pure-menu-item',
-				html: '<span class="' + n.className + '">&nbsp;</span>' + (nx) + ': ' + (n.data * (total / 100)).round(0) + ' (' + n.data.round(2) + '%)'
+				title: title,
+				html: '<span class="' + n.className + '"' + (false ? 'title="' + title + '"' : '') + '>&nbsp;</span>' + (nx) + ': ' + (n.data * (total / 100)).format({decimals:0}) + (unit === 0 ? '' : '€') + ' (' + n.data.round(2) + '%)'
 			}).inject(ul);
 
 		}
-		console.log(data);
+		//console.log(data);
 	},
 	build_tag_graph: function ()
 	{

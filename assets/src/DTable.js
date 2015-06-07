@@ -26,7 +26,7 @@ var DTable = new Class({
 				type: 's'
 			},
 			{
-				name: 'Money',
+				name: 'Sum',
 				pid: 'amount',
 				type: 'n'
 			}
@@ -166,7 +166,8 @@ var DTable = new Class({
 			for (var j = 0; j < (ho.length - hal); j++)
 			{
 				var pid = ho[j].pid;
-				new Element('td', {text: d[i][pid]}).inject(r);
+				var text = (pid === 'amount') ? d[i][pid].format() + '€' : d[i][pid];
+				new Element('td', {text: text}).inject(r);
 			}
 			r.inject(w);
 		}

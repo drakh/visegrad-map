@@ -21,7 +21,11 @@ var YearSel = new Class({
 	},
 	set_header: function (t)
 	{
-		this.head_el.set('html', t);
+		this.head_el.getFirst().set('text', t);
+	},
+	set_header_count: function (c)
+	{
+		 this.head_el.getLast().set('text', c);
 	},
 	get_message: function ()
 	{
@@ -67,6 +71,7 @@ var YearSel = new Class({
 	{
 		this.p_d = this.prepare_data(DataUtil.group_by_year(data));
 
+		this.set_header_count(this.p_d.count);
 		this.redraw_divs();
 
 		if (this.created == false)
@@ -131,6 +136,7 @@ var YearSel = new Class({
 	prepare_data: function (data)
 	{
 		var max = DataUtil.get_max_len(data);
-		return {data: data, max: max};
+		var count = DataUtil.count_arr(data, 0).total;
+		return {data: data, max: max, count: count};
 	}
 });

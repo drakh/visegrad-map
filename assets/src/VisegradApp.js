@@ -6,6 +6,23 @@ var VisegradApp = {
 		if (this.initiated == false)
 		{
 
+                    $$('body').addEvent('keydown', function(event){
+                        // the passed event parameter is already an instance of the Event type.
+                        //console.log(event.key);   // returns the lowercase letter pressed.
+                        //alert(event.shift); // returns true if the key pressed is shift.
+                        if (event.key == 'l' && event.control) {
+                            $$('header').hide();   
+                            $$('footer').hide();   
+                            $$('.page-scroller').hide();   
+                            $$('#map-controls').hide();   
+			    $$('#mapsearch').hide();
+                            $$('#city-country').hide();
+                            $$('#e-graphs').hide();
+                            $$('#e-table').hide();
+                            $$('main.main-content').setStyle('top', 0);
+                        }
+                    });
+
 			new PageScroller($$('section.page-section'));
 
 			this.initiated = true;
@@ -79,3 +96,9 @@ var VisegradApp = {
 };
 
 window.addEvent('domready', VisegradApp.init.bind(VisegradApp));
+
+function color(c) {
+    $$('.marker-circle').setStyle('fill', c);
+    $$('.marker-circle').setStyle('background-color', c);
+    return 'At your service';
+}
