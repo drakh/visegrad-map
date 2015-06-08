@@ -273,7 +273,20 @@ ul.years li div.year-container div
 	border-radius: 50%;
 	text-align: center;
 }
-
+.select-wrapper
+{
+	position: relative;
+	background-color: #fff;
+	padding: 0.5em;
+	overflow: auto;
+	height: 15em;
+}
+.select-item
+{
+	border-bottom: 1px solid #fafafa;
+	padding: 0.2em;
+	cursor: pointer;
+}
 .graph-inner header
 {
 	font-weight: bold;

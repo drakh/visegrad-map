@@ -7,12 +7,19 @@ var SelectFilter = new Class({
 	{
 		this.created = false;
 		this.setOptions(options);
-		this.el = el;
+
+		var w = new Element('div', {class: 'pure-menu select-wrapper'}).inject(el, 'before');
+		var ul = new Element('ul', {class: 'pure-menu-list select'}).inject(w);
+		this.el = ul;
 		var p = el.getParent()
 		this.head = p.getElement('header');
 		this.s = p.getParent();
 		this.filter = [];
-		this.els = [];
+		this.els = {};
+		this.vals = {};
+
+		el.remove();
+
 		a.addEvent('click', this.select_all.bind(this));
 		n.addEvent('click', this.select_none.bind(this));
 	},
@@ -81,20 +88,22 @@ var SelectFilter = new Class({
 	{
 		var el = this.el;
 		el.empty();
-		var els = {}
+		var els = {};
+		var vals = {};
 		for (var pid in data)
 		{
-			var e = new Element('option', {
-				value: pid,
+			var e = new Element('li', {
+				class: 'pure-menu-item select-item',
 				html: (data[pid]['n'] ? data[pid]['n'] : data[pid]),
 				events: {
-					mousedown: this.prevent.bind(this),
-					mouseup: this.prevent.bind(this),
 					click: this.change_filters.bind(this, pid)
 				}
+
 			}).inject(el);
 			els[pid] = e;
+			vals[pid] = false;
 		}
+		this.vals = vals;
 		this.els = els;
 	},
 	prevent: function (e)
@@ -107,25 +116,39 @@ var SelectFilter = new Class({
 		{
 			e.stop();
 		}
+		var vals = this.vals;
 		var els = this.els;
-		if (els[pid].selected == true)
+
+		if (vals[pid] == true)
 		{
-			els[pid].selected = false;
+			vals[pid] = false;
+			els[pid].addClass('light-bg');
+			els[pid].removeClass('dark-bg');
 		}
 		else
 		{
-			els[pid].selected = true;
+			vals[pid] = true;
+			els[pid].addClass('dark-bg');
+			els[pid].removeClass('light-bg');
 		}
+
 		var tmps = [];
-		for (var pid in els)
+
+		for (var pd in vals)
 		{
-			if (els[pid].selected == true)
+			if (vals[pd] == true)
 			{
-				tmps.push(pid);
+				tmps.push(pd);
 			}
 		}
+
 		this.filter = tmps;
-		this.select_change();
+
+		if (this.timer)
+		{
+			window.clearTimeout(this.timer);
+		}
+		this.timer = this.select_change.delay(50, this);
 	},
 	select_all: function (e)
 	{
@@ -134,10 +157,15 @@ var SelectFilter = new Class({
 			e.stop();
 		}
 		var els = this.els;
+		var vals = this.vals;
+
 		var tmps = [];
-		for (var pid in els)
+
+		for (var pid in vals)
 		{
-			els[pid].selected = true;
+			vals[pid] = true;
+			els[pid].addClass('dark-bg');
+			els[pid].removeClass('light-bg');
 			tmps.push(pid);
 		}
 		this.filter = tmps;
@@ -150,10 +178,15 @@ var SelectFilter = new Class({
 			e.stop();
 		}
 		var els = this.els;
-		for (var pid in els)
+		var vals = this.vals;
+
+		for (var pid in vals)
 		{
-			els[pid].selected = false;
+			vals[pid] = false;
+			els[pid].addClass('light-bg');
+			els[pid].removeClass('dark-bg');
 		}
+
 		this.filter = [];
 		this.select_change();
 	},
