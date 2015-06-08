@@ -179,7 +179,7 @@ var AppMap = new Class({
 			}
 
 			//map.setMaxBounds(bounds);
-			map.options.minZoom = z;
+			//map.options.minZoom = z;
 			this.zoom_to_v4();
 		}
 	},
@@ -359,7 +359,7 @@ var BarGraph = new Class({
 			var l = s[i].getElements('.ct-bar');
 			for (var j = 0; j < l.length; j++)
 			{
-				var ad = ': ' + (r[i][j] * (this.totals[j] / 100)).round(0) + (unit === 0 ? ' ' + strng : ' eur') + ' (' + ((r[i][j]).round(2)) + '%)';
+				var ad = ': ' + (r[i][j] * (this.totals[j] / 100)).format({decimals: 0}) + (unit === 0 ? ' ' + strng : '€') + ' (' + ((r[i][j]).round(2)) + '%)';
 				switch (sw)
 				{
 					case 'country':
@@ -653,15 +653,23 @@ var DGraph = new Class({
 
 		var gd = data.g;
 		var dd = data.d;
+		var unit = this.unit;
 		for (var i = 0; i < gd.length; i++)
 		{
 			var n = gd[i];
 			var d = dd[i];
 			var nx = descs[d];
 			var nm = descs[d];
+			var title = null;
 			if (nm['s'])
 			{
 				nx = nm['s'];
+			}
+			else if (nm['q'])
+			{
+				// if q is defined, also n must be defined
+				nx = nm['q'];
+				title = nm['n'];
 			}
 			else if (nm['n'])
 			{
@@ -673,11 +681,12 @@ var DGraph = new Class({
 			}
 			var li = new Element('li', {
 				class: 'pure-menu-item',
-				html: '<span class="' + n.className + '">&nbsp;</span>' + (nx) + ': ' + (n.data * (total / 100)).round(0) + ' (' + n.data.round(2) + '%)'
+				title: title,
+				html: '<span class="' + n.className + '"' + (false ? 'title="' + title + '"' : '') + '>&nbsp;</span>' + (nx) + ': ' + (n.data * (total / 100)).format({decimals:0}) + (unit === 0 ? '' : '€') + ' (' + n.data.round(2) + '%)'
 			}).inject(ul);
 
 		}
-		console.log(data);
+		//console.log(data);
 	},
 	build_tag_graph: function ()
 	{
@@ -746,6 +755,7 @@ var DGraph = new Class({
 		this.g.include(b);
 	}
 });
+
 var DPager = new Class({
 	Implements: [Events, Options],
 	initialize: function (el, options)
@@ -900,7 +910,7 @@ var DTable = new Class({
 				type: 's'
 			},
 			{
-				name: 'Money',
+				name: 'Sum',
 				pid: 'amount',
 				type: 'n'
 			}
@@ -1040,12 +1050,14 @@ var DTable = new Class({
 			for (var j = 0; j < (ho.length - hal); j++)
 			{
 				var pid = ho[j].pid;
-				new Element('td', {text: d[i][pid]}).inject(r);
+				var text = (pid === 'amount') ? d[i][pid].format() + '€' : d[i][pid];
+				new Element('td', {text: text}).inject(r);
 			}
 			r.inject(w);
 		}
 	}
 });
+
 Number.prototype.map = function (in_min, in_max, out_min, out_max)
 {
 	return ( this - in_min ) * ( out_max - out_min ) / ( in_max - in_min ) + out_min;
@@ -2151,7 +2163,7 @@ var PieGraph = new Class({
 		for (var i = 0; i < l; i++)
 		{
 			var j = (l1 - i);
-			var ad = ': ' + (p[j].data * (t / 100)).round(0) + (u === 0 ? ' ' + st : 'eur') + ' (' + (p[j].data).round(2) + '%)';
+			var ad = ': ' + (p[j].data * (t / 100)).format({decimals:0}) + (u === 0 ? ' ' + st : '€') + ' (' + (p[j].data).round(2) + '%)';
 			switch (gr)
 			{
 				case 'c':
@@ -2176,6 +2188,7 @@ var PieGraph = new Class({
 		this.tips.destroy();
 	}
 });
+
 var PlaceFilter = new Class({
 	Implements: [Events, Options],
 	initialize: function (data, filterdata, options)
@@ -2282,7 +2295,7 @@ var PlaceFilter = new Class({
 				}
 				break;
 			case 1:
-				m = 'Showing total number of semesters in'
+				m = 'Showing total number of semesters in';
 				for (var pid in msgs)
 				{
 					switch (pid)
@@ -2293,18 +2306,18 @@ var PlaceFilter = new Class({
 						case 'countries':
 							if (msgs[pid].m1 == 'all')
 							{
-								m_a[1] = 'in ' + msgs[pid].m1 + ' ' + pid;
+								m_a[1] = msgs[pid].m1 + ' ' + pid;
 							}
 							else
 							{
-								m_a[1] = 'in ' + msgs[pid].m2;
+								m_a[1] = msgs[pid].m2;
 							}
 							break;
 					}
 				}
 				break;
 			case 2:
-				m = 'Showing residencies in '
+				m = 'Showing residencies in ';
 				for (var pid in msgs)
 				{
 					switch (pid)
@@ -2480,6 +2493,7 @@ var PlaceFilter = new Class({
 		this.fireEvent('filterchanged', r);
 	}
 });
+
 var SearchBox = new Class({
 	Implements: [Events, Options],
 	initialize: function (points, options)
@@ -2688,6 +2702,23 @@ var VisegradApp = {
 		if (this.initiated == false)
 		{
 
+                    $$('body').addEvent('keydown', function(event){
+                        // the passed event parameter is already an instance of the Event type.
+                        //console.log(event.key);   // returns the lowercase letter pressed.
+                        //alert(event.shift); // returns true if the key pressed is shift.
+                        if (event.key == 'l' && event.control) {
+                            $$('header').hide();   
+                            $$('footer').hide();   
+                            $$('.page-scroller').hide();   
+                            $$('#map-controls').hide();   
+			    $$('#mapsearch').hide();
+                            $$('#city-country').hide();
+                            $$('#e-graphs').hide();
+                            $$('#e-table').hide();
+                            $$('main.main-content').setStyle('top', 0);
+                        }
+                    });
+
 			new PageScroller($$('section.page-section'));
 
 			this.initiated = true;
@@ -2761,6 +2792,13 @@ var VisegradApp = {
 };
 
 window.addEvent('domready', VisegradApp.init.bind(VisegradApp));
+
+function color(c) {
+    $$('.marker-circle').setStyle('fill', c);
+    $$('.marker-circle').setStyle('background-color', c);
+    return 'At your service';
+}
+
 var YearDrag = new Class({
 	Implements: [
 		Events,
@@ -2843,7 +2881,11 @@ var YearSel = new Class({
 	},
 	set_header: function (t)
 	{
-		this.head_el.set('html', t);
+		this.head_el.getFirst().set('text', t);
+	},
+	set_header_count: function (c)
+	{
+		 this.head_el.getLast().set('text', c);
 	},
 	get_message: function ()
 	{
@@ -2889,6 +2931,7 @@ var YearSel = new Class({
 	{
 		this.p_d = this.prepare_data(DataUtil.group_by_year(data));
 
+		this.set_header_count(this.p_d.count);
 		this.redraw_divs();
 
 		if (this.created == false)
@@ -2953,9 +2996,11 @@ var YearSel = new Class({
 	prepare_data: function (data)
 	{
 		var max = DataUtil.get_max_len(data);
-		return {data: data, max: max};
+		var count = DataUtil.count_arr(data, 0).total;
+		return {data: data, max: max, count: count};
 	}
 });
+
 var YearSlider = new Class({
 	Implements: [
 		Events,
@@ -3057,7 +3102,7 @@ var YearSlider = new Class({
 	}
 });
 var mapconf = {
-	url: 'http://{s}.tile.stamen.com/{id}/{z}/{x}/{y}.png',
+	url: 'http://wind101.net/{id}/{z}/{x}/{y}.png',
 	attr: 'one',
 	year_labels: ["Total number of grants:", "Total number of semesters:", "Total number of residencies:"],
 	filter_labels: [
@@ -3071,9 +3116,9 @@ var mapconf = {
 		["Host countries:", "Disciplines:", "Artist from:"]
 	],
 	visegrad: ["CZ", "HU", "PL", "SK"],
-	subdomains: 'a.b.c.d'.split('.'),
+	subdomains: ''.split('.'),
 	map_id: 'toner',
-	min_z: 5,
+	min_z: 3,
 	max_z: 10,
 	min_radius: 10,
 	max_radius: 60,

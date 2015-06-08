@@ -179,7 +179,7 @@ var AppMap = new Class({
 			}
 
 			//map.setMaxBounds(bounds);
-			map.options.minZoom = z;
+			//map.options.minZoom = z;
 			this.zoom_to_v4();
 		}
 	},
