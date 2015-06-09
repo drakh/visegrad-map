@@ -27250,7 +27250,7 @@ var countries_geo =
 	"BM": {"s": "Bermuda", "lon": -64.75737, "lat": 32.321384, "c": "BM"},
 	"BT": {"s": "Bhutan", "lon": 90.433601, "lat": 27.514162, "c": "BT"},
 	"BO": {"s": "Bolivia", "lon": -63.588653, "lat": -16.290154, "c": "BO"},
-	"BA": {"s": "Bosnia and Herzegovina", "lon": 17.679076, "lat": 43.915886, "c": "BA"},
+	"BA": {"s": "Bosnia and Herzeg.", "lon": 17.679076, "lat": 43.915886, "c": "BA"},
 	"BW": {"s": "Botswana", "lon": 24.684866, "lat": -22.328474, "c": "BW"},
 	"BV": {"s": "Bouvet Island", "lon": 3.413194, "lat": -54.423199, "c": "BV"},
 	"BR": {"s": "Brazil", "lon": -51.92528, "lat": -14.235004, "c": "BR"},
@@ -27508,7 +27508,7 @@ var filter_countries = {
 	"BT": "Bhutan",
 	"BO": "Bolivia",
 	"BQ": "Bonaire, Sint Eustatius and Saba",
-	"BA": "Bosnia and Herzegovina",
+	"BA": "Bosnia and Herzeg.",
 	"BW": "Botswana",
 	"BV": "Bouvet Island",
 	"BR": "Brazil",
@@ -28641,9 +28641,10 @@ var DTable = new Class({
 				type: 's'
 			},
 			{
-				name: 'Sum',
+				name: 'Sum <b style="font-weight: normal">(€)</b>',
 				pid: 'amount',
-				type: 'n'
+				type: 'n',
+				style: 'text-align: center'
 			}
 		],
 		sort_els: {
@@ -28705,7 +28706,7 @@ var DTable = new Class({
 			var e = new Element('div', {
 				class: 'pure-menu pure-menu-horizontal'
 			}).inject(th);
-			new Element('span', {class: 'pure-menu-heading', text: ho[i].name}).inject(e);
+			new Element('span', {class: 'pure-menu-heading', html: ho[i].name}).inject(e);
 			var ul = new Element('ul', {class: 'pure-menu-list'}).inject(e);
 			for (var pid in se)
 			{
@@ -28781,8 +28782,9 @@ var DTable = new Class({
 			for (var j = 0; j < (ho.length - hal); j++)
 			{
 				var pid = ho[j].pid;
-				var text = (pid === 'amount') ? d[i][pid].format() + '€' : d[i][pid];
-				new Element('td', {text: text}).inject(r);
+				var opt = {text: (pid === 'amount') ? d[i][pid].format() : d[i][pid]};
+				if (ho[j].style) opt.style = ho[j].style;
+				new Element('td', opt).inject(r);
 			}
 			r.inject(w);
 		}
@@ -30649,7 +30651,17 @@ var YearSel = new Class({
 	},
 	set_header_count: function (c)
 	{
-		 this.head_el.getLast().set('text', c);
+                this.head_el.getLast().set('text', c.format());
+                
+                // this hides/shows the below content if 0 items selected and fires scroll (won't help to properly handle scrolling arrows)
+                if (c == 0) {
+                        $('e-table').hide();
+                        $('e-graphs').hide();
+                } else {
+                        $('e-table').show();
+                        $('e-graphs').show();
+                }
+                $$('body').fireEvent('scroll');
 	},
 	get_message: function ()
 	{

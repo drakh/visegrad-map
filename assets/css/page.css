@@ -249,12 +249,12 @@ ul.years li div.year-val
 	padding-top: 1em;
 	border-top: 1px solid #000;
 	margin-top: 0.2em;
-	font-size: 0.6em;
+	font-size: 0.7em;
 }
 
 ul.years li div.year-container div
 {
-	font-size: 0.6em;
+	font-size: 0.7em;
 }
 
 .marker-circle
@@ -311,7 +311,7 @@ ul.years li div.year-container div
 }
 .gp-labels .pure-menu .pure-menu-list li span
 {
-	width: 2em;
+	width: 1em;
 	margin-right: 1em;
 	display: inline-block;
 }
@@ -411,4 +411,9 @@ ul.years li div.year-container div
 @media screen and (min-width: 80em)
 {
 
+}
+
+.ct-chart .ct-label,.ct-chart .ct-label.ct-horizontal
+{
+    text-align: center;
 }

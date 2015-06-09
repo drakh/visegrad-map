@@ -910,9 +910,10 @@ var DTable = new Class({
 				type: 's'
 			},
 			{
-				name: 'Sum',
+				name: 'Sum <b style="font-weight: normal">(€)</b>',
 				pid: 'amount',
-				type: 'n'
+				type: 'n',
+				style: 'text-align: center'
 			}
 		],
 		sort_els: {
@@ -974,7 +975,7 @@ var DTable = new Class({
 			var e = new Element('div', {
 				class: 'pure-menu pure-menu-horizontal'
 			}).inject(th);
-			new Element('span', {class: 'pure-menu-heading', text: ho[i].name}).inject(e);
+			new Element('span', {class: 'pure-menu-heading', html: ho[i].name}).inject(e);
 			var ul = new Element('ul', {class: 'pure-menu-list'}).inject(e);
 			for (var pid in se)
 			{
@@ -1050,8 +1051,9 @@ var DTable = new Class({
 			for (var j = 0; j < (ho.length - hal); j++)
 			{
 				var pid = ho[j].pid;
-				var text = (pid === 'amount') ? d[i][pid].format() + '€' : d[i][pid];
-				new Element('td', {text: text}).inject(r);
+				var opt = {text: (pid === 'amount') ? d[i][pid].format() : d[i][pid]};
+				if (ho[j].style) opt.style = ho[j].style;
+				new Element('td', opt).inject(r);
 			}
 			r.inject(w);
 		}
@@ -2918,7 +2920,17 @@ var YearSel = new Class({
 	},
 	set_header_count: function (c)
 	{
-		 this.head_el.getLast().set('text', c);
+                this.head_el.getLast().set('text', c.format());
+                
+                // this hides/shows the below content if 0 items selected and fires scroll (won't help to properly handle scrolling arrows)
+                if (c == 0) {
+                        $('e-table').hide();
+                        $('e-graphs').hide();
+                } else {
+                        $('e-table').show();
+                        $('e-graphs').show();
+                }
+                $$('body').fireEvent('scroll');
 	},
 	get_message: function ()
 	{

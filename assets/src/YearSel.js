@@ -25,7 +25,17 @@ var YearSel = new Class({
 	},
 	set_header_count: function (c)
 	{
-		 this.head_el.getLast().set('text', c);
+                this.head_el.getLast().set('text', c.format());
+                
+                // this hides/shows the below content if 0 items selected and fires scroll (won't help to properly handle scrolling arrows)
+                if (c == 0) {
+                        $('e-table').hide();
+                        $('e-graphs').hide();
+                } else {
+                        $('e-table').show();
+                        $('e-graphs').show();
+                }
+                $$('body').fireEvent('scroll');
 	},
 	get_message: function ()
 	{
