@@ -30282,7 +30282,7 @@ var SelectFilter = new Class({
 		this.els = {};
 		this.vals = {};
 
-		el.remove();
+		el.destroy();
 
 		a.addEvent('click', this.select_all.bind(this));
 		n.addEvent('click', this.select_none.bind(this));
