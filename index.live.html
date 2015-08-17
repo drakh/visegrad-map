@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Visegrad Fund Project Map</title>
+    <link rel="stylesheet" href="dist/app.min.css">
+    
+    <script src="bower_components/lunr/lunr.min.js"></script>
+    <script src="bower_components/chartist/dist/chartist.min.js"></script>
+    <script src="bower_components/leaflet/dist/leaflet.js"></script>
+    <script src="bower_components/mootools-core/dist/mootools-core.min.js"></script>
+    <script src="bower_components/mootools-more/mootools-more-nocompat.js"></script>
+    <script src="bower_components/mootools-more/Array.sortOn.js"></script>
+    <script src="assets/src/AppMap.js"></script>
+    <script src="assets/src/CityMarker.js"></script>
+    <script src="assets/src/DataUtil.js"></script>
+    <script src="assets/src/DGraph.js"></script>
+    <script src="assets/src/DPager.js"></script>
+    <script src="assets/src/DTable.js"></script>
+    <script src="assets/src/FilterWin.js"></script>
+    <script src="assets/src/GraphMarker.js"></script>
+    <script src="assets/src/mapconf.js"></script>
+    <script src="assets/src/MessageWin.js"></script>
+    <script src="assets/src/PageScroller.js"></script>
+    <script src="assets/src/PieGraph.js"></script>
+    <script src="assets/src/BarGraph.js"></script>
+    <script src="assets/src/PlaceFilter.js"></script>
+    <script src="assets/src/SelectFilter.js"></script>
+    <script src="assets/src/VisegradApp.js"></script>
+    <script src="assets/src/YearDrag.js"></script>
+    <script src="assets/src/YearSel.js"></script>
+    <script src="assets/src/YearSlider.js"></script>
+    <script src="assets/src/MooComplete.js"></script>
+    <script src="assets/src/SearchBox.js"></script>
+    
+    <script src="http://visegradfund.org/wp-calendar-json.php"></script>
+    <script src="nino-data/countries.js"></script>
+<!--    <script src="dist/app.min.js"></script>-->
+    <script src="assets/src-h/AppMap.js"></script>
+    <script src="assets/src-h/YearSel.js"></script>
+    <link rel="stylesheet" href="http://visegradfund.org/wp-content/themes/visegrad-fund/fonts/vicon/stylesheet-vicon.css?ver=4.2.2">
+    <style>
+        header {
+            line-height: normal;
+        }
+        header a {
+            color: white;
+        }
+        
+        @font-face {
+            font-family: 'vicon';
+            src:url('vicon.eot');
+            src:url('vicon.ttf') format('truetype'),
+                url('vicon.woff') format('woff');
+            font-weight: normal;
+            font-style: normal;
+        }
+        
+        .main-header {
+            width: auto;
+        }
+        
+        main.main-content {
+            top: 0;
+            left: 300px;
+        }
+        
+        .map {
+            height: calc(100vh);
+        }
+            
+    </style>
+</head>
+<body>
+    
+    <div id="calendar" style="
+    height: 100%;
+    width: 300px;
+    position: fixed;
+    z-index: 3;
+    left: 0;
+    top: 0;
+    background-color: red;
+">
+        <header class="black-bg main-header">
+    <section class="logo black-bg">
+        <span class="main-logo"><a href="./"><img
+                src="http://visegradfund.org/wordpress/wp-content/uploads/logo/visegrad_fund_logo_inverse_150.jpg"
+                alt="Visegrad Fund Project Map" title="Visegrad Fund Project Map" width="150" height="62"></a></span>
+        <span id="filter-message"></span>
+<!--        <span style="position: absolute; right: 10px;">
+            <a class="icn icon-151" href="/" style="font-size: 5em; text-decoration: none"></a>
+        </span>-->
+    </section>
+                
+</header>
+        
+        <table>
+            <tbody><tr>
+                <td>PO</td>
+                <td>UT</td>
+            </tr>
+        </tbody></table>
+    </div>
+
+    
+    
+<main class="main-content">
+    <section class="page-section">
+        <main class="map">
+            <section class="map">
+                <div id="map-main" class="map"></div>
+            </section>
+            <section class="map-control" id="map-controls">
+                <nav class="pure-g">
+                    <span class="pure-u-1-2"><a class="pure-button dark-bg" title="Fit to see all">fit</a><a class="pure-button dark-bg" title="Fit to V4 region">V4</a></span>
+                    <span class="pure-u-1-2"><a class="pure-button dark-bg"><i class="el el-plus"></i></a><a class="pure-button dark-bg"><i class="el el-minus"></i></a></span>
+                </nav>
+            </section>
+            <section class="map-control-city" id="city-country">
+                <nav class="pure-g">
+                    <span class="pure-u-1-2"><a class="pure-button dark-bg" title="Cities"><i class="el el-map-marker"></i></a><a class="pure-button dark-bg" title="Countries"><i class="el el-map-marker-alt"></i></a></span>
+                </nav>
+            </section>
+            <section class="map-control-search" id="mapsearch">
+                <form id="searchform" class="pure-form pure-form-aligned">
+                    <div class="white-bg">
+                        <label for="s-place"><i class="el el-search"></i></label>
+                        <input id="s-place" name="s-place" type="text" class="pure-input">
+                    </div>
+                </form>
+            </section>
+        </main>
+    </section>
+    <section id="e-graphs" class="page-section">
+
+    </section>
+    <section id="e-table" class="page-section">
+
+    </section>
+</main>
+<footer class="black-bg"><a href="http://visegradfund.org" target="_blank" style="color: #fff; text-decoration: none">© 2015 International Visegrad Fund</a></footer>
+</body>
+</html>
