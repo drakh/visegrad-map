@@ -266,9 +266,10 @@ var BarGraph = new Class({
 		{
 			l.include(yr);
 		}
+		l.sort();
 
 		var y_d_c = DataUtil.count_arr_o(y_d, unit);
-		;
+
 		for (var c = 0; c < ord.length; c++)
 		{
 			var grd = {data: [], className: 'graph-' + (c % 17)};
@@ -280,7 +281,9 @@ var BarGraph = new Class({
 			{
 				var crd = c_d[cid];
 				c_y_d = DataUtil.group_by_year(crd);
+
 			}
+
 			for (var i = 0; i < l.length; i++)
 			{
 				grd.data[i] = 0;
