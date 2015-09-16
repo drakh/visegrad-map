@@ -202,7 +202,7 @@ main.main-content
 {
 	left: 10.4em;
 	bottom: 4.5em;
-	width: 15em;
+	width: 16em;
 }
 .map-control span a, .map-control-city span a
 {
@@ -308,6 +308,10 @@ ul.years li div.year-container div
 .gp-labels .pure-menu .pure-menu-list li
 {
 	margin-bottom: 1em;
+}
+.gp-labels .pure-menu .pure-menu-list li td
+{
+	vertical-align: top;
 }
 .gp-labels .pure-menu .pure-menu-list li span
 {
@@ -416,4 +420,10 @@ ul.years li div.year-container div
 .ct-chart .ct-label,.ct-chart .ct-label.ct-horizontal
 {
     text-align: center;
+}
+
+.leaflet-popup-scrolled
+{
+    border-bottom: none;
+    border-top: none;
 }

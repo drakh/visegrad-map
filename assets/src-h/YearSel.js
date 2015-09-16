@@ -11,7 +11,7 @@ var YearSel = new Class({
 			data: {},
 			max: 0
 		};
-		//this.head_el = el.getParent().getElement('header');
+		this.head_el = el.getParent().getElement('header');
 		this.bounds = bounds;
 		this.build_elements(bounds, el);
 		this.data = [];

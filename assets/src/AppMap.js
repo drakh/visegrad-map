@@ -11,6 +11,8 @@ var AppMap = new Class({
 			zoomControl: false,
 			padding: [200, 200]
 		});
+                
+                Locale.use('EU');
 
 		L.tileLayer(conf.url, {
 			attribution: conf.attr,

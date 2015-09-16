@@ -38,7 +38,10 @@
 <!--    <script src="dist/app.min.js"></script>-->
     <script src="assets/src-h/AppMap.js"></script>
     <script src="assets/src-h/YearSel.js"></script>
+    <script src="live/moment-with-locales.min.js"></script>
+    <link rel="stylesheet" href="live/elusive-webfont.css">
     <link rel="stylesheet" href="http://visegradfund.org/wp-content/themes/visegrad-fund/fonts/vicon/stylesheet-vicon.css?ver=4.2.2">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Slab:100normal,300normal,400normal,700normal|Roboto:400normal|Open+Sans:400normal|Lato:400normal|Raleway:400normal|Oswald:400normal|Roboto+Condensed:400normal|Source+Sans+Pro:400normal|Montserrat:400normal|PT+Sans:400normal|Ubuntu:400normal&subset=all" type='text/css'>
     <style>
         header {
             line-height: normal;
@@ -62,45 +65,676 @@
         
         main.main-content {
             top: 0;
-            left: 300px;
+            left: 340px;
+            width: calc(100% - 340px);
         }
         
         .map {
             height: calc(100vh);
         }
-            
+        
+        .head_tools .wheadline {
+	background:#5e5e5e;
+	height:44px;
+	width:74%;
+	display:block;
+	padding-left:10px;
+	padding-right:10px; 
+	float:left;
+}
+
+.head_tools .wheadline h3, .head_tools .wheadline h3 a {
+ 	font-family:'Roboto Slab'; 
+ 	font-size:26px; 
+ 	line-height:44px; 
+ 	color:#d1d1d1;	
+	margin:0;
+	text-decoration:none
+}
+
+.head_tools .wheadline h3 a {
+	display:block;
+}
+
+.head_tools .wheadline h3 a:hover:after {
+	font-family: 'Elusive-Icons';	
+	font-size:20px;
+	color:#d1d1d1;
+	content: "\e6fc";	
+	display:inline-block;
+	vertical-align:middle;	
+	float:right
+}
+
+.head_tools .wclose {
+	background:#5e5e5e;
+	width:24.6%;
+	height:44px;
+	display:block;
+	float:left;
+	margin-left:4px;
+	text-align:center;
+}
+
+.head_tools .wclose span {
+	display:block;
+	font-size:10px;
+	color:#d1d1d1;
+}
+
+.head_tools .wclose .mindate {
+	margin-top:6px;
+	text-align:right;
+	margin-right:7px;
+}
+
+.head_tools .wclose .maxdate {
+	text-align:right;
+	margin-right:7px;	
+}
+
+.h_calendar .wcontent .row_wnames {
+	margin:4px 0px;
+}
+
+.h_calendar .wcontent .row_wnames {
+	margin:4px 0px;
+}
+
+.h_calendar .wcontent .wname {
+	width:44px;
+	height:20px;
+	float:left;
+	background-color:#d1d1d1;
+	color:#505050;
+	margin-left:4px;
+}
+
+.h_calendar .wcontent .wname.weekend {
+	background-color:#b4b4b4;
+	margin-left:5px;
+}
+
+.h_calendar .wcontent .wname.first {
+	margin-left:0px;
+}
+
+.h_calendar .wcontent .wname p {
+	margin:0;
+	font-size:12px;
+	line-height:20px;
+	color:#505050;
+	text-transform:uppercase;
+	text-align:center;
+	font-weight:bold;
+}
+
+.h_calendar .wcontent .row_days {
+	margin:4px 0px;
+}
+
+.h_calendar .wcontent .row_days .day_box {
+	width:44px;
+	height:44px;
+	background-color:#d1d1d1;
+	color:#505050;
+	margin-left:4px;
+	float:left;
+	text-align:center;
+	font-weight:bold;
+	cursor:default;
+}
+
+.h_calendar .wcontent .row_days .day_box .top {
+	font-size:28px;
+	line-height:27px;
+	margin-top:3px;
+	color:#505050;
+	text-transform:uppercase;	
+}
+
+.h_calendar .wcontent .row_days .day_box .bottom {
+	font-size:9px;
+	line-height:14px;
+	color:#505050;		
+	font-weight:normal;
+}
+
+.h_calendar .wcontent .row_days .day_box.first {
+	margin-left:0px;
+}
+
+.h_calendar .wcontent .row_days .day_box.weekend {
+	background-color:#b4b4b4;
+	margin-left:5px;
+}
+
+.h_calendar .wcontent .row_days .day_box.nt_week .top, .h_calendar .wcontent .row_days .day_box.nt_week .bottom {
+	color:#949494
+}
+
+.h_calendar .wcontent .row_days .day_box.type_events {
+	background-color:#00d4df;
+	cursor:pointer;
+}
+
+.h_calendar .wcontent .row_days .day_box.type_deadlines {
+	background-color:#ffaa01;
+	cursor:pointer;
+}
+
+.h_calendar .wcontent .row_days .day_box.type_messages {
+	background-color:#ff0000;
+	cursor:pointer;
+}
+
+.h_calendar .wcontent .row_days .day_box.type_both {
+	background:transparent url(images/calendar_type_both.png) no-repeat;
+	cursor:pointer;
+}
+
+.h_calendar .wcontent .row_days .day_box:hover {
+	background-color:#ffffff;
+}
+
+.h_calendar .ext_link {
+	display:block;
+	margin-top:25px;	
+	text-decoration:none;	
+}
+
+.h_calendar .ext_link .icn {
+	width:44px;
+	height:44px;
+	display:block;
+	float:left;
+	text-decoration:none;
+	color:#d1d1d1;
+	background-color:#5e5e5e;
+	text-align:center;
+	margin-right:4px;
+	text-decoration:none;
+	border:0;	
+	padding-top:7px;
+}
+
+.h_calendar .ext_link .icn:before {
+	border:0;
+	font-size:30px;	
+	color:#d1d1d1;
+	text-decoration:none;
+}
+
+.h_calendar .ext_link:hover .icn:before {
+	color:#5e5e5e;	
+}
+
+.h_calendar .ext_link:hover .icn {
+	background-color:#ffffff;
+}
+
+.h_calendar .ext_link .wheadline {
+	background:#5e5e5e;
+	height:44px;
+	display:block;
+	padding-left:10px;
+	padding-right:10px; 
+	float:left;
+	width:85%;
+}
+
+.h_calendar .ext_link .wheadline h3 {
+ 	font-family:'Roboto Slab'; 
+ 	font-size:26px; 
+ 	line-height:44px; 
+ 	color:#d1d1d1;	
+	margin:0;
+	text-decoration:none;
+	display:block;
+}
+
+.h_calendar .ext_link:hover .wheadline h3:after {
+	font-family: 'Elusive-Icons';	
+	font-size:20px;
+	color:#d1d1d1;
+	content: "\e6fc";	
+	display:inline-block;
+	vertical-align:middle;	
+	float:right
+}
+
+/*****************/
+
+.page-template-template_calendar .day_box {
+	width:52px;
+	height:52px;
+	display:block;
+	background-color:#ffffff;
+	border:4px solid #d1d1d1;
+	margin-left:-4px;
+	margin-top:-27px;
+/*	position:absolute;	*/
+}
+
+.page-template-template_calendar .day_box .top {
+ 	font-family: robotolight;
+	font-size:28px;
+	font-weight:bold;
+	line-height:27px;
+	height:27px;
+	display:block;
+	text-align:center;
+	margin-top:3px;	
+}
+
+.page-template-template_calendar .day_box .bottom {
+ 	font-family: robotolight;
+	font-size:9px;
+	font-weight:bold;
+	line-height:14px;
+	height:14px;
+	display:block;	
+	text-align:center;	
+}
+
+.page-template-template_calendar .entry-content .n_body .day_content .cal_event:hover > .cal_projectno {
+	opacity:1;
+	-webkit-transition: opacity 0.5s ease-in-out;
+    -moz-transition: opacity 0.5s ease-in-out;
+    transition: opacity 0.5s ease-in-out;	
+}
+
+.page-template-template_calendar .entry-content .n_body .day_content .cal_event {
+	margin-bottom:15px;
+}
+
+.page-template-template_calendar .cal_event .cal_headline, .page-template-template_calendar .cal_event .cal_subheadline {
+	display:block;
+}
+
+.page-template-template_calendar .cal_event .cal_headline strong {
+	font-family: 'roboto_slabregular';
+    font-weight: normal;
+    font-style: normal;
+	display:block;
+}
+
+.page-template-template_calendar .cal_event .cal_type {
+	float:left;
+	display:block;
+	text-transform:lowercase;
+	font-family: 'robotolight_italic';
+	font-size:13px;
+	margin-top:4px;
+}
+
+.page-template-template_calendar .cal_event .cal_city_country {
+	float:right;
+	display:block;	
+}
+
+.page-template-template_calendar .cal_event .cal_link a {
+	word-wrap:break-word;
+}
+
+.page-template-template_calendar .cal_event .cal_link, .page-template-template_calendar .cal_event .cal_projectno {
+	display:block;
+}
+
+.page-template-template_calendar .cal_event .cal_projectno {
+	font-size:9px;
+	color:rgb(121,121,121);
+	margin-top:-3px; 
+	text-align:left;
+	opacity:0;
+	-webkit-transition: opacity 0.5s ease-in-out;
+    -moz-transition: opacity 0.5s ease-in-out;
+    transition: opacity 0.5s ease-in-out;		
+}
     </style>
 </head>
 <body>
     
-    <div id="calendar" style="
-    height: 100%;
-    width: 300px;
-    position: fixed;
-    z-index: 3;
-    left: 0;
-    top: 0;
-    background-color: red;
-">
-        <header class="black-bg main-header">
+    <header class="black-bg main-header" style="display:none">
     <section class="logo black-bg">
         <span class="main-logo"><a href="./"><img
                 src="http://visegradfund.org/wordpress/wp-content/uploads/logo/visegrad_fund_logo_inverse_150.jpg"
                 alt="Visegrad Fund Project Map" title="Visegrad Fund Project Map" width="150" height="62"></a></span>
         <span id="filter-message"></span>
-<!--        <span style="position: absolute; right: 10px;">
-            <a class="icn icon-151" href="/" style="font-size: 5em; text-decoration: none"></a>
-        </span>-->
     </section>
-                
+    <dialog class="filters light-bg" id="filter_pane">
+        <form class="pure-form">
+            <section class="pure-g filter-tab">
+                <div class="pure-u-1 pure-u-lg-1-2 pure-u-xl-1-2">
+                    <header class="ys"><b>Total number of grants:</b> <span></span></header>
+                    <ul class="years"></ul>
+                </div>
+                <div class="pure-u-1-3 pure-u-sm-1-4 pure-u-lg-1-6 pure-u-xl-1-8">
+                    <section class="select">
+                        <header>Country:</header>
+                        <div>select: <a href="#" class="s-all">all</a> <a href="#" class="s-none">none</a></div>
+                        <select multiple size="8"></select>
+                    </section>
+                </div>
+                <div class="pure-u-1-3 pure-u-sm-1-4 pure-u-lg-1-6 pure-u-xl-1-8">
+                    <section class="select">
+                        <header>Grant program:</header>
+                        <div>select: <a href="#" class="s-all">all</a> <a href="#" class="s-none">none</a></div>
+                        <select multiple size="8"></select>
+                    </section>
+                </div>
+                <div class="pure-u-1-3 pure-u-sm-1-2 pure-u-lg-1-6 pure-u-xl-1-4">
+                    <section class="select">
+                        <header>Fields of activity:</header>
+                        <div>select: <a href="#" class="s-all">all</a> <a href="#" class="s-none">none</a></div>
+                        <select multiple size="8"></select>
+                    </section>
+                </div>
+            </section>
+        </form>
+        <nav class="filter-tab-switch">
+            <div class="pure-g">
+                <div class="pure-u-1-3"><a class="pure-button g-switch dark-bg">Grants</a></div>
+                <div class="pure-u-1-3"><a class="pure-button g-switch dark-bg">Scholarships</a></div>
+                <div class="pure-u-1-3"><a class="pure-button g-switch dark-bg">Residences</a></div>
+            </div>
+        </nav>
+        <nav class="filter-btn">
+            <a href="#" class="pure-button switch light-bg">filter<i class="el el-filter"></i></a>
+        </nav>
+    </dialog>
 </header>
+    
+    <div id="calendar" style="
+    height: 100%;
+    width: 340px;
+    position: fixed;
+    z-index: 3;
+    left: 0;
+    top: 0;
+    background-color: black;
+         ">
+        <header class="black-bg main-header">
+            <section class="logo black-bg">
+                <span class="main-logo"><a href="./"><img
+                            src="http://visegradfund.org/wordpress/wp-content/uploads/logo/visegrad_fund_logo_inverse_150.jpg"
+                            alt="Visegrad Fund Project Map" title="Visegrad Fund Project Map" width="150" height="62"></a></span>
+                <span id="filter-message"></span>
+                <!--        <span style="position: absolute; right: 10px;">
+                            <a class="icn icon-151" href="/" style="font-size: 5em; text-decoration: none"></a>
+                        </span>-->
+            </section>
+
+        </header>
         
-        <table>
-            <tbody><tr>
-                <td>PO</td>
-                <td>UT</td>
-            </tr>
-        </tbody></table>
+        <br/><br/><br/><br/><br/><br/>
+
+        <div class="h_calendar"><div class="head_tools clear">
+                <a class="wicon no-ajaxy tooltipstered clicked" title="Hide Calendar"></a><div class="hpc" style="display: block;">
+                    <span class="wheadline"><h3><a href="#" id="toggle-future">Calendar</a></h3></span><span class="wclose" title="Close"><span class="mindate">Aug 17, 2015</span><span class="maxdate">Sep 20, 2015</span></span></div>
+            </div>
+            <div class="wcontent" style="display: block;">
+                <div class="row_wnames clear"><div class="wname   first"><p>Mon</p></div><div class="wname  "><p>Tue</p></div><div class="wname  "><p>Wed</p></div><div class="wname  "><p>Thu</p></div><div class="wname  "><p>Fri</p></div><div class="wname  weekend "><p>Sat</p></div><div class="wname  weekend "><p>Sun</p></div></div><div class="row_days clear">
+                    <div class="day_box first" data-cboxdate="17/08/2015">
+                        <span class="store_data" data-box=""></span>
+                        <div class="top">
+                            17</div>
+                        <div class="bottom">
+                            Aug 2015</div>
+                    </div>
+                    <div class="day_box" data-cboxdate="18/08/2015">
+                        <span class="store_data" data-box=""></span>
+                        <div class="top">
+                            18</div>
+                        <div class="bottom">
+                            Aug 2015</div>
+                    </div>
+                    <div class="day_box" data-cboxdate="19/08/2015">
+                        <span class="store_data" data-box=""></span>
+                        <div class="top">
+                            19</div>
+                        <div class="bottom">
+                            Aug 2015</div>
+                    </div>
+                    <div class="day_box" data-cboxdate="20/08/2015">
+                        <span class="store_data" data-box=""></span>
+                        <div class="top">
+                            20</div>
+                        <div class="bottom">
+                            Aug 2015</div>
+                    </div>
+                    <div class="day_box" data-cboxdate="21/08/2015">
+                        <span class="store_data" data-box=""></span>
+                        <div class="top">
+                            21</div>
+                        <div class="bottom">
+                            Aug 2015</div>
+                    </div>
+                    <div class="day_box weekend" data-cboxdate="22/08/2015">
+                        <span class="store_data" data-box=""></span>
+                        <div class="top">
+                            22</div>
+                        <div class="bottom">
+                            Aug 2015</div>
+                    </div>
+                    <div class="day_box weekend" data-cboxdate="23/08/2015">
+                        <span class="store_data" data-box=""></span>
+                        <div class="top">
+                            23</div>
+                        <div class="bottom">
+                            Aug 2015</div>
+                    </div>
+                </div>
+                <div class="row_days clear">
+                    <div class="day_box first" data-cboxdate="24/08/2015">
+                        <span class="store_data" data-box=""></span>
+                        <div class="top">
+                            24</div>
+                        <div class="bottom">
+                            Aug 2015</div>
+                    </div>
+                    <div class="day_box" data-cboxdate="25/08/2015">
+                        <span class="store_data" data-box=""></span>
+                        <div class="top">
+                            25</div>
+                        <div class="bottom">
+                            Aug 2015</div>
+                    </div>
+                    <div class="day_box" data-cboxdate="26/08/2015">
+                        <span class="store_data" data-box=""></span>
+                        <div class="top">
+                            26</div>
+                        <div class="bottom">
+                            Aug 2015</div>
+                    </div>
+                    <div class="day_box" data-cboxdate="27/08/2015">
+                        <span class="store_data" data-box=""></span>
+                        <div class="top">
+                            27</div>
+                        <div class="bottom">
+                            Aug 2015</div>
+                    </div>
+                    <div class="day_box" data-cboxdate="28/08/2015">
+                        <span class="store_data" data-box=""></span>
+                        <div class="top">
+                            28</div>
+                        <div class="bottom">
+                            Aug 2015</div>
+                    </div>
+                    <div class="day_box weekend" data-cboxdate="29/08/2015">
+                        <span class="store_data" data-box=""></span>
+                        <div class="top">
+                            29</div>
+                        <div class="bottom">
+                            Aug 2015</div>
+                    </div>
+                    <div class="day_box weekend" data-cboxdate="30/08/2015">
+                        <span class="store_data" data-box=""></span>
+                        <div class="top">
+                            30</div>
+                        <div class="bottom">
+                            Aug 2015</div>
+                    </div>
+                </div><div class="row_days clear"><div class="day_box first" data-cboxdate="31/08/2015">
+                        <span class="store_data" data-box=""></span>
+                        <div class="top">
+                            31</div>
+                        <div class="bottom">
+                            Aug 2015</div>
+                    </div>
+                    <div class="day_box" data-cboxdate="01/09/2015">
+                        <span class="store_data" data-box=""></span>
+                        <div class="top">
+                            1</div>
+                        <div class="bottom">
+                            Sep 2015</div>
+                    </div>
+                    <div class="day_box" data-cboxdate="02/09/2015">
+                        <span class="store_data" data-box=""></span>
+                        <div class="top">
+                            2</div>
+                        <div class="bottom">
+                            Sep 2015</div>
+                    </div>
+                    <div class="day_box" data-cboxdate="03/09/2015">
+                        <span class="store_data" data-box=""></span>
+                        <div class="top">
+                            3</div>
+                        <div class="bottom">
+                            Sep 2015</div>
+                    </div>
+                    <div class="day_box" data-cboxdate="04/09/2015">
+                        <span class="store_data" data-box=""></span>
+                        <div class="top">
+                            4</div>
+                        <div class="bottom">
+                            Sep 2015</div>
+                    </div>
+                    <div class="day_box weekend" data-cboxdate="05/09/2015">
+                        <span class="store_data" data-box=""></span>
+                        <div class="top">
+                            5</div>
+                        <div class="bottom">
+                            Sep 2015</div>
+                    </div>
+                    <div class="day_box weekend" data-cboxdate="06/09/2015">
+                        <span class="store_data" data-box=""></span>
+                        <div class="top">
+                            6</div>
+                        <div class="bottom">
+                            Sep 2015</div>
+                    </div>
+                </div><div class="row_days clear"><div class="day_box first" data-cboxdate="07/09/2015">
+                        <span class="store_data" data-box=""></span>
+                        <div class="top">
+                            7</div>
+                        <div class="bottom">
+                            Sep 2015</div>
+                    </div>
+                    <div class="day_box" data-cboxdate="08/09/2015">
+                        <span class="store_data" data-box=""></span>
+                        <div class="top">
+                            8</div>
+                        <div class="bottom">
+                            Sep 2015</div>
+                    </div>
+                    <div class="day_box" data-cboxdate="09/09/2015">
+                        <span class="store_data" data-box=""></span>
+                        <div class="top">
+                            9</div>
+                        <div class="bottom">
+                            Sep 2015</div>
+                    </div>
+                    <div class="day_box" data-cboxdate="10/09/2015">
+                        <span class="store_data" data-box=""></span>
+                        <div class="top">
+                            10</div>
+                        <div class="bottom">
+                            Sep 2015</div>
+                    </div>
+                    <div class="day_box" data-cboxdate="11/09/2015">
+                        <span class="store_data" data-box=""></span>
+                        <div class="top">
+                            11</div>
+                        <div class="bottom">
+                            Sep 2015</div>
+                    </div>
+                    <div class="day_box weekend" data-cboxdate="12/09/2015">
+                        <span class="store_data" data-box=""></span>
+                        <div class="top">
+                            12</div>
+                        <div class="bottom">
+                            Sep 2015</div>
+                    </div>
+                    <div class="day_box weekend" data-cboxdate="13/09/2015">
+                        <span class="store_data" data-box=""></span>
+                        <div class="top">
+                            13</div>
+                        <div class="bottom">
+                            Sep 2015</div>
+                    </div>
+                </div><div class="row_days clear"><div class="day_box first" data-cboxdate="14/09/2015">
+                        <span class="store_data" data-box=""></span>
+                        <div class="top">
+                            14</div>
+                        <div class="bottom">
+                            Sep 2015</div>
+                    </div>
+                    <div class="day_box" data-cboxdate="15/09/2015">
+                        <span class="store_data" data-box=""></span>
+                        <div class="top">
+                            15</div>
+                        <div class="bottom">
+                            Sep 2015</div>
+                    </div>
+                    <div class="day_box" data-cboxdate="16/09/2015">
+                        <span class="store_data" data-box=""></span>
+                        <div class="top">
+                            16</div>
+                        <div class="bottom">
+                            Sep 2015</div>
+                    </div>
+                    <div class="day_box" data-cboxdate="17/09/2015">
+                        <span class="store_data" data-box=""></span>
+                        <div class="top">
+                            17</div>
+                        <div class="bottom">
+                            Sep 2015</div>
+                    </div>
+                    <div class="day_box" data-cboxdate="18/09/2015">
+                        <span class="store_data" data-box=""></span>
+                        <div class="top">
+                            18</div>
+                        <div class="bottom">
+                            Sep 2015</div>
+                    </div>
+                    <div class="day_box weekend" data-cboxdate="19/09/2015">
+                        <span class="store_data" data-box=""></span>
+                        <div class="top">
+                            19</div>
+                        <div class="bottom">
+                            Sep 2015</div>
+                    </div>
+                    <div class="day_box weekend" data-cboxdate="20/09/2015">
+                        <span class="store_data" data-box=""></span>
+                        <div class="top">
+                            20</div>
+                        <div class="bottom">
+                            Sep 2015</div>
+                    </div>
+                </div><a class="ext_link clear" title="See projects on a map" href="http://map.visegradfund.org/" target="_blank">
+                    <span class="icn icon-151"></span>
+                    <span class="wheadline"><h3>History map</h3></span>
+                </a>
+            </div>
+        </div>
+        
+        <div id="c-content" style="background-color: white; overflow-y: scroll; height: 50%; width: 100%">
+            <br/><br/><br/><br/>
+            
+            <div class="page-template-template_calendar n_body">
+            </div>
+        </div>
     </div>
 
     

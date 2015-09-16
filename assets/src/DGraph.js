@@ -201,7 +201,7 @@ var DGraph = new Class({
 			var li = new Element('li', {
 				class: 'pure-menu-item',
 				title: title,
-				html: '<span class="' + n.className + '"' + (false ? 'title="' + title + '"' : '') + '>&nbsp;</span>' + (nx) + ': ' + (n.data * (total / 100)).format({decimals:0}) + (unit === 0 ? '' : '€') + ' (' + n.data.round(2) + '%)'
+				html: '<table><tr><td><span class="' + n.className + '"' + (false ? 'title="' + title + '"' : '') + '>&nbsp;</span></td><td>' + (nx) + ': ' + (unit === 0 ? '' : '€') + (n.data * (total / 100)).format({decimals:0}) + ' (' + n.data.round(2) + '%)</td></tr></table>'
 			}).inject(ul);
 
 		}

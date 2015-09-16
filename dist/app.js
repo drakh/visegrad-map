@@ -19914,11 +19914,11 @@ var Scroller = new Class({
 
 Locale.define('EU', 'Number', {
 	
-	decimal: ',',
-	group: '.',
+	decimal: '.',
+	group: ',',
 	
 	currency: {
-		prefix: '€ '
+		prefix: '€'
 	}
 	
 });
@@ -27742,6 +27742,8 @@ var AppMap = new Class({
 			zoomControl: false,
 			padding: [200, 200]
 		});
+                
+                Locale.use('EU');
 
 		L.tileLayer(conf.url, {
 			attribution: conf.attr,
@@ -28093,7 +28095,8 @@ var BarGraph = new Class({
 			var l = s[i].getElements('.ct-bar');
 			for (var j = 0; j < l.length; j++)
 			{
-				var ad = ': ' + (r[i][j] * (this.totals[j] / 100)).format({decimals: 0}) + (unit === 0 ? ' ' + strng : '€') + ' (' + ((r[i][j]).round(2)) + '%)';
+                                var n = r[i][j] * (this.totals[j] / 100);
+				var ad = ': ' + (unit === 0 ? n.format({decimals: 0}) + ' ' + strng : n.formatCurrency({decimals: 0})) + ' (' + ((r[i][j]).round(2)) + '%)';
 				switch (sw)
 				{
 					case 'country':
@@ -28416,7 +28419,7 @@ var DGraph = new Class({
 			var li = new Element('li', {
 				class: 'pure-menu-item',
 				title: title,
-				html: '<span class="' + n.className + '"' + (false ? 'title="' + title + '"' : '') + '>&nbsp;</span>' + (nx) + ': ' + (n.data * (total / 100)).format({decimals:0}) + (unit === 0 ? '' : '€') + ' (' + n.data.round(2) + '%)'
+				html: '<table><tr><td><span class="' + n.className + '"' + (false ? 'title="' + title + '"' : '') + '>&nbsp;</span></td><td>' + (nx) + ': ' + (unit === 0 ? '' : '€') + (n.data * (total / 100)).format({decimals:0}) + ' (' + n.data.round(2) + '%)</td></tr></table>'
 			}).inject(ul);
 
 		}
@@ -29899,7 +29902,8 @@ var PieGraph = new Class({
 		for (var i = 0; i < l; i++)
 		{
 			var j = (l1 - i);
-			var ad = ': ' + (p[j].data * (t / 100)).format({decimals:0}) + (u === 0 ? ' ' + st : '€') + ' (' + (p[j].data).round(2) + '%)';
+                        var n = p[j].data * (t / 100);
+			var ad = ': ' + (u === 0 ? n.format({decimals:0}) + ' ' + st : n.formatCurrency({decimals:0})) + ' (' + (p[j].data).round(2) + '%)';
 			switch (gr)
 			{
 				case 'c':
@@ -30285,7 +30289,7 @@ var SelectFilter = new Class({
 		this.els = {};
 		this.vals = {};
 
-		el.remove();
+		el.destroy();
 
 		a.addEvent('click', this.select_all.bind(this));
 		n.addEvent('click', this.select_none.bind(this));

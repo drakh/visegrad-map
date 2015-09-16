@@ -41,7 +41,111 @@ var AppMap = new Class({
 
 		this.map = a_map;
 		this.zoom_to_v4();
+                this.init_calendar();
 	},
+        init_calendar:function()
+        {
+            moment.locale('en-gb');
+            this.scroll = new Fx.Scroll('c-content', {
+                wait: false,
+                duration: 1000,
+//                offset: {'x': -200, 'y': -50},
+                transition: Fx.Transitions.Quad.easeInOut
+            });
+            $$('#toggle-future').addEvent('click', this.toggle_future.bind(this));
+            this.is_future = false;
+            this.fill_calendar();
+        },
+        toggle_future:function()
+        {
+            this.is_future = this.is_future ? false : true;
+            console.log(this.is_future);
+            this.fill_calendar();
+        },
+        fill_calendar:function()
+        {
+            $$('div.n_body').empty();
+            var current_d = moment().startOf('week');
+            if(this.is_future) current_d.add(35, 'day');
+            console.log(current_d.format('MMM D, YYYY'));
+            $$('.mindate').set('text', current_d.format('MMM D, YYYY'));
+            var boxes = $$('.day_box');
+            for (var i in boxes) {
+                var box = boxes[i];
+                if (typeof box.getChildren === 'function') {
+                    if (this.has_event(current_d)) {
+                        box.addClass('type_events');
+                        box.set('data-cboxdate', current_d.format('DD-MM-YYYY'));
+                        this.render_day(current_d);
+                        box.removeEvents();
+                        box.addEvent('click', this.calendar_click.bind(this));
+                    } else {
+                        box.removeClass('type_events');
+                    }
+                    if (false) box.addClass('nt_week');
+                    box.getChildren('.top').set('text', current_d.date());
+                    box.getChildren('.bottom').set('text', current_d.format('MMM YYYY'));
+                    $$('.maxdate').set('text', current_d.format('MMM D, YYYY'));
+                    current_d.add(1, 'd');
+                }
+            }
+        },
+        calendar_click:function(el)
+        {
+            var id = 'dt-' + $(el.target.parentNode).get('data-cboxdate');
+            var $e = $$('#c-content');
+            var y = $$('#'+id).getPosition();
+            //console.log(id + ': ' + y[0].y);
+            //$e.scrollTo(y[0].x,y[0].y);
+            this.scroll.toElement(id);
+            
+        },
+        has_event:function(d)
+        {
+            for(var i in mapdata[0]) {
+                for(var j in mapdata[0][i].data) {
+                    for(var k in mapdata[0][i].data[j]) {
+                        var rf = mapdata[0][i].data[j][k].rf;
+                        if (typeof rf === 'undefined') continue;
+                        rf = moment(rf, 'DD/MM/YYYY');
+                        if (d.isSame(rf)) return true;
+                    }
+                }
+            }
+            return false;
+        },
+        render_day:function(d)
+        {
+            var $e = $$('div.n_body');
+            Elements.from('<div class="day_box" data-cboxdate="08/08/2015" id="dt-' + d.format('DD-MM-YYYY') + '">\n\
+                <div class="top">' + d.date() + '</div>\n\
+                <div class="bottom">' + d.format('MMM YYYY') + '</div>\n\
+               </div>').inject($e[0]);
+            
+            var el  = new Element('div', {class: 'day_content'});
+            for(var i in mapdata[0]) {
+                for(var j in mapdata[0][i].data) {
+                    for(var k in mapdata[0][i].data[j]) {
+                        var event = mapdata[0][i].data[j][k];
+                        if (typeof event.rf === 'undefined') continue;
+                        var rf = moment(event.rf, 'DD/MM/YYYY');
+                        if (d.isSame(rf)) {
+                            Elements.from('<div class="cal_event clear">\n\
+                                    <!-- span class="cal_projectno">ID#  21320073</span -->\n\
+                                    <span class="cal_headline"><strong>' + event.name + '</strong></span>\n\
+                                    <span class="cal_subheadline">' + event.subheadline + '</span>\n\
+                                    <span class="cal_link"><a href="' + event.url + '" target="_blank">' + event.url + '</a></span>\n\
+                                    <span class="tc clear">\n\
+                                    <span class="cal_type">' + event.type + '</span>\n\
+                                    <span class="cal_city_country">' + event.place + '</span>\n\
+                                    </span>\n\
+                                </div>').inject(el);
+                        }
+                    }
+                }
+            }
+            el.inject($e[0]);
+        },
 	move_map:function(p,z)
 	{
 		if(z)
