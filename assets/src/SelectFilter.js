@@ -95,6 +95,7 @@ var SelectFilter = new Class({
 			var e = new Element('li', {
 				class: 'pure-menu-item select-item',
 				html: (data[pid]['n'] ? data[pid]['n'] : data[pid]),
+                                title: (data[pid]['d'] ? data[pid]['d'] : null),
 				events: {
 					click: this.change_filters.bind(this, pid)
 				}

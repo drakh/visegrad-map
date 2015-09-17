@@ -97,7 +97,7 @@ var PlaceFilter = new Class({
 							}
 							else
 							{
-								m_a[2] = 'in the field(s) <i>' + msgs[pid].m1 + '</i>';
+								m_a[2] = 'in the following field(s) <i>' + msgs[pid].m1 + '</i>';
 							}
 							break;
 					}

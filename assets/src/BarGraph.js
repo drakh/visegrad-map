@@ -80,7 +80,7 @@ var BarGraph = new Class({
 		var g = new Chartist.Bar(el, {
 			labels: l,
 			series: r
-		}, {stackBars: true});
+		}, {axisY:{}, stackBars: true});
 		g.on('created', this.graph_bind_events.bind(this, el));
 	},
 	graph_bind_events: function (el)
@@ -137,6 +137,12 @@ var BarGraph = new Class({
 		{
 			this.tips.attach(lns);
 		}
+                // format numbers in chartist labels
+                var s = el.getElementsByClassName('ct-label ct-vertical');
+                for (var i = 0; i < s.length; i++) {
+                    var n = 1 * s[i].get('text');
+                    if (!isNaN(n)) s[i].set('text', n.format({decimals: 0}));
+                }
 	},
 	destroy: function ()
 	{
