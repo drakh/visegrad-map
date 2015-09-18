@@ -19885,11 +19885,11 @@ var Scroller = new Class({
 
 Locale.define('EU', 'Number', {
 	
-	decimal: ',',
-	group: '.',
+	decimal: '.',
+	group: ',',
 	
 	currency: {
-		prefix: '€ '
+		prefix: '€'
 	}
 	
 });
