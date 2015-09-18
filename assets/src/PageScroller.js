@@ -2,11 +2,11 @@ var PageScroller = new Class({
 	Implements: [Events, Options],
 	initialize: function (els, options)
 	{
-		var titles = [];
-		for (var i = 0; i < els.length; i++)
-		{
-			titles[i] = els[i].get('title');
-		}
+		var titles = ['Previous section', 'Next section'];
+//		for (var i = 0; i < els.length; i++)
+//		{
+//			titles[i] = els[i].get('title');
+//		}
 		this.titles = titles;
 		this.els = els;
 		this.s = 0;
@@ -31,7 +31,7 @@ var PageScroller = new Class({
 		var w = new Element('div', {class: 'page-scroller'}).inject(document.body);
 		for (var i = 0; i < 2; i++)
 		{
-			s[i] = new Element('i', {class: c[i], events: {click: this.sc_clicked.bind(this, i)}}).inject(w);
+			s[i] = new Element('i', {class: c[i], title: this.titles[i], events: {click: this.sc_clicked.bind(this, i)}}).inject(w);
 		}
 		this.c = s;
 	},
@@ -88,7 +88,7 @@ var PageScroller = new Class({
 		}
 		else
 		{
-			this.c[0].set('title', this.titles[s - 1]);
+			//this.c[0].set('title', this.titles[s - 1]);
 			this.c[0].removeClass('c-hidden');
 		}
 
@@ -98,7 +98,7 @@ var PageScroller = new Class({
 		}
 		else
 		{
-			this.c[1].set('title', this.titles[s + 1]);
+			//this.c[1].set('title', this.titles[s + 1]);
 			this.c[1].removeClass('c-hidden');
 		}
 		this.s = s;
