@@ -272,11 +272,14 @@ var AppMap = new Class({
                                 }
                                 
                                 var marker = L.marker([p.pt.lat, p.pt.lon], {icon: this.my_icon, title:p.pt.s}).addTo(map).bindPopup(
-                                        '<b>' + p.pt.s + '</b>' + text,
+                                        '<b style="font-size: 125%">' + p.pt.s + '</b><div style="height: 200px" class="leaflet-popup-scrolled">' + text + "</div>",
                                         {
                                             maxWidth: 400,
-                                            maxHeight: 200
+                                            maxHeight: 200,
+                                            //className: 'no-leaflet-scroll'
                                         });
+                                        
+                                //marker.removeClass('leaflet-popup-scrolled');
                                 
 //				var marker = new CityMarker(map, p, max, {
 //					pane: pane,
