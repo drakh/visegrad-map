@@ -426,4 +426,16 @@ ul.years li div.year-container div
 {
     border-bottom: none;
     border-top: none;
+    height: 180px;
+}
+
+.leaflet-container a.leaflet-popup-close-button
+{
+    top: 4px;
+    right: 18px;
+}
+
+.map-popup-city
+{
+    font-size: 125%;
 }

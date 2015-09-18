@@ -4058,7 +4058,7 @@ L.Popup = L.Class.extend({
 
 		if (maxHeight && height > maxHeight) {
 			style.height = maxHeight + 'px';
-			L.DomUtil.addClass(container, scrolledClass);
+			//L.DomUtil.addClass(container, scrolledClass);
 		} else {
 			L.DomUtil.removeClass(container, scrolledClass);
 		}

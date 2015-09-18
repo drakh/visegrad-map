@@ -56,24 +56,46 @@ var AppMap = new Class({
             this.is_future = false;
             this.fill_calendar();
         },
+        scroll_initial:function()
+        {
+            if (this.today_element) this.scroll.toElement(this.today_element);
+        },
+        get_start_day:function()
+        {
+            var current_d = moment().startOf('week');
+            if(this.is_future) current_d.add(35, 'day');
+            return current_d;
+        },
         toggle_future:function()
         {
             this.is_future = this.is_future ? false : true;
-            console.log(this.is_future);
+            
+            if (this.is_future) {
+                $$('#toggle-future')[0].addClass('future');
+            } else {
+                $$('#toggle-future')[0].removeClass('future');
+            }
+            
             this.fill_calendar();
+            this.redraw(this.cc_s);
         },
         fill_calendar:function()
         {
-            $$('div.n_body').empty();
-            var current_d = moment().startOf('week');
-            if(this.is_future) current_d.add(35, 'day');
-            console.log(current_d.format('MMM D, YYYY'));
+            $$('div.n_body')[0].empty();
+            var current_d = this.get_start_day();
             $$('.mindate').set('text', current_d.format('MMM D, YYYY'));
-            var boxes = $$('.day_box');
+            var boxes = $$('div.row_days > div.day_box');
+            var today = false;
+            var today_d = moment().subtract(1, 'day');
             for (var i in boxes) {
                 var box = boxes[i];
                 if (typeof box.getChildren === 'function') {
+                    //console.log(current_d.format('MMM D, YYYY'));
                     if (this.has_event(current_d)) {
+                        if (!today && current_d.isAfter(today_d)) {
+                            today = true;
+                            this.today_element = 'dt-' + current_d.format('DD-MM-YYYY');
+                        }
                         box.addClass('type_events');
                         box.set('data-cboxdate', current_d.format('DD-MM-YYYY'));
                         this.render_day(current_d);
@@ -89,6 +111,7 @@ var AppMap = new Class({
                     current_d.add(1, 'd');
                 }
             }
+            setTimeout(this.scroll_initial.bind(this), 1000);
         },
         calendar_click:function(el)
         {
@@ -133,10 +156,10 @@ var AppMap = new Class({
                             Elements.from('<div class="cal_event clear">\n\
                                     <!-- span class="cal_projectno">ID#  21320073</span -->\n\
                                     <span class="cal_headline"><strong>' + event.name + '</strong></span>\n\
-                                    <span class="cal_subheadline">' + event.subheadline + '</span>\n\
+                                    <span class="cal_subheadline">' + (event.subheadline ? event.subheadline : '') + '</span>\n\
                                     <span class="cal_link"><a href="' + event.url + '" target="_blank">' + event.url + '</a></span>\n\
                                     <span class="tc clear">\n\
-                                    <span class="cal_type">' + event.type + '</span>\n\
+                                    <span class="cal_type">' + (event.type ? event.type : '') + '</span>\n\
                                     <span class="cal_city_country">' + event.place + '</span>\n\
                                     </span>\n\
                                 </div>').inject(el);
@@ -257,6 +280,8 @@ var AppMap = new Class({
 		var pane = this.pane;
 		var map = this.map;
 		var b_arr = [];
+                var start = this.get_start_day().subtract('1', 'day');
+                var end = this.get_start_day().add('35', 'day');
 		for (var pid in pt_d)
 		{
 			if (dt[pid] && dt[pid].length > 0)
@@ -268,18 +293,23 @@ var AppMap = new Class({
                                 
                                 var text = '';
                                 for (var i=0; i<p.data.length; i++) {
-                                    text += '<br/><br/>' + p.data[i].name + p.data[i].a;
+                                    if (!p.data[i].rf.isBetween(start, end)) continue;
+                                    
+                                    text += '<br/><b>' + p.data[i].name;
+                                    text += '</b>'; // + (p.data[i].subheadline ? '<br/>' + p.data[i].subheadline : '');
+                                    text += '<br/>' + p.data[i].rf.format('D MMM') + (p.data[i].rt ? '—' + p.data[i].rt.format('D MMM') : '');
+                                    text += p.data[i].a;
+                                    text += '<div style="padding-top: 3px"><img src="inf-press.png" width="20" title="Press release" /> <img src="inf-info.png" width="20" title="Description" /></div>';
                                 }
                                 
+                                if (text === '') continue;
+                                
                                 var marker = L.marker([p.pt.lat, p.pt.lon], {icon: this.my_icon, title:p.pt.s}).addTo(map).bindPopup(
-                                        '<b style="font-size: 125%">' + p.pt.s + '</b><div style="height: 200px" class="leaflet-popup-scrolled">' + text + "</div>",
+                                        '<b class="map-popup-city">' + p.pt.s + '</b><div class="leaflet-popup-scrolled">' + text + '</div>',
                                         {
                                             maxWidth: 400,
-                                            maxHeight: 200,
-                                            //className: 'no-leaflet-scroll'
+                                            maxHeight: 200
                                         });
-                                        
-                                //marker.removeClass('leaflet-popup-scrolled');
                                 
 //				var marker = new CityMarker(map, p, max, {
 //					pane: pane,
@@ -374,7 +404,7 @@ var AppMap = new Class({
 		var map = this.map;
 		for (var i = 0; i < m.length; i++)
 		{
-			m[i].destroy(map);
+			map.removeLayer(m[i]);
 		}
 		this.markers = [];
 		this.destroy_graph(map);
