@@ -54,11 +54,12 @@ var AppMap = new Class({
             });
             $$('#toggle-future').addEvent('click', this.toggle_future.bind(this));
             this.is_future = false;
+            this.active_d = moment().startOf('day');
             this.fill_calendar();
         },
         scroll_initial:function()
         {
-            if (this.today_element) this.scroll.toElement(this.today_element);
+            if (this.today_element) this.scroll.toElement(this.today_element, 'y');
         },
         get_start_day:function()
         {
@@ -81,23 +82,32 @@ var AppMap = new Class({
         },
         fill_calendar:function()
         {
-            $$('div.n_body')[0].empty();
+            this.day_arr = {};
+            $$('#c-content')[0].empty();
             var current_d = this.get_start_day();
             $$('.mindate').set('text', current_d.format('MMM D, YYYY'));
             var boxes = $$('div.row_days > div.day_box');
-            var today = false;
-            var today_d = moment().subtract(1, 'day');
+            var today_d = moment().startOf('day');
             for (var i in boxes) {
                 var box = boxes[i];
                 if (typeof box.getChildren === 'function') {
-                    //console.log(current_d.format('MMM D, YYYY'));
+                    //skip history and continue with next day
+                    if (current_d.isBefore(today_d)) {
+                        current_d.add(1, 'd');
+                        continue;
+                    }
                     if (this.has_event(current_d)) {
-                        if (!today && current_d.isAfter(today_d)) {
-                            today = true;
-                            this.today_element = 'dt-' + current_d.format('DD-MM-YYYY');
+                        var d_index = current_d.format('DD-MM-YYYY');
+                        // store into global array
+                        this.day_arr[d_index] = {box:box};
+                        if (current_d.isSame(this.active_d)) {
+                            // set today element for scroll and add color
+                            this.today_element = 'dt-' + d_index;
+                            box.addClass('type_events_cur');
+                        } else {
+                            box.addClass('type_events');
                         }
-                        box.addClass('type_events');
-                        box.set('data-cboxdate', current_d.format('DD-MM-YYYY'));
+                        box.set('data-cboxdate', d_index);
                         this.render_day(current_d);
                         box.removeEvents();
                         box.addEvent('click', this.calendar_click.bind(this));
@@ -115,13 +125,43 @@ var AppMap = new Class({
         },
         calendar_click:function(el)
         {
-            var id = 'dt-' + $(el.target.parentNode).get('data-cboxdate');
-            var $e = $$('#c-content');
-            var y = $$('#'+id).getPosition();
+            var d_index = $(el.target.parentNode).get('data-cboxdate');
+            this.scroll.toElement('dt-' + d_index, 'y');
+            
+            var active_index = this.active_d.format('DD-MM-YYYY');
+            this.active_d = moment(d_index, 'DD-MM-YYYY');
+            // set previous active day to blue icon
+            if (this.day_arr[active_index]) {
+                for (var j in this.day_arr[active_index].markers) {
+                    if (typeof this.day_arr[active_index].markers[j].setIcon === 'function') {
+                        this.day_arr[active_index].markers[j].setIcon(this.blue_icon).setZIndexOffset(0);
+                    }
+                }
+            }
+            
+            for (var d in this.day_arr) {
+                if (this.day_arr[d].box) {
+                    if (d === d_index) {
+                        this.day_arr[d].box.addClass('type_events_cur').removeClass('type_events');
+                    } else {
+                        this.day_arr[d].box.removeClass('type_events_cur').addClass('type_events');
+                    }
+                }
+                
+                if (this.day_arr[d].markers) {
+                    if (d === d_index) {
+                        for (var j in this.day_arr[d].markers) {
+                            if (typeof this.day_arr[d].markers[j].setIcon === 'function') {
+                                this.day_arr[d].markers[j].setIcon(this.red_icon).setZIndexOffset(1000);
+                            }
+                        }
+                    }
+                }
+            }
+            //var $e = $$('#c-content');
+            //var y = $$('#'+id).getPosition();
             //console.log(id + ': ' + y[0].y);
             //$e.scrollTo(y[0].x,y[0].y);
-            this.scroll.toElement(id);
-            
         },
         has_event:function(d)
         {
@@ -139,13 +179,15 @@ var AppMap = new Class({
         },
         render_day:function(d)
         {
-            var $e = $$('div.n_body');
-            Elements.from('<div class="day_box" data-cboxdate="08/08/2015" id="dt-' + d.format('DD-MM-YYYY') + '">\n\
-                <div class="top">' + d.date() + '</div>\n\
-                <div class="bottom">' + d.format('MMM YYYY') + '</div>\n\
+            var $e = $$('#c-content');
+            Elements.from('<div class="vnutro_top" data-cboxdate="08/08/2015" id="dt-' + d.format('DD-MM-YYYY') + '">\n\
+                <div class="stvorcek">\n\
+                  <div class="top">' + d.date() + '</div>\n\
+                  <div class="bottom">' + d.format('MMM YYYY') + '</div>\n\
+                </div>\n\
                </div>').inject($e[0]);
             
-            var el  = new Element('div', {class: 'day_content'});
+            var el  = new Element('div', {class: 'vnutro_main'});
             for(var i in mapdata[0]) {
                 for(var j in mapdata[0][i].data) {
                     for(var k in mapdata[0][i].data[j]) {
@@ -153,7 +195,7 @@ var AppMap = new Class({
                         if (typeof event.rf === 'undefined') continue;
                         var rf = moment(event.rf, 'DD/MM/YYYY');
                         if (d.isSame(rf)) {
-                            Elements.from('<div class="cal_event clear">\n\
+                            Elements.from('<div class="">\n\
                                     <!-- span class="cal_projectno">ID#  21320073</span -->\n\
                                     <span class="cal_headline"><strong>' + event.name + '</strong></span>\n\
                                     <span class="cal_subheadline">' + (event.subheadline ? event.subheadline : '') + '</span>\n\
@@ -292,9 +334,20 @@ var AppMap = new Class({
 				};
                                 
                                 var text = '';
+                                var icon = this.blue_icon;
+                                var days = [];
                                 for (var i=0; i<p.data.length; i++) {
+                                    // skip if out of calendar 35days
                                     if (!p.data[i].rf.isBetween(start, end)) continue;
                                     
+                                    // icon
+                                    if (this.active_d.isSame(p.data[i].rf) && (icon === this.blue_icon)) icon = this.red_icon;
+                                    
+                                    // which dates is this marker active for
+                                    var d_index = p.data[i].rf.format('DD-MM-YYYY');
+                                    if (days.indexOf(d_index) < 0) days.push(d_index);
+                                    
+                                    // construct text
                                     text += '<br/><b>' + p.data[i].name;
                                     text += '</b>'; // + (p.data[i].subheadline ? '<br/>' + p.data[i].subheadline : '');
                                     text += '<br/>' + p.data[i].rf.format('D MMM') + (p.data[i].rt ? '—' + p.data[i].rt.format('D MMM') : '');
@@ -304,12 +357,23 @@ var AppMap = new Class({
                                 
                                 if (text === '') continue;
                                 
-                                var marker = L.marker([p.pt.lat, p.pt.lon], {icon: this.my_icon, title:p.pt.s}).addTo(map).bindPopup(
+                                var marker = L.marker([p.pt.lat, p.pt.lon], {icon: icon, title:p.pt.s}).addTo(map).bindPopup(
                                         '<b class="map-popup-city">' + p.pt.s + '</b><div class="leaflet-popup-scrolled">' + text + '</div>',
                                         {
                                             maxWidth: 400,
                                             maxHeight: 200
                                         });
+                                        
+                                
+                                for (var i in days) {
+                                    if (typeof this.day_arr[days[i]] !== 'object') {
+                                        this.day_arr[days[i]] = {markers: []};
+                                    }
+                                    if (typeof this.day_arr[days[i]].markers !== 'object') {
+                                        this.day_arr[days[i]].markers = [];
+                                    }
+                                    this.day_arr[days[i]].markers.push(marker);
+                                }
                                 
 //				var marker = new CityMarker(map, p, max, {
 //					pane: pane,
@@ -409,8 +473,14 @@ var AppMap = new Class({
 		this.markers = [];
 		this.destroy_graph(map);
 	},
-        my_icon: L.icon({
+        blue_icon: L.icon({
             iconUrl: 'marker.png',
+            iconSize: [48, 48], // size of the icon
+            iconAnchor: [24, 48],
+            popupAnchor: [0, -38] // point from which the popup should open relative to the iconAnchor,
+        }),
+        red_icon: L.icon({
+            iconUrl: 'marker-red.png',
             iconSize: [48, 48], // size of the icon
             iconAnchor: [24, 48],
             popupAnchor: [0, -38] // point from which the popup should open relative to the iconAnchor
