@@ -182,8 +182,8 @@ var AppMap = new Class({
             var $e = $$('#c-content');
             Elements.from('<div class="vnutro_top" data-cboxdate="08/08/2015" id="dt-' + d.format('DD-MM-YYYY') + '">\n\
                 <div class="stvorcek">\n\
-                  <div class="top">' + d.date() + '</div>\n\
-                  <div class="bottom">' + d.format('MMM YYYY') + '</div>\n\
+                  <div class="horny">' + d.date() + '</div>\n\
+                  <div class="spodny">' + d.format('MMM YYYY') + '</div>\n\
                 </div>\n\
                </div>').inject($e[0]);
             
@@ -195,16 +195,14 @@ var AppMap = new Class({
                         if (typeof event.rf === 'undefined') continue;
                         var rf = moment(event.rf, 'DD/MM/YYYY');
                         if (d.isSame(rf)) {
-                            Elements.from('<div class="">\n\
-                                    <!-- span class="cal_projectno">ID#  21320073</span -->\n\
-                                    <span class="cal_headline"><strong>' + event.name + '</strong></span>\n\
+                            Elements.from('<!-- span class="cal_projectno">ID#  21320073</span -->\n\
+                                    <span><strong class="cal_headline">' + event.name + '</strong></span>\n\
                                     <span class="cal_subheadline">' + (event.subheadline ? event.subheadline : '') + '</span>\n\
-                                    <span class="cal_link"><a href="' + event.url + '" target="_blank">' + event.url + '</a></span>\n\
-                                    <span class="tc clear">\n\
-                                    <span class="cal_type">' + (event.type ? event.type : '') + '</span>\n\
-                                    <span class="cal_city_country">' + event.place + '</span>\n\
-                                    </span>\n\
-                                </div>').inject(el);
+                                    <span class="kotva"><a href="' + event.url + '" target="_blank">' + event.url + '</a></span>\n\
+                                    <div>\n\
+                                        <span class="cal_type">' + (event.type ? event.type : '') + '</span>\n\
+                                        <span class="cal_city_country">' + event.place + '</span>\n\
+                                    </div><br/>').inject(el);
                         }
                     }
                 }
