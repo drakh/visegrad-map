@@ -34,7 +34,7 @@
     <script src="assets/src/SearchBox.js"></script>
     
     <script src="http://visegradfund.org/wp-calendar-json.php"></script>
-    <script src="nino-data/countries.js"></script>
+    <script src="http://map.visegradfund.org/nino-data/countries.js"></script>
 <!--    <script src="dist/app.min.js"></script>-->
     <script src="assets/src-h/AppMap.js"></script>
     <script src="assets/src-h/DataUtil.js"></script>
@@ -44,6 +44,9 @@
     <link rel="stylesheet" href="http://visegradfund.org/wp-content/themes/visegrad-fund/fonts/vicon/stylesheet-vicon.css?ver=4.2.2">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Slab:100normal,300normal,400normal,700normal|Roboto:400normal|Open+Sans:400normal|Lato:400normal|Raleway:400normal|Oswald:400normal|Roboto+Condensed:400normal|Source+Sans+Pro:400normal|Montserrat:400normal|PT+Sans:400normal|Ubuntu:400normal&subset=all" type='text/css'>
     <style>
+	.white-bg{ background-color: transparent; }
+	.pure-button{ vertical-align: initial; }
+	.map-control-search{ left: 7.5em; bottom: 4.4em; }	
         header {
             line-height: normal;
         }
@@ -75,18 +78,21 @@
         }
         
         .head_tools .wheadline {
-	background:#5e5e5e;
-	height:92px;
+	height:69px;
 	width:239px;
 	display:block;
-	padding-left:10px;
+	padding-left:2px;
 	padding-right:10px; 
 	margin-bottom:4px;
 	float:left;
+        color: #fff;
 }
 	.head_tools .logo{
-	background:#5e5e5e;
-	height:92px;
+        background-image: url('ico-l0.png');
+        background-size: 50px;
+        background-repeat: no-repeat;
+        background-position: center;
+	height:69px;
 	width:92px;
 	display:block;
 	padding-left:10px;
@@ -94,15 +100,20 @@
 	margin-right:4px;
 	margin-bottom:4px;
 	float:left;
+        cursor: pointer;
+}
+
+.head_tools .logo:hover{
+        background-image: url('ico-h0.png');
 }
 
 .head_tools .wheadline h3, .head_tools .wheadline h3 a {
  	font-family:'Roboto Slab'; 
  	font-size:26px; 
- 	line-height:44px; 
- 	color:#d1d1d1;	
 	margin:0;
-	text-decoration:none
+	text-decoration:none;
+        padding-top: 10px;
+        font-weight: normal;
 }
 
 .head_tools .wheadline h3 a {
@@ -353,9 +364,41 @@
 	margin-top:4px;
 }
 
+.cal_type_no_float {
+    text-transform:lowercase;
+    font-family: 'robotolight_italic';
+    font-size:13px;
+    margin-top:4px;
+}
+
 /*GOZO Styly*/
 
-		.logo:before{
+.press-release {
+    cursor: pointer;
+}
+
+.press-release-content {
+    display: none;
+    cursor: default;
+}
+
+.sprite-pr-down, .sprite-pr-up {
+  background-image: url('pr-sprite.png');
+  background-repeat: no-repeat;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.sprite-pr-down {
+  height: 9px;
+}
+
+.sprite-pr-up {
+  height: 9px;
+  background-position: 0px -9px;
+}
+
+/*		.logo:before{
 				font-family: 'vicon';
 				  content: "\e600";
 				  font-size: 56px;
@@ -364,7 +407,7 @@
 				  margin-top: 16px;
 				  display: inline-block;
 				  margin-left: 4px;
-			}
+			}*/
 
 			.cal_city_country {
 			  float: right;
@@ -415,15 +458,20 @@ font-size:28px;
 			}
 			
 			.kotva a{
+                                display: block;
 				color: #51879f;
 				text-decoration: none;
+                                width: 260px;
+                                overflow: hidden;
+                                white-space: nowrap;
+                                text-overflow: ellipsis;
 			}
-
+                        
 
 .vnutro_top{
 				height:28px;
 				background-color:#fff;
-				margin-left:4px;
+				margin-left:1px;
 				border-bottom-style:solid;
 				border-bottom-width:5px;
 				border-color:#d1d1d1;
@@ -455,7 +503,7 @@ font-size:28px;
     <header class="black-bg main-header" style="display:none">
     <section class="logo black-bg">
         <span class="main-logo"><a href="./"><img
-                src="http://visegradfund.org/wordpress/wp-content/uploads/logo/visegrad_fund_logo_inverse_150.jpg"
+                src=""
                 alt="Visegrad Fund Project Map" title="Visegrad Fund Project Map" width="150" height="62"></a></span>
         <span id="filter-message"></span>
     </section>
@@ -512,12 +560,14 @@ font-size:28px;
     background-color: black;
          ">
         
-        <div class="h_calendar"><div class="head_tools clear">
-                <!-- <a class="wicon no-ajaxy tooltipstered clicked" title="Hide Calendar"></a> -->
-			<div class="hpc" style="display: block;">
-					<span class="logo"></span>
-                    <span class="wheadline"><h3><!-- <a href="#" id="toggle-future"> -->Project Map<!-- </a> --></h3></span>
-			</div>
+        <div class="h_calendar">
+            <div class="head_tools clear">
+                <div class="hpc" style="display: block;">
+                    <span class="logo" title="Past Projects Map" onclick="window.location='//map.visegradfund.org'"></span>
+                    <span class="wheadline"><h3 title="Currently running grant projects">Live Map</h3>
+                        Current Grant Projects
+                    </span>
+                </div>
             </div>
 
         
@@ -526,51 +576,51 @@ font-size:28px;
                     <div class="day_box first" data-cboxdate="17/08/2015">
                         <span class="store_data" data-box=""></span>
                         <div class="top">
-                            17</div>
+                            7</div>
                         <div class="bottom">
-                            Aug 2015</div>
+                            Dec 2015</div>
                     </div>
                     <div class="day_box" data-cboxdate="18/08/2015">
                         <span class="store_data" data-box=""></span>
                         <div class="top">
-                            18</div>
+                            8</div>
                         <div class="bottom">
-                            Aug 2015</div>
+                            Dec 2015</div>
                     </div>
                     <div class="day_box" data-cboxdate="19/08/2015">
                         <span class="store_data" data-box=""></span>
                         <div class="top">
-                            19</div>
+                            9</div>
                         <div class="bottom">
-                            Aug 2015</div>
+                            Dec 2015</div>
                     </div>
                     <div class="day_box" data-cboxdate="20/08/2015">
                         <span class="store_data" data-box=""></span>
                         <div class="top">
-                            20</div>
+                            10</div>
                         <div class="bottom">
-                            Aug 2015</div>
+                            Dec 2015</div>
                     </div>
                     <div class="day_box" data-cboxdate="21/08/2015">
                         <span class="store_data" data-box=""></span>
                         <div class="top">
-                            21</div>
+                            11</div>
                         <div class="bottom">
-                            Aug 2015</div>
+                            Dec 2015</div>
                     </div>
                     <div class="day_box weekend" data-cboxdate="22/08/2015">
                         <span class="store_data" data-box=""></span>
                         <div class="top">
-                            22</div>
+                            12</div>
                         <div class="bottom">
-                            Aug 2015</div>
+                            Dec 2015</div>
                     </div>
                     <div class="day_box weekend" data-cboxdate="23/08/2015">
                         <span class="store_data" data-box=""></span>
                         <div class="top">
-                            23</div>
+                            13</div>
                         <div class="bottom">
-                            Aug 2015</div>
+                            Dec 2015</div>
                     </div>
                 </div>
                 <div class="row_days clear">
@@ -774,7 +824,7 @@ font-size:28px;
             </div>
         </div>
         
-        <div id="c-content" style="background-color: white; overflow-x: hidden; overflow-y: scroll; height: calc(100% - 383px); width: 100%;margin-top:4px;">
+        <div id="c-content" style="background-color: white; overflow-x: hidden; overflow-y: scroll; height: calc(100% - 360px); width: 100%;margin-top:4px;">
             
 <!--            <div class="page-template-template_calendar n_body">
             </div>-->
@@ -803,8 +853,8 @@ font-size:28px;
             <section class="map-control-search" id="mapsearch">
                 <form id="searchform" class="pure-form pure-form-aligned">
                     <div class="white-bg">
-                        <label for="s-place"><i class="el el-search"></i></label>
-                        <input id="s-place" name="s-place" type="text" class="pure-input">
+                        <label for="s-place" class="pure-button dark-bg" style="padding-left:7px; height:26px; width:26px"><i class="el el-search"></i></label>
+                        <input id="s-place" name="s-place" type="text" class="pure-input" placeholder="Enter city">
                     </div>
                 </form>
             </section>

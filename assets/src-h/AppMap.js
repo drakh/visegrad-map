@@ -9,6 +9,15 @@ var AppMap = new Class({
             $$('.filter-tab-switch').hide();
             //$$('.filter-btn').hide();
             $$('.page-scroller').hide();
+            $(document.body).addEvent("click:relay(.press-release)", function(event, element) {
+                if($(element).getChildren('.sprite-pr-down').length > 0) {
+                    $(element).getChildren('.sprite-pr-down').removeClass('sprite-pr-down').addClass('sprite-pr-up');
+                    $(element).getChildren('.press-release-content').show();
+                } else {
+                    $(element).getChildren('.sprite-pr-up').removeClass('sprite-pr-up').addClass('sprite-pr-down');
+                    $(element).getChildren('.press-release-content').hide();
+                }
+            });
                 this.tips = new Tips();
 		this.dtype = 0;
 		this.setOptions(options);
@@ -85,13 +94,15 @@ var AppMap = new Class({
             this.day_arr = {};
             $$('#c-content')[0].empty();
             var current_d = this.get_start_day();
-            $$('.mindate').set('text', current_d.format('MMM D, YYYY'));
+            //$$('.mindate').set('text', current_d.format('MMM D, YYYY'));
             var boxes = $$('div.row_days > div.day_box');
             var today_d = moment().startOf('day');
             for (var i in boxes) {
                 var box = boxes[i];
                 if (typeof box.getChildren === 'function') {
                     //skip history and continue with next day
+		    box.getChildren('.top').set('text', current_d.date());
+                    box.getChildren('.bottom').set('text', current_d.format('MMM YYYY'));
                     if (current_d.isBefore(today_d)) {
                         current_d.add(1, 'd');
                         continue;
@@ -114,10 +125,6 @@ var AppMap = new Class({
                     } else {
                         box.removeClass('type_events');
                     }
-                    if (false) box.addClass('nt_week');
-                    box.getChildren('.top').set('text', current_d.date());
-                    box.getChildren('.bottom').set('text', current_d.format('MMM YYYY'));
-                    $$('.maxdate').set('text', current_d.format('MMM D, YYYY'));
                     current_d.add(1, 'd');
                 }
             }
@@ -335,6 +342,12 @@ var AppMap = new Class({
                                 var icon = this.blue_icon;
                                 var days = [];
                                 for (var i=0; i<p.data.length; i++) {
+                                    var pressrelease = false;
+                                    var info = p.data[i].d;
+                                    
+                                    //pressrelease = 'lorem ipsum<br>lorem ipsum<br>lorem ipsum';
+                                    //info = 'detailed information about the..';
+                                    
                                     // skip if out of calendar 35days
                                     if (!p.data[i].rf.isBetween(start, end)) continue;
                                     
@@ -345,12 +358,32 @@ var AppMap = new Class({
                                     var d_index = p.data[i].rf.format('DD-MM-YYYY');
                                     if (days.indexOf(d_index) < 0) days.push(d_index);
                                     
+                                    if (i>0) {
+                                        text += '<br/><hr/>';
+                                    }
+                                    
                                     // construct text
-                                    text += '<br/><b>' + p.data[i].name;
-                                    text += '</b>'; // + (p.data[i].subheadline ? '<br/>' + p.data[i].subheadline : '');
-                                    text += '<br/>' + p.data[i].rf.format('D MMM') + (p.data[i].rt ? '—' + p.data[i].rt.format('D MMM') : '');
-                                    text += p.data[i].a;
-                                    text += '<div style="padding-top: 3px"><img src="inf-press.png" width="20" title="Press release" /> <img src="inf-info.png" width="20" title="Description" /></div>';
+                                    text += '<b class="cal_headline">' + p.data[i].name + '</b>';
+                                    
+                                    if (p.data[i].name.contains('Indoor radon and health risk assessment for')) {
+                                        pressrelease = '<b>Invitation to European Radon Day in Krakow at IFJ PAN</b><br/>We invite you to attend the session on radon which will take place at the Institute of Nuclear Physics PAN in Krakow on 6th November 2015 (from 10:00 to 12:30). The session is organized by Laboratory of Radiometric Expertise IFJ PAN within the celebration of European Radon Day. During the session we will present the indoor radon measurements in kindergartens in the frame of V4 project.';
+                                    }
+                                    
+                                    text += '<div class="cal_subheadline">' + (p.data[i].subheadline ? p.data[i].subheadline : '') + '</div>';
+                                    text += '<div>' + (p.data[i].a ? p.data[i].a : '') + '</div>';
+                                    text += '<br/><div>' + p.data[i].rf.format('MMMM D, YYYY') + (p.data[i].rt ? '—' + p.data[i].rt.format('MMMM D, YYYY') : '') + '</div>';
+                                    text += '<div class="kotva">' + (p.data[i].url ? '<a href="' + p.data[i].url + '">' + p.data[i].url + '</a>' : '') + '</div>'
+                                    text += '<div style="padding-top: 3px">';
+                                    
+                                    if (pressrelease) {
+                                        text += '<div class="press-release"><div class="sprite-pr-down">&nbsp; &nbsp;</div>&nbsp;Press release<div class="press-release-content">' + pressrelease + '</div></div>';
+                                    }
+                                    
+                                    if (info) {
+                                        text += '<div class="press-release"><div class="sprite-pr-down">&nbsp; &nbsp;</div>&nbsp;Description<div class="press-release-content">' + info + '</div></div>';
+                                    }
+                                    
+                                    text += '</div>';
                                 }
                                 
                                 if (text === '') continue;

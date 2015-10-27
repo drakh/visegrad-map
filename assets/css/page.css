@@ -309,10 +309,6 @@ ul.years li div.year-container div
 {
 	margin-bottom: 1em;
 }
-.gp-labels .pure-menu .pure-menu-list li td
-{
-	vertical-align: top;
-}
 .gp-labels .pure-menu .pure-menu-list li span
 {
 	width: 1em;
@@ -420,22 +416,4 @@ ul.years li div.year-container div
 .ct-chart .ct-label,.ct-chart .ct-label.ct-horizontal
 {
     text-align: center;
-}
-
-.leaflet-popup-scrolled
-{
-    border-bottom: none;
-    border-top: none;
-    height: 180px;
-}
-
-.leaflet-container a.leaflet-popup-close-button
-{
-    top: 4px;
-    right: 18px;
-}
-
-.map-popup-city
-{
-    font-size: 125%;
 }
