@@ -6,13 +6,36 @@
     <link rel="stylesheet" href="dist/app.min.css">
     <script src="nino-data/data.final.js"></script>
     <script src="dist/app.min.js"></script>
+    <style>
+        section.logo .logo{
+	
+        background-image: url('ico-h0.png');
+        background-size: 62px;
+        background-repeat: no-repeat;
+        background-position: center;
+	height:69px;
+	width:69px;
+	display:block;
+	padding-left:10px;
+	padding-right:10px;
+	margin-right:4px;
+	margin-bottom:4px;
+	float:left;
+        cursor: pointer;
+}
+
+        section.logo .logo:hover{
+                background-image: url('ico-l0.png');
+        }
+    </style>
 </head>
 <body>
 <header class="black-bg main-header">
     <section class="logo black-bg">
-        <span class="main-logo"><a href="./"><img
-                src="http://visegradfund.org/wordpress/wp-content/uploads/logo/visegrad_fund_logo_inverse_150.jpg"
-                alt="Visegrad Fund Project Map" title="Visegrad Fund Project Map" width="150" height="62"></a></span>
+        <span class="logo" title="Live Map" onclick="window.location='index.live.html'"></span>
+        <span class="main-logo"><a href="http://visegradfund.org"><img
+                src="http://old.visegradfund.org/wordpress/wp-content/uploads/logo/visegrad_fund_logo_inverse_150.jpg"
+                alt="Visegrad Fund" title="Visegrad Fund" width="150" height="62"></a></span>
         <span id="filter-message"></span>
     </section>
     <dialog class="filters light-bg" id="filter_pane">
@@ -78,7 +101,7 @@
                 <form id="searchform" class="pure-form pure-form-aligned">
                     <div class="white-bg">
                         <label for="s-place"><i class="el el-search"></i></label>
-                        <input id="s-place" name="s-place" type="text" class="pure-input">
+                        <input id="s-place" name="s-place" type="text" class="pure-input" placeholder="Enter city">
                     </div>
                 </form>
             </section>

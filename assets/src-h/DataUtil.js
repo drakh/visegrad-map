@@ -185,7 +185,8 @@ var DataUtil = {
 								city: dx.s,
 								country: dx.c,
 								year: String.from(pt_year),
-								a: fd.a,
+								a: fd.type, //live
+                                                                url: fd.url,
 								c: f_tp,
 								g: String.from(fd.g),
 								amount: fd.amount,
