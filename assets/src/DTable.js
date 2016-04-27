@@ -108,6 +108,9 @@ var DTable = new Class({
 	},
 	set_data: function (data)
 	{
+                // delete data if dtype == 1 (scholarships)
+                if (this.dtype == 1) data = [];
+                
 		this.pagination.page = 0;
 		this.pagination.count = data.length;
 		this.table_data = data;

@@ -195,6 +195,9 @@ var PlaceFilter = new Class({
 		this.filt_arr[i] = d.filter;
 		var prefiltered = this.prefilter();
 		this.p_data = prefiltered;
+                
+                // set_data hides or shows bottom sections
+                this.year_sel.switch_data(get_data_type());
 		this.year_sel.set_data(prefiltered);
 	},
 	switch_data: function (i)

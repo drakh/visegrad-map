@@ -6,11 +6,16 @@
     <link rel="stylesheet" href="dist/app.min.css">
     <script src="nino-data/data.final.js"></script>
     <script src="dist/app.min.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Slab:100normal,300normal,400normal,700normal|Roboto:400normal|Open+Sans:400normal|Lato:400normal|Raleway:400normal|Oswald:400normal|Roboto+Condensed:400normal|Source+Sans+Pro:400normal|Montserrat:400normal|PT+Sans:400normal|Ubuntu:400normal&subset=all" type='text/css'>
     <style>
+	.white-bg{ background-color: transparent; }
+        .pure-button{ vertical-align: initial; }
+        .map-control-search{ left: 7.5em; bottom: 4.4em; }
+
         section.logo .logo{
 	
         background-image: url('ico-h0.png');
-        background-size: 62px;
+        background-size: 50px;
         background-repeat: no-repeat;
         background-position: center;
 	height:69px;
@@ -18,7 +23,7 @@
 	display:block;
 	padding-left:10px;
 	padding-right:10px;
-	margin-right:4px;
+	margin-right:10px;
 	margin-bottom:4px;
 	float:left;
         cursor: pointer;
@@ -27,15 +32,39 @@
         section.logo .logo:hover{
                 background-image: url('ico-l0.png');
         }
+        
+        .wheadline {
+	width:280px;
+	display:block;
+	padding-left:10px;
+	padding-right:10px;
+        padding-top: 10px;
+	float:left;
+        }
+        .wheadline-h {
+            font-size: 24px;
+            font-family: 'Roboto Slab';
+        }
+        #filter-message {
+            align-self: auto;
+            padding-top: 7px;
+        }
+        .marker-circle {
+            fill: #00b7c6;
+            fill-opacity: .2;
+            background-color: #00b7c6;
+            opacity: .2;
+        }
     </style>
 </head>
 <body>
 <header class="black-bg main-header">
     <section class="logo black-bg">
-        <span class="logo" title="Live Map" onclick="window.location='index.live.html'"></span>
-        <span class="main-logo"><a href="http://visegradfund.org"><img
-                src="http://old.visegradfund.org/wordpress/wp-content/uploads/logo/visegrad_fund_logo_inverse_150.jpg"
-                alt="Visegrad Fund" title="Visegrad Fund" width="150" height="62"></a></span>
+        <span class="logo" title="Live Map" onclick="window.location='//live.visegradfund.org'"></span>
+        <span class="wheadline">
+            <div class="wheadline-h" title="Currently running grant projects">Granted Projects</div>
+            2000–2015
+        </span>
         <span id="filter-message"></span>
     </section>
     <dialog class="filters light-bg" id="filter_pane">
@@ -100,7 +129,7 @@
             <section class="map-control-search" id="mapsearch">
                 <form id="searchform" class="pure-form pure-form-aligned">
                     <div class="white-bg">
-                        <label for="s-place"><i class="el el-search"></i></label>
+                        <label for="s-place" class="pure-button dark-bg" style="padding-left:7px; height:27px; width:29px"><i class="el el-search"></i></label>
                         <input id="s-place" name="s-place" type="text" class="pure-input" placeholder="Enter city">
                     </div>
                 </form>

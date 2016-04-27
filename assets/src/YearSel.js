@@ -15,6 +15,7 @@ var YearSel = new Class({
 		this.bounds = bounds;
 		this.build_elements(bounds, el);
 		this.data = [];
+                this.sel_filter = 0;
 		this.drag = new YearDrag(el, this.vals.length, {
 			onChanged: this.change_vals.bind(this)
 		});
@@ -89,6 +90,14 @@ var YearSel = new Class({
 			this.created = true;
 			this.fireEvent('filtercreated');
 		}
+	},
+        switch_data: function (i)
+        {
+                this.sel_filter = i;
+        },
+        get_data_type:function()
+	{
+		return this.sel_filter;
 	},
 	redraw_divs: function ()
 	{
