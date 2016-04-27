@@ -155,6 +155,8 @@ var YearSel = new Class({
 	prepare_data: function (data)
 	{
 		var max = DataUtil.get_max_len(data);
+                
+                // for semesters, we need sum_arr instead of count_arr
 		var count = DataUtil.count_arr(data, 0).total;
 		return {data: data, max: max, count: count};
 	}
