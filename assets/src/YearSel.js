@@ -119,7 +119,7 @@ var YearSel = new Class({
 			var t = '';
 			if (data[y])
 			{
-				v = data[y].length;
+                                v = DataUtil.count_or_sum(data[y], this.get_data_type());
 			}
 			if (v > 0)
 			{
@@ -154,10 +154,9 @@ var YearSel = new Class({
 	},
 	prepare_data: function (data)
 	{
-		var max = DataUtil.get_max_len(data);
-                
-                // for semesters, we need sum_arr instead of count_arr
-		var count = DataUtil.count_arr(data, 0).total;
+		var max = DataUtil.get_max_len(data, this.get_data_type());
+                var w = (this.get_data_type() == 1) ? 1 : 0;
+		var count = DataUtil.count_arr(data, w).total;
 		return {data: data, max: max, count: count};
 	}
 });

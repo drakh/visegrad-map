@@ -141,7 +141,7 @@ var AppMap = new Class({
 
 		var dt = data[w];
 		var pt_d = pts[w];
-		var max = DataUtil.get_max_len(dt);
+		var max = DataUtil.get_max_len(dt, this.dtype);
 		var markers = [];
 		var o = this.options;
 		var pane = this.pane;

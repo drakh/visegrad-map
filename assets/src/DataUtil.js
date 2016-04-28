@@ -52,12 +52,23 @@ var DataUtil = {
 		var ret = {total: total, r: r};
 		return ret;
 	},
-	get_max_len: function (data)
+        count_or_sum: function(year_data, data_type)
+        {
+            if (data_type == 1) {
+                var total = 0;
+                for (var i = 0; i < year_data.length; i++) {
+                    total += year_data[i].amount;
+                }
+                return total;
+            }
+            return year_data.length;
+        },
+	get_max_len: function (data, data_type)
 	{
 		var max = 0;
 		for (var pid in data)
 		{
-			var l = data[pid].length;
+                        var l = this.count_or_sum(data[pid], data_type);
 			if (l > max)
 			{
 				max = l;
