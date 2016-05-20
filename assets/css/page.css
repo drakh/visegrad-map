@@ -204,6 +204,10 @@ main.main-content
 	bottom: 4.5em;
 	width: 16em;
 }
+.map-control-search input
+{
+	width: 13em;
+}
 .map-control span a, .map-control-city span a
 {
 	margin: 0.2em;

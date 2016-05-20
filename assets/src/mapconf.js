@@ -1,5 +1,5 @@
 var mapconf = {
-	url: 'http://wind101.net/{id}/{z}/{x}/{y}.png',
+	url: 'http://map.visegradfund.org/{id}/{z}/{x}/{y}.png',
 	attr: 'one',
 	year_labels: ["Total number of grants:", "Total number of semesters:", "Total number of residencies:"],
 	filter_labels: [
