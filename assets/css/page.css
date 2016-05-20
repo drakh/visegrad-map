@@ -421,3 +421,10 @@ ul.years li div.year-container div
 {
     text-align: center;
 }
+
+/*for live version*/
+.leaflet-popup-scrolled {
+    border-bottom: none;
+    border-top: none;
+    height: 180px;
+}
