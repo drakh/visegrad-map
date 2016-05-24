@@ -571,6 +571,10 @@ main.main-content
 	bottom: 4.5em;
 	width: 16em;
 }
+.map-control-search input
+{
+	width: 13em;
+}
 .map-control span a, .map-control-city span a
 {
 	margin: 0.2em;
@@ -675,10 +679,6 @@ ul.years li div.year-container div
 .gp-labels .pure-menu .pure-menu-list li
 {
 	margin-bottom: 1em;
-}
-.gp-labels .pure-menu .pure-menu-list li td
-{
-	vertical-align: top;
 }
 .gp-labels .pure-menu .pure-menu-list li span
 {
@@ -787,4 +787,11 @@ ul.years li div.year-container div
 .ct-chart .ct-label,.ct-chart .ct-label.ct-horizontal
 {
     text-align: center;
+}
+
+/*for live version*/
+.leaflet-popup-scrolled {
+    border-bottom: none;
+    border-top: none;
+    height: 180px;
 }

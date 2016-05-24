@@ -27872,7 +27872,7 @@ var AppMap = new Class({
 
 		var dt = data[w];
 		var pt_d = pts[w];
-		var max = DataUtil.get_max_len(dt);
+		var max = DataUtil.get_max_len(dt, this.dtype);
 		var markers = [];
 		var o = this.options;
 		var pane = this.pane;
@@ -28060,7 +28060,7 @@ var BarGraph = new Class({
 		var g = new Chartist.Bar(el, {
 			labels: l,
 			series: r
-		}, {stackBars: true});
+		}, {axisY:{}, stackBars: true});
 		g.on('created', this.graph_bind_events.bind(this, el));
 	},
 	graph_bind_events: function (el)
@@ -28117,6 +28117,12 @@ var BarGraph = new Class({
 		{
 			this.tips.attach(lns);
 		}
+                // format numbers in chartist labels
+                var s = el.getElementsByClassName('ct-label ct-vertical');
+                for (var i = 0; i < s.length; i++) {
+                    var n = 1 * s[i].get('text');
+                    if (!isNaN(n)) s[i].set('text', n.format({decimals: 0}));
+                }
 	},
 	destroy: function ()
 	{
@@ -28729,6 +28735,9 @@ var DTable = new Class({
 	},
 	set_data: function (data)
 	{
+                // delete data if dtype == 1 (scholarships)
+                if (this.dtype == 1) data = [];
+                
 		this.pagination.page = 0;
 		this.pagination.count = data.length;
 		this.table_data = data;
@@ -28851,12 +28860,23 @@ var DataUtil = {
 		var ret = {total: total, r: r};
 		return ret;
 	},
-	get_max_len: function (data)
+        count_or_sum: function(year_data, data_type)
+        {
+            if (data_type == 1) {
+                var total = 0;
+                for (var i = 0; i < year_data.length; i++) {
+                    total += year_data[i].amount;
+                }
+                return total;
+            }
+            return year_data.length;
+        },
+	get_max_len: function (data, data_type)
 	{
 		var max = 0;
 		for (var pid in data)
 		{
-			var l = data[pid].length;
+                        var l = this.count_or_sum(data[pid], data_type);
 			if (l > max)
 			{
 				max = l;
@@ -29707,11 +29727,11 @@ var PageScroller = new Class({
 	Implements: [Events, Options],
 	initialize: function (els, options)
 	{
-		var titles = [];
-		for (var i = 0; i < els.length; i++)
-		{
-			titles[i] = els[i].get('title');
-		}
+		var titles = ['Previous section', 'Next section'];
+//		for (var i = 0; i < els.length; i++)
+//		{
+//			titles[i] = els[i].get('title');
+//		}
 		this.titles = titles;
 		this.els = els;
 		this.s = 0;
@@ -29736,7 +29756,7 @@ var PageScroller = new Class({
 		var w = new Element('div', {class: 'page-scroller'}).inject(document.body);
 		for (var i = 0; i < 2; i++)
 		{
-			s[i] = new Element('i', {class: c[i], events: {click: this.sc_clicked.bind(this, i)}}).inject(w);
+			s[i] = new Element('i', {class: c[i], title: this.titles[i], events: {click: this.sc_clicked.bind(this, i)}}).inject(w);
 		}
 		this.c = s;
 	},
@@ -29793,7 +29813,7 @@ var PageScroller = new Class({
 		}
 		else
 		{
-			this.c[0].set('title', this.titles[s - 1]);
+			//this.c[0].set('title', this.titles[s - 1]);
 			this.c[0].removeClass('c-hidden');
 		}
 
@@ -29803,7 +29823,7 @@ var PageScroller = new Class({
 		}
 		else
 		{
-			this.c[1].set('title', this.titles[s + 1]);
+			//this.c[1].set('title', this.titles[s + 1]);
 			this.c[1].removeClass('c-hidden');
 		}
 		this.s = s;
@@ -30028,7 +30048,7 @@ var PlaceFilter = new Class({
 							}
 							else
 							{
-								m_a[2] = 'in the field(s) <i>' + msgs[pid].m1 + '</i>';
+								m_a[2] = 'in the following field(s) <i>' + msgs[pid].m1 + '</i>';
 							}
 							break;
 					}
@@ -30126,6 +30146,9 @@ var PlaceFilter = new Class({
 		this.filt_arr[i] = d.filter;
 		var prefiltered = this.prefilter();
 		this.p_data = prefiltered;
+                
+                // set_data hides or shows bottom sections
+                this.year_sel.switch_data(this.get_data_type());
 		this.year_sel.set_data(prefiltered);
 	},
 	switch_data: function (i)
@@ -30366,6 +30389,7 @@ var SelectFilter = new Class({
 			var e = new Element('li', {
 				class: 'pure-menu-item select-item',
 				html: (data[pid]['n'] ? data[pid]['n'] : data[pid]),
+                                title: (data[pid]['d'] ? data[pid]['d'] : null),
 				events: {
 					click: this.change_filters.bind(this, pid)
 				}
@@ -30648,6 +30672,7 @@ var YearSel = new Class({
 		this.bounds = bounds;
 		this.build_elements(bounds, el);
 		this.data = [];
+                this.sel_filter = 0;
 		this.drag = new YearDrag(el, this.vals.length, {
 			onChanged: this.change_vals.bind(this)
 		});
@@ -30723,6 +30748,14 @@ var YearSel = new Class({
 			this.fireEvent('filtercreated');
 		}
 	},
+        switch_data: function (i)
+        {
+                this.sel_filter = i;
+        },
+        get_data_type:function()
+	{
+		return this.sel_filter;
+	},
 	redraw_divs: function ()
 	{
 		var bars = this.bars;
@@ -30743,7 +30776,7 @@ var YearSel = new Class({
 			var t = '';
 			if (data[y])
 			{
-				v = data[y].length;
+                                v = DataUtil.count_or_sum(data[y], this.get_data_type());
 			}
 			if (v > 0)
 			{
@@ -30778,8 +30811,9 @@ var YearSel = new Class({
 	},
 	prepare_data: function (data)
 	{
-		var max = DataUtil.get_max_len(data);
-		var count = DataUtil.count_arr(data, 0).total;
+		var max = DataUtil.get_max_len(data, this.get_data_type());
+                var w = (this.get_data_type() == 1) ? 1 : 0;
+		var count = DataUtil.count_arr(data, w).total;
 		return {data: data, max: max, count: count};
 	}
 });
@@ -30885,7 +30919,7 @@ var YearSlider = new Class({
 	}
 });
 var mapconf = {
-	url: 'http://wind101.net/{id}/{z}/{x}/{y}.png',
+	url: 'http://map.visegradfund.org/{id}/{z}/{x}/{y}.png',
 	attr: 'one',
 	year_labels: ["Total number of grants:", "Total number of semesters:", "Total number of residencies:"],
 	filter_labels: [
