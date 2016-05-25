@@ -28999,6 +28999,7 @@ var DataUtil = {
 							{
 								u_cities[countries_geo[dx.c].s] = countries_geo[dx.c];
 							}
+
 							var o = {
 								pt_id: pid,
 								city: dx.s,
@@ -30499,44 +30500,45 @@ var VisegradApp = {
 		if (this.initiated == false)
 		{
 
-                    $$('body').addEvent('keydown', function(event){
-                        // the passed event parameter is already an instance of the Event type.
-                        //console.log(event.key);   // returns the lowercase letter pressed.
-                        //alert(event.shift); // returns true if the key pressed is shift.
-                        if (event.key == 'l' && event.control) {
-                            $$('header').hide();   
-                            $$('footer').hide();   
-                            $$('.page-scroller').hide();   
-                            $$('#map-controls').hide();   
-			    $$('#mapsearch').hide();
-                            $$('#city-country').hide();
-                            $$('#e-graphs').hide();
-                            $$('#e-table').hide();
-                            $$('main.main-content').setStyle('top', 0);
-                        }
-                    });
+			$$('body').addEvent('keydown', function (event)
+			{
+				// the passed event parameter is already an instance of the Event type.
+				//console.log(event.key);   // returns the lowercase letter pressed.
+				//alert(event.shift); // returns true if the key pressed is shift.
+				if (event.key == 'l' && event.control)
+				{
+					$$('header').hide();
+					$$('footer').hide();
+					$$('.page-scroller').hide();
+					$$('#map-controls').hide();
+					$$('#mapsearch').hide();
+					$$('#city-country').hide();
+					$$('#e-graphs').hide();
+					$$('#e-table').hide();
+					$$('main.main-content').setStyle('top', 0);
+				}
+			});
 
 			new PageScroller($$('section.page-section'));
 
 			this.initiated = true;
-			var dt = [];
-			var cities = [];
-			var u_cities = [];
+			var dt         = [];
+			var cities     = [];
+			var u_cities   = [];
 			for (var i = 0; i < mapdata.length; i++)
 			{
-				dt[i] = DataUtil.flatten_data(mapdata[i], filters[i], i, u_cities);
-				cities[i] = dt[i].points;
+				dt[i]      = DataUtil.flatten_data(mapdata[i], filters[i], i, u_cities);
+				cities[i]  = dt[i].points;
 				filters[i] = dt[i].filters;
 			}
 
-
 			this.msg_win = new MessageWin($('filter-message'));
-			this.map = new AppMap($(mapid), $('map-controls'), mapconf, {
+			this.map     = new AppMap($(mapid), $('map-controls'), mapconf, {
 				onGraphcreated: this.draw_graph.bind(this),
 				onGraphdestroyed: this.graph_closed.bind(this)
 			});
-			this.graph = new DGraph($('e-graphs'));
-			this.table = new DTable($('e-table'));
+			this.graph   = new DGraph($('e-graphs'));
+			this.table   = new DTable($('e-table'));
 
 			this.filter = new PlaceFilter(dt, filters, {
 				onFilterchanged: this.draw.bind(this),
@@ -30561,10 +30563,10 @@ var VisegradApp = {
 	draw: function (d)
 	{
 		this.all_data = d;
-		var data = d.data;
-		var message = d.message;
-		var pts = d.points;
-		var sel = d.sel;
+		var data      = d.data;
+		var message   = d.message;
+		var pts       = d.points;
+		var sel       = d.sel;
 		this.msg_win.set_message(message);
 		this.map.draw_points(data, pts, filters[sel]);
 		this.refill(d);
@@ -30572,13 +30574,13 @@ var VisegradApp = {
 	refill: function (d)
 	{
 		var data = d.data;
-		var sel = d.sel;
+		var sel  = d.sel;
 		this.graph.set_data(data, filters[sel]);
 		this.table.set_data(data);
 	},
 	draw_graph: function (d_in)
 	{
-		var d = this.all_data;
+		var d  = this.all_data;
 		var di = {data: d_in.data, sel: d.sel};
 		this.refill(di);
 	},
@@ -30590,10 +30592,11 @@ var VisegradApp = {
 
 window.addEvent('domready', VisegradApp.init.bind(VisegradApp));
 
-function color(c) {
-    $$('.marker-circle').setStyle('fill', c);
-    $$('.marker-circle').setStyle('background-color', c);
-    return 'At your service';
+function color(c)
+{
+	$$('.marker-circle').setStyle('fill', c);
+	$$('.marker-circle').setStyle('background-color', c);
+	return 'At your service';
 }
 
 var YearDrag = new Class({
@@ -30826,13 +30829,13 @@ var YearSlider = new Class({
 	initialize: function (wrapper, sliders, divs, options)
 	{
 		this.setOptions(options);
-		this.w = wrapper;
+		this.w       = wrapper;
 		this.sliders = sliders;
 
 		var d = [];
 		var l = sliders.length - 1;
 
-		this.bounds = {};
+		this.bounds         = {};
 		this.bounds['divs'] = divs;
 
 		for (var i = 0; i < l + 1; i++)
@@ -30851,32 +30854,32 @@ var YearSlider = new Class({
 	set_size: function ()
 	{
 		var wrapper = this.w;
-		var w_s = wrapper.getSize();
-		var divs = this.bounds.divs;
+		var w_s     = wrapper.getSize();
+		var divs    = this.bounds.divs;
 
-		var grid = Math.round(w_s.x / divs);
-		var d = this.drags;
-		var sliders = this.sliders;
+		var grid      = Math.ceil(w_s.x / divs);
+		var d         = this.drags;
+		var sliders   = this.sliders;
 		var slidersel = this.slidersel;
-		var l = sliders.length - 1;
+		var l         = sliders.length - 1;
 
 		for (var i = 0; i < d.length; i++)
 		{
 			var s_s = sliders[i].getSize();
-			var x = Math.round(s_s.x / 2);
-			var y = Math.round(s_s.y / 2);
+			var x   = Math.round(s_s.x / 2);
+			var y   = Math.round(s_s.y / 2);
 
 			var s_p = (slidersel[i] * grid - x);
 			sliders[i].setStyles({
-				left: s_p
-			});
+				                     left: s_p
+			                     });
 			var min_x = 0 - x;
 			var max_x = w_s.x - x;
 
 			d[i].options.limit = {
 				x: [
-					min_x + (Math.round(w_s.x / divs) * i),
-					max_x - Math.round(w_s.x / divs) * (l - i)
+					min_x + (Math.floor(w_s.x / divs) * i),
+					max_x - Math.ceil(w_s.x / divs) * (l - i - 1)
 				],
 				y: [
 					0 - y,
@@ -30885,7 +30888,7 @@ var YearSlider = new Class({
 			};
 			d[i].options.grid = grid;
 		}
-		this.bounds['x'] = {
+		this.bounds['x']    = {
 			min: min_x,
 			max: max_x
 		};
@@ -30899,11 +30902,11 @@ var YearSlider = new Class({
 		{
 			case 0:
 				this.drags[1].options.limit.x[0] = p.x + b.grid;
-				this.slidersel[0] = Math.round((p.x - b.x.min) / b.grid);
+				this.slidersel[0]                = Math.ceil((p.x - b.x.min) / b.grid);
 				break;
 			case 1:
 				this.drags[0].options.limit.x[1] = p.x - b.grid;
-				this.slidersel[1] = Math.round((p.x - b.x.min) / b.grid);
+				this.slidersel[1]                = Math.ceil((p.x - b.x.min) / b.grid);
 				break;
 		}
 		this.chng();

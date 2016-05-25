@@ -6,13 +6,13 @@ var YearSlider = new Class({
 	initialize: function (wrapper, sliders, divs, options)
 	{
 		this.setOptions(options);
-		this.w = wrapper;
+		this.w       = wrapper;
 		this.sliders = sliders;
 
 		var d = [];
 		var l = sliders.length - 1;
 
-		this.bounds = {};
+		this.bounds         = {};
 		this.bounds['divs'] = divs;
 
 		for (var i = 0; i < l + 1; i++)
@@ -31,32 +31,32 @@ var YearSlider = new Class({
 	set_size: function ()
 	{
 		var wrapper = this.w;
-		var w_s = wrapper.getSize();
-		var divs = this.bounds.divs;
+		var w_s     = wrapper.getSize();
+		var divs    = this.bounds.divs;
 
-		var grid = Math.round(w_s.x / divs);
-		var d = this.drags;
-		var sliders = this.sliders;
+		var grid      = Math.ceil(w_s.x / divs);
+		var d         = this.drags;
+		var sliders   = this.sliders;
 		var slidersel = this.slidersel;
-		var l = sliders.length - 1;
+		var l         = sliders.length - 1;
 
 		for (var i = 0; i < d.length; i++)
 		{
 			var s_s = sliders[i].getSize();
-			var x = Math.round(s_s.x / 2);
-			var y = Math.round(s_s.y / 2);
+			var x   = Math.round(s_s.x / 2);
+			var y   = Math.round(s_s.y / 2);
 
 			var s_p = (slidersel[i] * grid - x);
 			sliders[i].setStyles({
-				left: s_p
-			});
+				                     left: s_p
+			                     });
 			var min_x = 0 - x;
 			var max_x = w_s.x - x;
 
 			d[i].options.limit = {
 				x: [
-					min_x + (Math.round(w_s.x / divs) * i),
-					max_x - Math.round(w_s.x / divs) * (l - i)
+					min_x + (Math.floor(w_s.x / divs) * i),
+					max_x - Math.ceil(w_s.x / divs) * (l - i - 1)
 				],
 				y: [
 					0 - y,
@@ -65,7 +65,7 @@ var YearSlider = new Class({
 			};
 			d[i].options.grid = grid;
 		}
-		this.bounds['x'] = {
+		this.bounds['x']    = {
 			min: min_x,
 			max: max_x
 		};
@@ -79,11 +79,11 @@ var YearSlider = new Class({
 		{
 			case 0:
 				this.drags[1].options.limit.x[0] = p.x + b.grid;
-				this.slidersel[0] = Math.round((p.x - b.x.min) / b.grid);
+				this.slidersel[0]                = Math.ceil((p.x - b.x.min) / b.grid);
 				break;
 			case 1:
 				this.drags[0].options.limit.x[1] = p.x - b.grid;
-				this.slidersel[1] = Math.round((p.x - b.x.min) / b.grid);
+				this.slidersel[1]                = Math.ceil((p.x - b.x.min) / b.grid);
 				break;
 		}
 		this.chng();

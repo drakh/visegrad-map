@@ -191,6 +191,7 @@ var DataUtil = {
 							{
 								u_cities[countries_geo[dx.c].s] = countries_geo[dx.c];
 							}
+
 							var o = {
 								pt_id: pid,
 								city: dx.s,
