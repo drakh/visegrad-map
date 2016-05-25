@@ -25,7 +25,7 @@ var VisegradApp = {
 				}
 			});
 
-			new PageScroller($$('section.page-section'));
+			this.scroller = new PageScroller($$('section.page-section'));
 
 			this.initiated = true;
 			var dt         = [];
@@ -65,6 +65,15 @@ var VisegradApp = {
 		this.graph.set_dtype(i);
 		this.table.set_dtype(i);
 		this.map.set_dtype(i);
+		if (i == 1)
+		{
+			this.scroller.set_max(2);
+		}
+		else
+		{
+			this.scroller.set_max(3);
+		}
+		this.scroller.recalculate();
 	},
 	draw: function (d)
 	{

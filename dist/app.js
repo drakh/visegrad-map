@@ -28674,8 +28674,8 @@ var DTable = new Class({
 			count: 0
 		};
 
-		this.wp = el;
-		var t = new Element('table', {class: 'pure-table pure-table-bordered pure-table-striped'}).inject(el);
+		this.wp  = el;
+		var t    = new Element('table', {class: 'pure-table pure-table-bordered pure-table-striped'}).inject(el);
 		this.tbl = t;
 		this.bld_t();
 		this.pager = new DPager(el, {onPagechanged: this.change_page.bind(this)});
@@ -28687,26 +28687,34 @@ var DTable = new Class({
 		this.build_head(t);
 		this.el = new Element('tbody').inject(t);
 	},
+	hide: function ()
+	{
+		this.wp.setStyles({display: 'none'});
+	},
+	show: function ()
+	{
+		this.wp.setStyles({display: 'block'});
+	},
 	set_dtype: function (i)
 	{
 		this.dtype = i;
 		if (i == 1)
 		{
-			this.wp.setStyles({display: 'none'});
+			this.hide()
 		}
 		else
 		{
-			this.wp.setStyles({display: 'block'});
+			this.show();
+			this.bld_t();
 		}
-		this.bld_t();
 	},
 	build_head: function (t)
 	{
-		var h = new Element('thead').inject(t);
-		var r = new Element('tr').inject(h);
-		var o = this.options;
-		var ho = o.table_headers;
-		var se = o.sort_els;
+		var h   = new Element('thead').inject(t);
+		var r   = new Element('tr').inject(h);
+		var o   = this.options;
+		var ho  = o.table_headers;
+		var se  = o.sort_els;
 		var hal = 0;
 		if (this.dtype != 0)
 		{
@@ -28715,7 +28723,7 @@ var DTable = new Class({
 		for (var i = 0; i < (ho.length - hal); i++)
 		{
 			var th = new Element('th').inject(r);
-			var e = new Element('div', {
+			var e  = new Element('div', {
 				class: 'pure-menu pure-menu-horizontal'
 			}).inject(th);
 			new Element('span', {class: 'pure-menu-heading', html: ho[i].name}).inject(e);
@@ -28735,12 +28743,15 @@ var DTable = new Class({
 	},
 	set_data: function (data)
 	{
-                // delete data if dtype == 1 (scholarships)
-                if (this.dtype == 1) data = [];
-                
-		this.pagination.page = 0;
+		// delete data if dtype == 1 (scholarships)
+		if (this.dtype == 1)
+		{
+			data = [];
+		}
+
+		this.pagination.page  = 0;
 		this.pagination.count = data.length;
-		this.table_data = data;
+		this.table_data       = data;
 		this.pager.set_data(this.pagination);
 	},
 	change_page: function (p)
@@ -28776,8 +28787,8 @@ var DTable = new Class({
 
 		var w = this.el;
 		w.empty();
-		var pg = this.pagination;
-		var d = this.table_data;
+		var pg  = this.pagination;
+		var d   = this.table_data;
 		var min = pg.page * pg.limit;
 		var max = min + pg.limit;
 		var hal = 0;
@@ -28798,7 +28809,10 @@ var DTable = new Class({
 			{
 				var pid = ho[j].pid;
 				var opt = {text: (pid === 'amount') ? d[i][pid].format() : d[i][pid]};
-				if (ho[j].style) opt.style = ho[j].style;
+				if (ho[j].style)
+				{
+					opt.style = ho[j].style;
+				}
 				new Element('td', opt).inject(r);
 			}
 			r.inject(w);
@@ -29733,14 +29747,15 @@ var PageScroller = new Class({
 //		{
 //			titles[i] = els[i].get('title');
 //		}
-		this.titles = titles;
-		this.els = els;
-		this.s = 0;
+		this.titles  = titles;
+		this.els     = els;
+		this.s       = 0;
 		this.classes = [
 			'el el-arrow-up scroll-btn pure-button light-bg',
 			'el el-arrow-down scroll-btn pure-button light-bg'
 		];
 		this.setOptions(options);
+		this.set_max(this.els.length);
 		this.build_html();
 		this.recalculate();
 		window.addEvents(
@@ -29757,7 +29772,11 @@ var PageScroller = new Class({
 		var w = new Element('div', {class: 'page-scroller'}).inject(document.body);
 		for (var i = 0; i < 2; i++)
 		{
-			s[i] = new Element('i', {class: c[i], title: this.titles[i], events: {click: this.sc_clicked.bind(this, i)}}).inject(w);
+			s[i] = new Element('i', {
+				class: c[i],
+				title: this.titles[i],
+				events: {click: this.sc_clicked.bind(this, i)}
+			}).inject(w);
 		}
 		this.c = s;
 	},
@@ -29789,42 +29808,63 @@ var PageScroller = new Class({
 	},
 	scroll_to: function (i)
 	{
-		if (i != this.s)
+		if (i < this.e_max && i != this.s)
 		{
 			new Fx.Scroll(window).toElement(this.els[i], 'y');
 			this.s = i;
 		}
+		else if (i >= this.e_max && i != this.s)
+		{
+			new Fx.Scroll(window).toElement(this.els[(this.e_max - 1)], 'y');
+			this.s = this.e_max - 1;
+		}
+	},
+	set_max: function (i)
+	{
+		this.e_max = i;
 	},
 	recalculate: function ()
 	{
-		var els = this.els;
-		var ws = window.getScroll();
-		var s = 0;
-		for (var i = 0; i < els.length; i++)
+		var els   = this.els;
+		var ws    = window.getScroll();
+		var win_s = window.getSize();
+		var s     = this.s;
+		var b     = 0;
+		for (var i = 0; i < this.e_max; i++)
 		{
 			var c = els[i].getCoordinates();
 			if (ws.y >= c.top)
 			{
 				s = i;
 			}
+			if (i == 0)
+			{
+				b = c.top;
+			}
+		}
+		if (this.e_max == 2 && ws.y > b)
+		{
+			s = 1;
+		}
+		if (s >= this.e_max)
+		{
+			s = this.e_max - 1;
 		}
 		if (s <= 0)
 		{
 			this.c[0].addClass('c-hidden');
+			s = 0;
 		}
 		else
 		{
-			//this.c[0].set('title', this.titles[s - 1]);
 			this.c[0].removeClass('c-hidden');
 		}
-
-		if (s >= this.els.length - 1)
+		if (s >= this.e_max - 1)
 		{
 			this.c[1].addClass('c-hidden');
 		}
 		else
 		{
-			//this.c[1].set('title', this.titles[s + 1]);
 			this.c[1].removeClass('c-hidden');
 		}
 		this.s = s;
@@ -30519,7 +30559,7 @@ var VisegradApp = {
 				}
 			});
 
-			new PageScroller($$('section.page-section'));
+			this.scroller = new PageScroller($$('section.page-section'));
 
 			this.initiated = true;
 			var dt         = [];
@@ -30559,6 +30599,15 @@ var VisegradApp = {
 		this.graph.set_dtype(i);
 		this.table.set_dtype(i);
 		this.map.set_dtype(i);
+		if (i == 1)
+		{
+			this.scroller.set_max(2);
+		}
+		else
+		{
+			this.scroller.set_max(3);
+		}
+		this.scroller.recalculate();
 	},
 	draw: function (d)
 	{
@@ -30667,16 +30716,16 @@ var YearSel = new Class({
 	{
 		this.created = false;
 		this.setOptions(options);
-		this.p_d = {
+		this.p_d     = {
 			data: {},
 			max: 0
 		};
 		this.head_el = el.getParent().getElement('header');
-		this.bounds = bounds;
+		this.bounds  = bounds;
 		this.build_elements(bounds, el);
-		this.data = [];
-                this.sel_filter = 0;
-		this.drag = new YearDrag(el, this.vals.length, {
+		this.data       = [];
+		this.sel_filter = 0;
+		this.drag       = new YearDrag(el, this.vals.length, {
 			onChanged: this.change_vals.bind(this)
 		});
 	},
@@ -30686,24 +30735,34 @@ var YearSel = new Class({
 	},
 	set_header_count: function (c)
 	{
-                this.head_el.getLast().set('text', c.format());
-                
-                // this hides/shows the below content if 0 items selected and fires scroll (won't help to properly handle scrolling arrows)
-                if (c == 0) {
-                        $('e-table').hide();
-                        $('e-graphs').hide();
-                } else {
-                        $('e-table').show();
-                        $('e-graphs').show();
-                }
-                $$('body').fireEvent('scroll');
+		this.head_el.getLast().set('text', c.format());
+		// this hides/shows the below content if 0 items selected and fires scroll (won't help to properly handle scrolling arrows)
+		if (c == 0)
+		{
+			$('e-table').hide();
+			$('e-graphs').hide();
+		}
+		else
+		{
+			if (this.sel_filter == 1)
+			{
+				$('e-table').hide();
+			}
+			else
+			{
+				$('e-table').show();
+			}
+
+			$('e-graphs').show();
+		}
+		$$('body').fireEvent('scroll');
 	},
 	get_message: function ()
 	{
-		var f = this.range;
+		var f   = this.range;
 		var min = f[0];
 		var max;
-		var m = '';
+		var m   = '';
 		for (var i = 0; i < f.length; i++)
 		{
 			max = Number.from(f[i]);
@@ -30724,7 +30783,7 @@ var YearSel = new Class({
 		var vals = [];
 		for (var i = b.min; i <= b.max; i++)
 		{
-			var li = new Element('li');
+			var li  = new Element('li');
 			var y_c = new Element('div', {
 				class: 'year-container'
 			}).inject(li);
@@ -30751,11 +30810,11 @@ var YearSel = new Class({
 			this.fireEvent('filtercreated');
 		}
 	},
-        switch_data: function (i)
-        {
-                this.sel_filter = i;
-        },
-        get_data_type:function()
+	switch_data: function (i)
+	{
+		this.sel_filter = i;
+	},
+	get_data_type: function ()
 	{
 		return this.sel_filter;
 	},
@@ -30763,32 +30822,32 @@ var YearSel = new Class({
 	{
 		var bars = this.bars;
 		var vals = this.vals;
-		var lim = this.limit;
+		var lim  = this.limit;
 
 		var f = [];
 
-		var dt = this.p_d;
+		var dt   = this.p_d;
 		var data = dt.data;
-		var m = dt.max / 100;
+		var m    = dt.max / 100;
 
 		for (var i = 0; i < vals.length; i++)
 		{
-			var y = vals[i].get('text');
-			var v = 0;
+			var y  = vals[i].get('text');
+			var v  = 0;
 			var hg = 0;
-			var t = '';
+			var t  = '';
 			if (data[y])
 			{
-                                v = DataUtil.count_or_sum(data[y], this.get_data_type());
+				v = DataUtil.count_or_sum(data[y], this.get_data_type());
 			}
 			if (v > 0)
 			{
 				hg = v / m;
-				t = String.from(v);
+				t  = String.from(v);
 			}
 			bars[i].set('text', t).setStyles({
-				height: hg + '%'
-			});
+				                                 height: hg + '%'
+			                                 });
 			if (i >= lim.min && i < lim.max)
 			{
 				bars[i].addClass('sel');
@@ -30800,7 +30859,7 @@ var YearSel = new Class({
 			}
 		}
 		this.range = f;
-		var ret = {
+		var ret    = {
 			years: f,
 			msg: this.get_message()
 		}
@@ -30814,8 +30873,8 @@ var YearSel = new Class({
 	},
 	prepare_data: function (data)
 	{
-		var max = DataUtil.get_max_len(data, this.get_data_type());
-                var w = (this.get_data_type() == 1) ? 1 : 0;
+		var max   = DataUtil.get_max_len(data, this.get_data_type());
+		var w     = (this.get_data_type() == 1) ? 1 : 0;
 		var count = DataUtil.count_arr(data, w).total;
 		return {data: data, max: max, count: count};
 	}

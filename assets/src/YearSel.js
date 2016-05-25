@@ -7,16 +7,16 @@ var YearSel = new Class({
 	{
 		this.created = false;
 		this.setOptions(options);
-		this.p_d = {
+		this.p_d     = {
 			data: {},
 			max: 0
 		};
 		this.head_el = el.getParent().getElement('header');
-		this.bounds = bounds;
+		this.bounds  = bounds;
 		this.build_elements(bounds, el);
-		this.data = [];
-                this.sel_filter = 0;
-		this.drag = new YearDrag(el, this.vals.length, {
+		this.data       = [];
+		this.sel_filter = 0;
+		this.drag       = new YearDrag(el, this.vals.length, {
 			onChanged: this.change_vals.bind(this)
 		});
 	},
@@ -26,24 +26,34 @@ var YearSel = new Class({
 	},
 	set_header_count: function (c)
 	{
-                this.head_el.getLast().set('text', c.format());
-                
-                // this hides/shows the below content if 0 items selected and fires scroll (won't help to properly handle scrolling arrows)
-                if (c == 0) {
-                        $('e-table').hide();
-                        $('e-graphs').hide();
-                } else {
-                        $('e-table').show();
-                        $('e-graphs').show();
-                }
-                $$('body').fireEvent('scroll');
+		this.head_el.getLast().set('text', c.format());
+		// this hides/shows the below content if 0 items selected and fires scroll (won't help to properly handle scrolling arrows)
+		if (c == 0)
+		{
+			$('e-table').hide();
+			$('e-graphs').hide();
+		}
+		else
+		{
+			if (this.sel_filter == 1)
+			{
+				$('e-table').hide();
+			}
+			else
+			{
+				$('e-table').show();
+			}
+
+			$('e-graphs').show();
+		}
+		$$('body').fireEvent('scroll');
 	},
 	get_message: function ()
 	{
-		var f = this.range;
+		var f   = this.range;
 		var min = f[0];
 		var max;
-		var m = '';
+		var m   = '';
 		for (var i = 0; i < f.length; i++)
 		{
 			max = Number.from(f[i]);
@@ -64,7 +74,7 @@ var YearSel = new Class({
 		var vals = [];
 		for (var i = b.min; i <= b.max; i++)
 		{
-			var li = new Element('li');
+			var li  = new Element('li');
 			var y_c = new Element('div', {
 				class: 'year-container'
 			}).inject(li);
@@ -91,11 +101,11 @@ var YearSel = new Class({
 			this.fireEvent('filtercreated');
 		}
 	},
-        switch_data: function (i)
-        {
-                this.sel_filter = i;
-        },
-        get_data_type:function()
+	switch_data: function (i)
+	{
+		this.sel_filter = i;
+	},
+	get_data_type: function ()
 	{
 		return this.sel_filter;
 	},
@@ -103,32 +113,32 @@ var YearSel = new Class({
 	{
 		var bars = this.bars;
 		var vals = this.vals;
-		var lim = this.limit;
+		var lim  = this.limit;
 
 		var f = [];
 
-		var dt = this.p_d;
+		var dt   = this.p_d;
 		var data = dt.data;
-		var m = dt.max / 100;
+		var m    = dt.max / 100;
 
 		for (var i = 0; i < vals.length; i++)
 		{
-			var y = vals[i].get('text');
-			var v = 0;
+			var y  = vals[i].get('text');
+			var v  = 0;
 			var hg = 0;
-			var t = '';
+			var t  = '';
 			if (data[y])
 			{
-                                v = DataUtil.count_or_sum(data[y], this.get_data_type());
+				v = DataUtil.count_or_sum(data[y], this.get_data_type());
 			}
 			if (v > 0)
 			{
 				hg = v / m;
-				t = String.from(v);
+				t  = String.from(v);
 			}
 			bars[i].set('text', t).setStyles({
-				height: hg + '%'
-			});
+				                                 height: hg + '%'
+			                                 });
 			if (i >= lim.min && i < lim.max)
 			{
 				bars[i].addClass('sel');
@@ -140,7 +150,7 @@ var YearSel = new Class({
 			}
 		}
 		this.range = f;
-		var ret = {
+		var ret    = {
 			years: f,
 			msg: this.get_message()
 		}
@@ -154,8 +164,8 @@ var YearSel = new Class({
 	},
 	prepare_data: function (data)
 	{
-		var max = DataUtil.get_max_len(data, this.get_data_type());
-                var w = (this.get_data_type() == 1) ? 1 : 0;
+		var max   = DataUtil.get_max_len(data, this.get_data_type());
+		var w     = (this.get_data_type() == 1) ? 1 : 0;
 		var count = DataUtil.count_arr(data, w).total;
 		return {data: data, max: max, count: count};
 	}

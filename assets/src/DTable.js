@@ -47,8 +47,8 @@ var DTable = new Class({
 			count: 0
 		};
 
-		this.wp = el;
-		var t = new Element('table', {class: 'pure-table pure-table-bordered pure-table-striped'}).inject(el);
+		this.wp  = el;
+		var t    = new Element('table', {class: 'pure-table pure-table-bordered pure-table-striped'}).inject(el);
 		this.tbl = t;
 		this.bld_t();
 		this.pager = new DPager(el, {onPagechanged: this.change_page.bind(this)});
@@ -60,26 +60,34 @@ var DTable = new Class({
 		this.build_head(t);
 		this.el = new Element('tbody').inject(t);
 	},
+	hide: function ()
+	{
+		this.wp.setStyles({display: 'none'});
+	},
+	show: function ()
+	{
+		this.wp.setStyles({display: 'block'});
+	},
 	set_dtype: function (i)
 	{
 		this.dtype = i;
 		if (i == 1)
 		{
-			this.wp.setStyles({display: 'none'});
+			this.hide()
 		}
 		else
 		{
-			this.wp.setStyles({display: 'block'});
+			this.show();
+			this.bld_t();
 		}
-		this.bld_t();
 	},
 	build_head: function (t)
 	{
-		var h = new Element('thead').inject(t);
-		var r = new Element('tr').inject(h);
-		var o = this.options;
-		var ho = o.table_headers;
-		var se = o.sort_els;
+		var h   = new Element('thead').inject(t);
+		var r   = new Element('tr').inject(h);
+		var o   = this.options;
+		var ho  = o.table_headers;
+		var se  = o.sort_els;
 		var hal = 0;
 		if (this.dtype != 0)
 		{
@@ -88,7 +96,7 @@ var DTable = new Class({
 		for (var i = 0; i < (ho.length - hal); i++)
 		{
 			var th = new Element('th').inject(r);
-			var e = new Element('div', {
+			var e  = new Element('div', {
 				class: 'pure-menu pure-menu-horizontal'
 			}).inject(th);
 			new Element('span', {class: 'pure-menu-heading', html: ho[i].name}).inject(e);
@@ -108,12 +116,15 @@ var DTable = new Class({
 	},
 	set_data: function (data)
 	{
-                // delete data if dtype == 1 (scholarships)
-                if (this.dtype == 1) data = [];
-                
-		this.pagination.page = 0;
+		// delete data if dtype == 1 (scholarships)
+		if (this.dtype == 1)
+		{
+			data = [];
+		}
+
+		this.pagination.page  = 0;
 		this.pagination.count = data.length;
-		this.table_data = data;
+		this.table_data       = data;
 		this.pager.set_data(this.pagination);
 	},
 	change_page: function (p)
@@ -149,8 +160,8 @@ var DTable = new Class({
 
 		var w = this.el;
 		w.empty();
-		var pg = this.pagination;
-		var d = this.table_data;
+		var pg  = this.pagination;
+		var d   = this.table_data;
 		var min = pg.page * pg.limit;
 		var max = min + pg.limit;
 		var hal = 0;
@@ -171,7 +182,10 @@ var DTable = new Class({
 			{
 				var pid = ho[j].pid;
 				var opt = {text: (pid === 'amount') ? d[i][pid].format() : d[i][pid]};
-				if (ho[j].style) opt.style = ho[j].style;
+				if (ho[j].style)
+				{
+					opt.style = ho[j].style;
+				}
 				new Element('td', opt).inject(r);
 			}
 			r.inject(w);
