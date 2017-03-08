@@ -245,7 +245,7 @@ ul.years li
 	margin: 0px;
 	padding-left: 2px;
 	padding-right: 2px;
-	width: 6.25%;
+	width: 5.84%;
 }
 
 ul.years li div.year-val
@@ -258,7 +258,7 @@ ul.years li div.year-val
 
 ul.years li div.year-container div
 {
-	font-size: 0.7em;
+	/*font-size: 0.7em; bigger numbers in yearSelector*/
 }
 
 .marker-circle

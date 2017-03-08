@@ -31,7 +31,7 @@ var mapconf = {
 	],
 	year_bounds: {
 		min: 2000,
-		max: 2015
+		max: 2016
 	}
 };
 var mapid = 'map-main';

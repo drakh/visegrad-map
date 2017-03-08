@@ -115,7 +115,7 @@ var DGraph = new Class({
 		switch (dt)
 		{
 			case 0:
-				this.build_topic_graph();
+				//this.build_topic_graph();
 				this.build_tag_graph();
 				this.build_country_graph();
 				break;
