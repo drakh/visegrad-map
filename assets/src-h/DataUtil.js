@@ -191,6 +191,7 @@ var DataUtil = {
 								g: String.from(fd.g),
 								amount: fd.amount,
 								name: fd.name,
+								d: fd.d,
                                                                 subheadline: fd.subheadline,
                                                                 rf: moment(fd.rf, 'DD/MM/YYYY'), //nino
                                                                 rt: fd.rt ? moment(fd.rt, 'DD/MM/YYYY') : null
