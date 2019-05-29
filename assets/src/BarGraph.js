@@ -50,7 +50,12 @@ var BarGraph = new Class({
 
 					var al = c_y_d[l[i]].length;
 					var am = 0;
-					switch (unit)
+
+
+					// unit 0 = count
+					// unit 1 = euro, but we also have semesters
+					var tmp_unit = (in_d.dtype == 1) ? 2 : unit;
+					switch (tmp_unit)
 					{
 						case 0:
 							am = al;
@@ -64,6 +69,14 @@ var BarGraph = new Class({
 							}
 							p_grd[i] = am / (t.count / 100);
 							am = Math.round(am / 1000);
+							break;
+						case 2:
+							am = 0;
+							for (var ai = 0; ai < al; ai++)
+							{
+								am += c_y_d[l[i]][ai].amount;
+							}
+							p_grd[i] = am / (t.count / 100);
 							break;
 					}
 

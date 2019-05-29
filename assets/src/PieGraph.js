@@ -41,7 +41,9 @@ var PieGraph = new Class({
 				c_d = DataUtil.group_by_country(data.graph_data);
 				break;
 		}
-		var gga = DataUtil.count_arr(c_d, unit);
+		// unit 0 = count
+		// unit 1 = euro, but we also have semesters
+		var gga = DataUtil.count_arr(c_d, (this.options.dtype == 1) ? 1 : unit);
 		var s = gga.r;
 		this.total = gga.total;
 

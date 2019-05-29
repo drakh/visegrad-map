@@ -1,5 +1,5 @@
 var mapconf = {
-	url: 'http://map.visegradfund.org/{id}/{z}/{x}/{y}.png',
+	url: '//map.visegradfund.org/{id}/{z}/{x}/{y}.png',
 	attr: 'one',
 	year_labels: ["Total number of grants:", "Total number of semesters:", "Total number of residencies:"],
 	filter_labels: [
@@ -9,7 +9,7 @@ var mapconf = {
 	],
 	graph_names: [
 		["Grant programs:", "Activity fields:", "Countries:"],
-		["Participant countries:", "", ""],
+		["Participant countries (by number of semesters):", "", ""],
 		["Host countries:", "Disciplines:", "Artist from:"]
 	],
 	visegrad: ["CZ", "HU", "PL", "SK"],
@@ -31,7 +31,7 @@ var mapconf = {
 	],
 	year_bounds: {
 		min: 2000,
-		max: 2016
+		max: 2018
 	}
 };
 var mapid = 'map-main';
