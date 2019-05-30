@@ -21,7 +21,9 @@ var BarGraph = new Class({
 		}
 		l.sort();
 
-		var y_d_c = DataUtil.count_arr_o(y_d, unit);
+		// unit 0 = count
+		// unit 1 = euro, but we also have semesters
+		var y_d_c = DataUtil.count_arr_o(y_d, (in_d.dtype == 1) ? 1 : unit);
 
 		for (var c = 0; c < ord.length; c++)
 		{
